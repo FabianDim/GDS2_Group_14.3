@@ -30,7 +30,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
 
         private void Awake()
         {
-            _player = GameObject.FindGameObjectWithTag("Runner").transform;
+            _player = GameObject.FindGameObjectWithTag("Chaser").transform;
             _spawnInterval = new WaitForSeconds(spawnInterval);
 
             _tokenPool = new ObjectPool<Token>(
@@ -63,10 +63,13 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
 
         private IEnumerator Start()
         {
-            yield return _spawnInterval;
-            for (var i = 0; i < tokensPerSpawn; i++)
-                if (TryGetSpawnPoint(out var spawnPosition, out var spawnRotation))
-                    _tokenPool.Get().Spawn(spawnPosition, spawnRotation);
+            while (true)
+            {
+                yield return _spawnInterval;
+                for (var i = 0; i < tokensPerSpawn; i++)
+                    if (TryGetSpawnPoint(out var spawnPosition, out var spawnRotation))
+                        _tokenPool.Get().Spawn(spawnPosition, spawnRotation);
+            }
         }
 
         private bool TryGetSpawnPoint(out Vector3 position, out Quaternion rotation)

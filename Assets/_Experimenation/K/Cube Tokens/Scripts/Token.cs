@@ -36,7 +36,9 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
             if (_collected) return;
             _collected = true;
 
-            EventBus.Raise(new PointChangeEvent(tokenValue));
+            EventBus.Raise(new TokenCollectedEvent(
+                tokenValue, other.CompareTag("Chaser")
+            ));
 
             if (_pool != null) _pool.Release(this);
             else Destroy(gameObject);

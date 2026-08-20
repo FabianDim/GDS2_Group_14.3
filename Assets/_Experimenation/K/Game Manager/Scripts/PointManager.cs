@@ -15,15 +15,15 @@ namespace _Experimenation.K.Game_Manager.Scripts
             _pointText = 
                 GameObject.FindGameObjectWithTag("Points").GetComponent<TextMeshProUGUI>();
             
-            EventBus.Subscribe<PointChangeEvent>(OnPointsChanged);
+            EventBus.Subscribe<TokenCollectedEvent>(OnPointsChanged);
         }
 
         private void OnDestroy()
         {
-            EventBus.Unsubscribe<PointChangeEvent>(OnPointsChanged);
+            EventBus.Unsubscribe<TokenCollectedEvent>(OnPointsChanged);
         }
         
-        private void OnPointsChanged(PointChangeEvent ev)
+        private void OnPointsChanged(TokenCollectedEvent ev)
         {
             _points += ev.points;
             _pointText.SetText("Points: " + _points);

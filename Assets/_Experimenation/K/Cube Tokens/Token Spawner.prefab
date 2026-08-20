@@ -29,7 +29,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2588287764820915691}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3579785908903549545
@@ -45,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Cube_Tokens.Scripts.TokenSpawner
   spawnInterval: 5
-  tokenPrefab: {fileID: 0}
+  tokenPrefab: {fileID: 2267741386133362133}
   tokensPerSpawn: 5
   poolPrewarmCount: 20
   poolMaxSize: 200
@@ -56,3 +57,80 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   maxSpawnAttempts: 10
+--- !u!1001 &2487782066983863270
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 4750389515423929476}
+    m_Modifications:
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8714437318731189684, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_Name
+      value: Token
+      objectReference: {fileID: 0}
+    - target: {fileID: 8714437318731189684, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+--- !u!114 &2267741386133362133 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4467221587229627955, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+  m_PrefabInstance: {fileID: 2487782066983863270}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3871e991777c44459389d239148f2b12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Cube_Tokens.Scripts.Token
+--- !u!4 &2588287764820915691 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+  m_PrefabInstance: {fileID: 2487782066983863270}
+  m_PrefabAsset: {fileID: 0}
