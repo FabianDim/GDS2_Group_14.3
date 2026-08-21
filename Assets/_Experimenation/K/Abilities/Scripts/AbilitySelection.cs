@@ -15,7 +15,7 @@ namespace _Experimenation.K.Abilities.Scripts
         public TextMeshProUGUI AbilityName;
         public TextMeshProUGUI Description;
     }
-    
+
     public class AbilitySelection : MonoBehaviour
     {
         private bool _newAbilitySet = true;
@@ -33,17 +33,17 @@ namespace _Experimenation.K.Abilities.Scripts
             SetupUI();
             SetupAbilities();
             gameObject.SetActive(false);
-            
+
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
             EventBus.Subscribe<LegEndedEvent>(OnLegEnds);
         }
-        
+
         private void OnDestroy()
         {
             EventBus.Unsubscribe<TokenCollectedEvent>(OnTokenCollected);
             EventBus.Unsubscribe<LegEndedEvent>(OnLegEnds);
         }
-        
+
         private void SetupUI()
         {
             for (var i = 0; i < abilitiesUI.childCount; i++)
@@ -58,11 +58,11 @@ namespace _Experimenation.K.Abilities.Scripts
                     });
             }
         }
-        
-        private void SetupAbilities() => 
+
+        private void SetupAbilities() =>
             _allAbilities = database.allAbilities.Where(a => a.abilityScope != AbilityScope.Runner).ToList();
         #endregion
-        
+
         #region Event Handlers
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
@@ -87,21 +87,21 @@ namespace _Experimenation.K.Abilities.Scripts
                 abilityUI.AbilityName.SetText(ability.abilityName);
                 abilityUI.Description.SetText(ability.abilityDescription);
             }
-            
+
             gameObject.SetActive(true);
         }
 
         private void OnLegEnds(LegEndedEvent ev)
         {
             _newAbilitySet = !_newAbilitySet;
-            if(_newAbilitySet)
+            if (_newAbilitySet)
                 _abilitySet.Clear();
             else
                 SetupAbilities();
             _abilitySetIndex = 0;
         }
         #endregion
-        
+
         #region Input Handlings
         private void SelectAbility(InputAction.CallbackContext ctx, int index)
         {
@@ -109,16 +109,16 @@ namespace _Experimenation.K.Abilities.Scripts
             Debug.Log($"Ability {_abilitySet[_abilitySetIndex - (3 - index) - 1].abilityName} selected");
             foreach (var ability in _abilitySet[_abilitySetIndex - (3 - index) - 1].effects)
             {
-                ability.ApplyEffect();
+                ability.ApplyEffect(this);
             }
             gameObject.SetActive(false);
         }
-        
-        public void SelectAbility1(InputAction.CallbackContext ctx) => 
+
+        public void SelectAbility1(InputAction.CallbackContext ctx) =>
             SelectAbility(ctx, 1);
-        public void SelectAbility2(InputAction.CallbackContext ctx) => 
+        public void SelectAbility2(InputAction.CallbackContext ctx) =>
             SelectAbility(ctx, 2);
-        public void SelectAbility3(InputAction.CallbackContext ctx) => 
+        public void SelectAbility3(InputAction.CallbackContext ctx) =>
             SelectAbility(ctx, 3);
         #endregion
     }

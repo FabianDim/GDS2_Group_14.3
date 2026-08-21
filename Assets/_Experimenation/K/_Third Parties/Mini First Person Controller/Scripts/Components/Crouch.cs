@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Crouch : MonoBehaviour
@@ -16,7 +17,7 @@ public class Crouch : MonoBehaviour
     [HideInInspector]
     public float? defaultHeadYLocalPosition;
     public float crouchYHeadPosition = 1;
-    
+
     [Tooltip("Collider to lower when crouched.")]
     public CapsuleCollider colliderToLower;
     [HideInInspector]
@@ -25,14 +26,17 @@ public class Crouch : MonoBehaviour
     public bool IsCrouched { get; private set; }
     public event System.Action CrouchStart, CrouchEnd;
 
-
+    private List<System.Func<float>> speedOverrides;
     void Reset()
     {
         // Try to get components.
         movement = GetComponentInParent<FirstPersonMovement>();
+        speedOverrides = movement.GetSpeedOverrideList();
         headToLower = movement.GetComponentInChildren<Camera>().transform;
         colliderToLower = movement.GetComponentInChildren<CapsuleCollider>();
     }
+
+
 
     void LateUpdate()
     {
@@ -62,7 +66,7 @@ public class Crouch : MonoBehaviour
 
                 // Get lowering amount.
                 float loweringAmount;
-                if(defaultHeadYLocalPosition.HasValue)
+                if (defaultHeadYLocalPosition.HasValue)
                 {
                     loweringAmount = defaultHeadYLocalPosition.Value - crouchYHeadPosition;
                 }
@@ -114,7 +118,7 @@ public class Crouch : MonoBehaviour
     void SetSpeedOverrideActive(bool state)
     {
         // Stop if there is no movement component.
-        if(!movement)
+        if (!movement)
         {
             return;
         }
@@ -123,17 +127,17 @@ public class Crouch : MonoBehaviour
         if (state)
         {
             // Try to add the SpeedOverride to the movement component.
-            if (!movement.speedOverrides.Contains(SpeedOverride))
+            if (!speedOverrides.Contains(SpeedOverride))
             {
-                movement.speedOverrides.Add(SpeedOverride);
+                speedOverrides.Add(SpeedOverride);
             }
         }
         else
         {
             // Try to remove the SpeedOverride from the movement component.
-            if (movement.speedOverrides.Contains(SpeedOverride))
+            if (speedOverrides.Contains(SpeedOverride))
             {
-                movement.speedOverrides.Remove(SpeedOverride);
+                speedOverrides.Remove(SpeedOverride);
             }
         }
     }

@@ -13,12 +13,4 @@ MonoBehaviour:
   m_Name: AbilityDatabase
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Abilities.Scripts.AbilityDatabase
   allAbilities:
-  - {fileID: 11400000, guid: 5a19dcbe1361d4547906257dd0e015ed, type: 2}
-  - {fileID: 11400000, guid: fed9f78198141b74ab154f2d37b09036, type: 2}
-  - {fileID: 11400000, guid: 86bdf86077722ab488957dcf8d6e99b5, type: 2}
-  - {fileID: 11400000, guid: a0d5291f8ecdacb4284dd4463fb7ae4d, type: 2}
-  - {fileID: 11400000, guid: cb4449550c40b7949802a8ba18251363, type: 2}
-  - {fileID: 11400000, guid: 820f85bf68208fa478c1acfbae0aab0f, type: 2}
-  - {fileID: 11400000, guid: f2cf93d062e638540b8a2a5594631999, type: 2}
-  - {fileID: 11400000, guid: 7a48838513e87f94cbf07241a533c9ec, type: 2}
-  - {fileID: 11400000, guid: cbf1703507ca24e4d95191d8b63c4fc1, type: 2}
+  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
