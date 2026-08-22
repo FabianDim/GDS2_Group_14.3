@@ -238,7 +238,7 @@ Transform:
   m_GameObject: {fileID: 534804765}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19.12492, y: 0.58189, z: 11.58574}
+  m_LocalPosition: {x: -8.92, y: 0.58189, z: 11.58574}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 674343804}
   - component: {fileID: 674343803}
   - component: {fileID: 674343802}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -416,6 +416,7 @@ GameObject:
   - component: {fileID: 1018126635}
   - component: {fileID: 1018126634}
   - component: {fileID: 1018126636}
+  - component: {fileID: 1018126637}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -536,8 +537,10 @@ MonoBehaviour:
   wallRun: {fileID: 1018126636}
   cam: {fileID: 534804766}
   orientation: {fileID: 364266886}
-  sensX: 100
-  sensY: 100
+  mouseSensitivityX: 0.1
+  mouseSensitivityY: 0.1
+  controllerSensitivityX: 180
+  controllerSensitivityY: 180
 --- !u!114 &1018126635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -558,11 +561,9 @@ MonoBehaviour:
   sprintSpeed: 10
   acceleration: 12
   jumpForce: 7
-  jumpKey: 32
   gravityMultiplier: 1.8
-  sprintKey: 304
   groundDrag: 6
-  airDrag: 0
+  airDrag: 0.1
   groundCheck: {fileID: 159579450}
   groundMask:
     serializedVersion: 2
@@ -581,7 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b079e3b7e3d90cd44bcbe143f906e3e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WallRun
-  orientation: {fileID: 0}
+  orientation: {fileID: 364266886}
   wallDistance: 0.5
   minimumJumpHeight: 1.5
   wallRunGravity: 0
@@ -592,6 +593,33 @@ MonoBehaviour:
   wallRunfovTime: 8
   camTilt: 10
   camTiltTime: 8
+--- !u!54 &1018126637
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018126629}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 1
 --- !u!1 &1230641705
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,7 +769,7 @@ GameObject:
   - component: {fileID: 1261509074}
   - component: {fileID: 1261509073}
   - component: {fileID: 1261509072}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -965,7 +993,7 @@ GameObject:
   - component: {fileID: 1272963227}
   - component: {fileID: 1272963226}
   - component: {fileID: 1272963225}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1204,7 +1232,7 @@ GameObject:
   - component: {fileID: 1854989395}
   - component: {fileID: 1854989394}
   - component: {fileID: 1854989393}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1316,7 +1344,7 @@ GameObject:
   - component: {fileID: 2034435088}
   - component: {fileID: 2034435087}
   - component: {fileID: 2034435086}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
