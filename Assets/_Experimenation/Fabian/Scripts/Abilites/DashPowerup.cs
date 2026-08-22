@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using _Experimenation.K.Abilities.Scripts;
 using UnityEngine;
 
@@ -9,10 +10,10 @@ namespace _Experimenation.K.Abilities.Scripts
     public class DashPowerup : AbilityEffect
     {
         [Header("Settings")]
-        public float boostSpeed = 1999999f;
+        public float boostSpeed = 100f;
         public float boostDuration = 3f;
 
-        float SpeedOverride() => boostSpeed;
+        private Func<float> SpeedOverride;
         public override void ApplyEffect(MonoBehaviour runner)
         {
 
@@ -25,9 +26,10 @@ namespace _Experimenation.K.Abilities.Scripts
             if (movement != null)
             {
                 Debug.Log($"DashPowerup: Adding the boost of {{ {boostSpeed} }}");
+                SpeedOverride = () => boostSpeed;
                 movement.GetSpeedOverrideList().Add(SpeedOverride);
                 Debug.Log("DashPowerup: First person movement object found in the scene. Starting coroutine.");
-                runner.StartCoroutine(RemoveEffectAfterTime(movement));
+                movement.StartCoroutine(RemoveEffectAfterTime(movement));
             }
             else
             {
@@ -37,8 +39,11 @@ namespace _Experimenation.K.Abilities.Scripts
 
         private IEnumerator RemoveEffectAfterTime(FirstPersonMovement movement)
         {
+            Debug.Log("DashPowerup: Coroutine running.");
             yield return new WaitForSeconds(boostDuration);
+            Debug.Log("DashPowerup: Coroutine wait for seconds ran.");
             movement.GetSpeedOverrideList().Remove(SpeedOverride);
+
         }
 
 
