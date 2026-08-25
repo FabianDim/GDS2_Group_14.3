@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using SerializeReferenceEditor;
 using UnityEngine;
@@ -33,6 +34,12 @@ namespace _Experimenation.K.Abilities.Scripts
     public abstract class AbilityEffect
     {
         public abstract void ApplyEffect(MonoBehaviour runner);
+
+        protected IEnumerator ExecuteAfterDelay(Action callback, float delay = 3f)
+        {
+            yield return new WaitForSeconds(delay);
+            callback?.Invoke();
+        }
     }
 
     #region Ability Effects

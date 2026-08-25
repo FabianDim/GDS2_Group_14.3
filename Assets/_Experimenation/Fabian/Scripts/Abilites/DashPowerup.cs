@@ -29,23 +29,12 @@ namespace _Experimenation.K.Abilities.Scripts
                 SpeedOverride = () => boostSpeed;
                 movement.GetSpeedOverrideList().Add(SpeedOverride);
                 Debug.Log("DashPowerup: First person movement object found in the scene. Starting coroutine.");
-                movement.StartCoroutine(RemoveEffectAfterTime(movement));
+                movement.StartCoroutine(ExecuteAfterDelay(() => { movement.GetSpeedOverrideList().Remove(SpeedOverride); }, boostDuration));
             }
             else
             {
                 Debug.LogError("DashPowerup: No FirstPersonMovement found in scene.");
             }
         }
-
-        private IEnumerator RemoveEffectAfterTime(FirstPersonMovement movement)
-        {
-            Debug.Log("DashPowerup: Coroutine running.");
-            yield return new WaitForSeconds(boostDuration);
-            Debug.Log("DashPowerup: Coroutine wait for seconds ran.");
-            movement.GetSpeedOverrideList().Remove(SpeedOverride);
-
-        }
-
-
     }
 }

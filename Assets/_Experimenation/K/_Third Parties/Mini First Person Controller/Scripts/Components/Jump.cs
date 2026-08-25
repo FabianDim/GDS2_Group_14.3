@@ -31,4 +31,13 @@ public class Jump : MonoBehaviour
             Jumped?.Invoke();
         }
     }
+    public float GetJumpStrength()
+    {
+        return jumpStrength;
+    }
+
+    public void SetJumpStrength(float newStrength)
+    {
+        jumpStrength = newStrength;
+    }
 }
