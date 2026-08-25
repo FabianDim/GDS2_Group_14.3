@@ -30,7 +30,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
 
         private void Awake()
         {
-            _player = GameObject.FindGameObjectWithTag("Chaser").transform;
+            _player = GameObject.FindGameObjectWithTag("Runner").transform;
             _spawnInterval = new WaitForSeconds(spawnInterval);
 
             _tokenPool = new ObjectPool<Token>(

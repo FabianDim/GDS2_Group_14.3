@@ -1,0 +1,11 @@
+Model Information:
+* title:	Teleporting Pod
+* source:	https://sketchfab.com/3d-models/teleporting-pod-8cef10e899d94a79b175f12c9eaa2a6c
+* author:	P3TroV (https://sketchfab.com/P3TroV)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Teleporting Pod" (https://sketchfab.com/3d-models/teleporting-pod-8cef10e899d94a79b175f12c9eaa2a6c) by P3TroV (https://sketchfab.com/P3TroV) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

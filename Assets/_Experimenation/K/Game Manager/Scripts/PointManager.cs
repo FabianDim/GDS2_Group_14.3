@@ -12,9 +12,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         private void Awake()
         {
-            _pointText = 
-                GameObject.FindGameObjectWithTag("Points").GetComponent<TextMeshProUGUI>();
-            
+            _pointText = GetComponentInChildren<TextMeshProUGUI>();
+            _pointText.SetText("Points: " + _points);
             EventBus.Subscribe<TokenCollectedEvent>(OnPointsChanged);
         }
 
