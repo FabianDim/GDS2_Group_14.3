@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 namespace _Experimenation.K.Abilities.Scripts
 {
     [System.Serializable]
@@ -6,6 +7,7 @@ namespace _Experimenation.K.Abilities.Scripts
     public class JumpBoostAbility : AbilityEffect
     {
         public float abilityDuration = 20f;
+
         public override void ApplyEffect(MonoBehaviour runner)
         {
             if (!runner.TryGetComponent<Jump>(out var jumper))
@@ -16,9 +18,9 @@ namespace _Experimenation.K.Abilities.Scripts
             if (jumper)
             {
                 Debug.Log("JumpBoost: found the jump class. Running the ability logic.");
-                float previousStrength = jumper.GetJumpStrength();
-                jumper.SetJumpStrength(previousStrength * 2f);
-                jumper.StartCoroutine(ExecuteAfterDelay(() => { jumper.SetJumpStrength(previousStrength); }, abilityDuration));
+                float baseStrength = jumper.GetJumpStrength();
+                jumper.SetJumpStrength(baseStrength * 2f);
+                jumper.StartCoroutine(ExecuteAfterDelay(() => { jumper.ResetJumpStrength(); }, abilityDuration));
             }
         }
     }
