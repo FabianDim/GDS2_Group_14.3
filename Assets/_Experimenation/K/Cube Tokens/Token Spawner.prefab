@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4750389515423929476}
   - component: {fileID: 3579785908903549545}
+  - component: {fileID: 8525490924620471011}
   m_Layer: 0
   m_Name: Token Spawner
   m_TagString: Untagged
@@ -48,8 +49,6 @@ MonoBehaviour:
   spawnInterval: 5
   tokenPrefab: {fileID: 2267741386133362133}
   tokensPerSpawn: 5
-  poolPrewarmCount: 20
-  poolMaxSize: 200
   spawnDistance: 10
   surfaceSearchRadius: 4
   surfaceOffset: 0.5
@@ -57,6 +56,27 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   maxSpawnAttempts: 10
+--- !u!114 &8525490924620471011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151166881923948812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 1077300829
+  SendPriority: 1
+  EnableInterpolation: 1
+  Flags: 262146
+  NestedObjects:
+  - {fileID: 6798849754191473172}
+  NetworkedBehaviours:
+  - {fileID: 3579785908903549545}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1001 &2487782066983863270
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -65,6 +85,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4750389515423929476}
     m_Modifications:
+    - target: {fileID: -226238468760753678, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: SortKey
+      value: 2995090064
+      objectReference: {fileID: 0}
     - target: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -134,3 +158,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
   m_PrefabInstance: {fileID: 2487782066983863270}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6798849754191473172 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -226238468760753678, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+  m_PrefabInstance: {fileID: 2487782066983863270}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject

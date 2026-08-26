@@ -1,47 +1,48 @@
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
+using Fusion;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace _Experimenation.K.Cube_Tokens.Scripts
 {
-    public class Token : MonoBehaviour
+    public class Token : NetworkBehaviour
     {
-        [SerializeField] private float rotationSpeed = 0.0001f;
+        [SerializeField] private float rotationSpeed = 90f;
         [SerializeField] private int tokenValue = 10;
 
-        private IObjectPool<Token> _pool;
         private bool _collected;
-
-        public void SetPool(IObjectPool<Token> pool) => _pool = pool;
-
-        public void Spawn(Vector3 position, Quaternion rotation)
-        {
-            transform.SetPositionAndRotation(position, rotation);
-            _collected = false;
-            gameObject.SetActive(true);
-        }
 
         private void Update()
         {
-            transform.Rotate(Vector3.up * rotationSpeed);
+            transform.Rotate(
+                Vector3.up * (rotationSpeed * Time.deltaTime)
+            );
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag("Runner") && !other.CompareTag("Chaser")) return;
+            if (!HasStateAuthority)
+                return;
 
-            // A trigger can fire again before the object deactivates. Releasing the same instance
-            // twice would leave it in the pool twice, so two Gets would hand out the same token.
-            if (_collected) return;
+            if (!other.CompareTag("Runner") &&
+                !other.CompareTag("Chaser"))
+            {
+                return;
+            }
+
+            if (_collected)
+                return;
+
             _collected = true;
 
-            EventBus.Raise(new TokenCollectedEvent(
-                tokenValue, other.CompareTag("Chaser")
-            ));
+            EventBus.Raise(
+                new TokenCollectedEvent(
+                    tokenValue,
+                    other.tag
+                )
+            );
 
-            if (_pool != null) _pool.Release(this);
-            else Destroy(gameObject);
+            Runner.Despawn(Object);
         }
     }
 }

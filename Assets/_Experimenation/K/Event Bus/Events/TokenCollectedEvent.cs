@@ -2,12 +2,12 @@
 {
     public class TokenCollectedEvent
     {
-        public readonly int points;
-        public readonly bool collectedByChaser;
-        public TokenCollectedEvent(int points, bool collectedByChaser)
+        public readonly int Points;
+        public readonly string CollectedBy;
+        public TokenCollectedEvent(int points, string collectedBy)
         {
-            this.points = points;
-            this.collectedByChaser = collectedByChaser;
+            Points = points;
+            CollectedBy = collectedBy;
         }
     }
 }

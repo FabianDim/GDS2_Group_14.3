@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.photonengine.fusion-simple-kcc": {
+      "version": "https://github.com/Photon-Server/Photon-UPM.git#fusion/v2/fusion-simple-kcc",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "d90dc4eed907a467abf0597c90210aed57fcccff"
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.14",
       "depth": 0,
@@ -89,6 +96,16 @@
       "depth": 3,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.postprocessing": {
+      "version": "3.5.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.physics": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {

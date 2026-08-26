@@ -54,7 +54,7 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
             if(_conditionCleared) return;
-            pointTarget -= ev.points;
+            pointTarget -= ev.Points;
             if (pointTarget > 0) return;
             StartCoroutine(SpawnPod());
             _conditionCleared = true;

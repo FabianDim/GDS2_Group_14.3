@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using _Experimenation.K.Abilities.Scripts;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
+using _Experimenation.K.Multiplayer.Scripts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace _Experimenation.K.Abilities.Scripts
+namespace _Experimenation.K.Game_Manager.Abilities.Scripts
 {
     public struct AbilityUI
     {
@@ -32,16 +34,25 @@ namespace _Experimenation.K.Abilities.Scripts
         {
             SetupUI();
             SetupAbilities();
+            
+            var localPlayer = FindObjectsByType<Player>()
+                .FirstOrDefault(player => player.HasInputAuthority);
+            if (localPlayer != null && localPlayer.Role == PlayerRole.Runner)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
             gameObject.SetActive(false);
             
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
-            EventBus.Subscribe<LegEndedEvent>(OnLegEnds);
+            EventBus.Subscribe<RoundOverEvent>(OnLegEnds);
         }
         
         private void OnDestroy()
         {
             EventBus.Unsubscribe<TokenCollectedEvent>(OnTokenCollected);
-            EventBus.Unsubscribe<LegEndedEvent>(OnLegEnds);
+            EventBus.Unsubscribe<RoundOverEvent>(OnLegEnds);
         }
         
         private void SetupUI()
@@ -66,7 +77,7 @@ namespace _Experimenation.K.Abilities.Scripts
         #region Event Handlers
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
-            if (!ev.collectedByChaser || gameObject.activeSelf) return;
+            if (!ev.CollectedBy.Equals("Chaser") || gameObject.activeSelf) return;
 
             foreach (var abilityUI in _abilitiesUI)
             {
@@ -91,7 +102,7 @@ namespace _Experimenation.K.Abilities.Scripts
             gameObject.SetActive(true);
         }
 
-        private void OnLegEnds(LegEndedEvent ev)
+        private void OnLegEnds(RoundOverEvent ev)
         {
             _newAbilitySet = !_newAbilitySet;
             if(_newAbilitySet)

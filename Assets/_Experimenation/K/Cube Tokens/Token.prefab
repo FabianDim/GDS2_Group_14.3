@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4017354638213656745}
   - component: {fileID: 6143734383965341662}
   - component: {fileID: 4467221587229627955}
+  - component: {fileID: -226238468760753678}
   m_Layer: 0
   m_Name: Token
   m_TagString: Untagged
@@ -128,6 +129,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Cube_Tokens.Scripts.Token
   rotationSpeed: 0.1
   tokenValue: 10
+--- !u!114 &-226238468760753678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8714437318731189684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 2110288623
+  SendPriority: 1
+  EnableInterpolation: 1
+  Flags: 262146
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 4467221587229627955}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1001 &5629465843081766336
 PrefabInstance:
   m_ObjectHideFlags: 0

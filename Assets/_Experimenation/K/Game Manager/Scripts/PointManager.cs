@@ -14,17 +14,18 @@ namespace _Experimenation.K.Game_Manager.Scripts
         {
             _pointText = GetComponentInChildren<TextMeshProUGUI>();
             _pointText.SetText("Points: " + _points);
-            EventBus.Subscribe<TokenCollectedEvent>(OnPointsChanged);
+            EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
         }
 
         private void OnDestroy()
         {
-            EventBus.Unsubscribe<TokenCollectedEvent>(OnPointsChanged);
+            EventBus.Unsubscribe<TokenCollectedEvent>(OnTokenCollected);
         }
         
-        private void OnPointsChanged(TokenCollectedEvent ev)
+        private void OnTokenCollected(TokenCollectedEvent ev)
         {
-            _points += ev.points;
+            if (!transform.parent.CompareTag(ev.CollectedBy)) return;
+            _points += ev.Points;
             _pointText.SetText("Points: " + _points);
         }
     }
