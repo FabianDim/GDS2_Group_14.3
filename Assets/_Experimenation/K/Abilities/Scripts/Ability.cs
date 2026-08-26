@@ -35,6 +35,8 @@ namespace _Experimenation.K.Abilities.Scripts
     {
         public abstract void ApplyEffect(MonoBehaviour runner);
 
+        public virtual void OnUpdate(MonoBehaviour runner) { }
+
         protected IEnumerator ExecuteAfterDelay(Action callback, float delay = 3f)
         {
             yield return new WaitForSeconds(delay);
