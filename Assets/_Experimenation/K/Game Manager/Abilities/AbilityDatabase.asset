@@ -15,11 +15,9 @@ MonoBehaviour:
   abilityFolderPath: Assets/_Experimenation/K/Game Manager/Abilities/Ability SO
   allAbilities:
   - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
-  - {fileID: 11400000, guid: a3adbaca16ac69f4aad0cca6c3e5914a, type: 2}
+  - {fileID: 11400000, guid: 24d20d6fe6739c542a44229ccd5a1491, type: 2}
+  - {fileID: 11400000, guid: 24d20d6fe6739c542a44229ccd5a1491, type: 2}
+  - {fileID: 11400000, guid: 24d20d6fe6739c542a44229ccd5a1491, type: 2}
+  - {fileID: 11400000, guid: 24d20d6fe6739c542a44229ccd5a1491, type: 2}
+  - {fileID: 11400000, guid: 24d20d6fe6739c542a44229ccd5a1491, type: 2}
+  - {fileID: 11400000, guid: 24d20d6fe6739c542a44229ccd5a1491, type: 2}
