@@ -16619,10 +16619,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Token Spawner
       objectReference: {fileID: 0}
-    - target: {fileID: 3579785908903549545, guid: e034eef1ae6bd6a49b10275ec465a5bf, type: 3}
-      propertyPath: tokenPrefab
-      value: 
-      objectReference: {fileID: 4467221587229627955, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
     - target: {fileID: 4750389515423929476, guid: e034eef1ae6bd6a49b10275ec465a5bf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

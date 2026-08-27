@@ -8,7 +8,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
     public class TokenSpawner : NetworkBehaviour
     {
         [SerializeField] private float spawnInterval = 5f;
-        [SerializeField] private Token tokenPrefab;
+        [SerializeField] private NetworkPrefabRef tokenPrefab;
         [SerializeField] private int tokensPerSpawn = 5;
 
         [Space, Header("Spawn Placement")]
@@ -18,7 +18,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
         [SerializeField] private LayerMask surfaceMask = ~0;
         [SerializeField] private int maxSpawnAttempts = 20;
 
-        private Transform _runner;
+        private Transform _runnerPlayer;
         private TickTimer _spawnTimer;
 
         private const float SkinWidth = 0.1f;
@@ -31,7 +31,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
             if (!HasStateAuthority)
                 return;
 
-            _runner = FindObjectsByType<Player>()
+            _runnerPlayer = FindObjectsByType<Player>()
                 .FirstOrDefault(player => player.Role == PlayerRole.Runner)
                 ?.transform;
 
@@ -91,7 +91,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
 
         private Vector3 GetRandomCandidate()
         {
-            return _runner.position +
+            return _runnerPlayer.position +
                    Random.onUnitSphere * spawnDistance;
         }
 

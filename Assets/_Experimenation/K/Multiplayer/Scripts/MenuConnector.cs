@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Fusion;
+using TMPro;
 using UnityEngine;
 
 namespace _Experimenation.K.Multiplayer.Scripts
@@ -7,13 +10,19 @@ namespace _Experimenation.K.Multiplayer.Scripts
     public class MenuConnector : NetworkRunnerCallbacks
     {
         [SerializeField] private NetworkRunner runnerPrefab;
-        private NetworkRunner _runner;
+        [SerializeField] private TextMeshProUGUI connectionText;
 
-        public async void HostGame()
+        private NetworkRunner _networkRunner;
+        private bool _gameStarted;
+
+        public void HostGame() => Connect(GameMode.Host);
+        public void JoinGame() => Connect(GameMode.Client);
+
+        private async void Connect(GameMode mode)
         {
             try
             {
-                await StartGame(GameMode.Host);
+                await StartGame(mode);
             }
             catch (Exception e)
             {
@@ -21,46 +30,44 @@ namespace _Experimenation.K.Multiplayer.Scripts
             }
         }
 
-        public async void JoinGame()
+        private async Task StartGame(GameMode mode)
         {
-            try
-            {
-                await StartGame(GameMode.Client);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
-        }
+            _networkRunner = Instantiate(runnerPrefab);
+            _networkRunner.name = "Network Runner";
+            _networkRunner.AddCallbacks(this);
+            _networkRunner.ProvideInput = true; // this client will feed input to Fusion
 
-        private async System.Threading.Tasks.Task StartGame(GameMode mode)
-        {
-            _runner = Instantiate(runnerPrefab);
-            _runner.name = "Network Runner";
-            _runner.AddCallbacks(this);
-            _runner.ProvideInput = true; // this client will feed input to Fusion
-
-            var sceneInfo = new NetworkSceneInfo();
-            // Only the host actually loads a new scene; clients are pulled in automatically
-            if (mode == GameMode.Host)
-            {
-                sceneInfo.AddSceneRef(
-                    SceneRef.FromIndex(1)
-                );
-            }
-
-            var result = await _runner.StartGame(new StartGameArgs
+            // No scene is passed here on purpose. The host stays in the Menu
+            // scene until the second player joins (see OnPlayerJoined below),
+            // then explicitly transitions via Runner.LoadScene().
+            var result = await _networkRunner.StartGame(new StartGameArgs
             {
                 GameMode = mode,
                 SessionName = "TestRoom1v1", // hardcoded room name for a demo; later make this a text field
-                Scene = sceneInfo,
-                SceneManager = _runner.gameObject.AddComponent<NetworkSceneManagerDefault>()
+                SceneManager = _networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                ObjectProvider = _networkRunner.GetComponent<INetworkObjectProvider>()
             });
 
             if (!result.Ok)
             {
                 Debug.LogError($"Failed to start: {result.ShutdownReason}");
             }
+        }
+
+        public override void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+            // Only the scene authority (the host, in Host Mode) decides when
+            // the match is ready to transition.
+            if (!runner.IsSceneAuthority) return;
+            if (_gameStarted) return;
+            if (runner.ActivePlayers.Count() < 2)
+            {
+                connectionText.SetText("Waiting for the other player");
+                return;
+            }
+
+            _gameStarted = true;
+            runner.LoadScene(SceneRef.FromIndex(1));
         }
     }
 }
