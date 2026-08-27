@@ -15,7 +15,7 @@ public class Slide : MonoBehaviour
     [Header("Sliding")]
     [SerializeField] private float slideForce = 6f;
     [SerializeField] private float slideDuration = 0.5f;
-    [SerializeField] private float minimumSlideSpeed = 3f;
+    [SerializeField] private float minimumSlideSpeed = 10f;
 
     public bool isCrouching { get; private set; }
     public bool isSliding { get; private set; }
@@ -146,6 +146,11 @@ public class Slide : MonoBehaviour
     {
         isSliding = false;
         playerMovement.isSliding = false;
+    }
+
+    public void StopSlideFromJump()
+    {
+        StopSlide();
     }
 
     private void SlideMovement()

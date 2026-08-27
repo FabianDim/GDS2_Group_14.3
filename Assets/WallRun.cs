@@ -23,6 +23,7 @@ public class WallRun : MonoBehaviour
     [SerializeField] private float camTiltTime;
 
     public float tilt { get; private set; }
+    public bool isWallRunning { get; private set; }
 
     private bool wallLeft;
     private bool wallRight;
@@ -31,6 +32,7 @@ public class WallRun : MonoBehaviour
     private RaycastHit rightWallHit;
 
     private Rigidbody rb;
+    private Climb climb;
 
     private PlayerInput playerInput;
     private InputAction jumpAction;
@@ -47,6 +49,7 @@ public class WallRun : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        climb = GetComponent<Climb>();
         playerInput = GetComponent<PlayerInput>();
 
         jumpAction = playerInput.actions["Jump"];
@@ -73,6 +76,12 @@ public class WallRun : MonoBehaviour
     {
         CheckWall();
 
+        if (climb != null && climb.isClimbing)
+        {
+            StopWallRun();
+            return;
+        }
+
         if (CanWallRun())
         {
             if (wallLeft)
@@ -96,6 +105,8 @@ public class WallRun : MonoBehaviour
 
     private void StartWallRun()
     {
+        isWallRunning = true;
+
         rb.useGravity = false;
 
         rb.AddForce(
@@ -169,7 +180,29 @@ public class WallRun : MonoBehaviour
 
     private void StopWallRun()
     {
-        rb.useGravity = true;
+        isWallRunning = false;
+
+        if (climb == null || !climb.isClimbing)
+        {
+            rb.useGravity = true;
+        }
+
+        cam.fieldOfView = Mathf.Lerp(
+            cam.fieldOfView,
+            fov,
+            wallRunfovTime * Time.deltaTime
+        );
+
+        tilt = Mathf.Lerp(
+            tilt,
+            0f,
+            camTiltTime * Time.deltaTime
+        );
+    }
+
+    public void StopWallRunFromClimb()
+    {
+        isWallRunning = false;
 
         cam.fieldOfView = Mathf.Lerp(
             cam.fieldOfView,

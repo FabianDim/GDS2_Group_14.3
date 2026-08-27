@@ -37,6 +37,7 @@ public class PlayerMovement : MonoBehaviour
     public bool isGrounded { get; private set; }
     public bool isCrouching { get; set; }
     public bool isSliding { get; set; }
+    public bool isClimbing { get; set; }
 
     private float horizontalMovement;
     private float verticalMovement;
@@ -46,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody rb;
     private RaycastHit slopeHit;
+    private Slide slide;
 
     private PlayerInput playerInput;
     private InputAction moveAction;
@@ -55,6 +57,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        slide = GetComponent<Slide>();
         playerInput = GetComponent<PlayerInput>();
 
         moveAction = playerInput.actions["Move"];
@@ -98,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isSliding)
+        if (!isSliding && !isClimbing)
         {
             MovePlayer();
         }
@@ -161,6 +164,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
+        if (slide != null && slide.isSliding)
+        {
+            slide.StopSlideFromJump();
+        }
+
         rb.linearVelocity = new Vector3(
             rb.linearVelocity.x,
             0f,
