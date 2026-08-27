@@ -12,8 +12,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float airMultiplier = 0.55f;
 
     [Header("Sprinting")]
-    [SerializeField] private float walkSpeed = 6f;
-    [SerializeField] private float sprintSpeed = 10f;
+    [SerializeField] private float walkSpeed = 10f;
+    [SerializeField] private float sprintSpeed = 15f;
+    [SerializeField] private float crouchSpeed = 5f;
     [SerializeField] private float acceleration = 12f;
 
     [Header("Jumping")]
@@ -25,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Drag")]
     [SerializeField] private float groundDrag = 6f;
     [SerializeField] private float airDrag = 0f;
+    [SerializeField] private float slideDrag = 1f;
 
     [Header("Ground Detection")]
     [SerializeField] private Transform groundCheck;
@@ -33,6 +35,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float playerHeight = 2f;
 
     public bool isGrounded { get; private set; }
+    public bool isCrouching { get; set; }
+    public bool isSliding { get; set; }
 
     private float horizontalMovement;
     private float verticalMovement;
@@ -94,7 +98,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        if (!isSliding)
+        {
+            MovePlayer();
+        }
+
         ApplyGravity();
     }
 
@@ -180,7 +188,11 @@ public class PlayerMovement : MonoBehaviour
     {
         float targetSpeed;
 
-        if (sprintAction.IsPressed() && isGrounded)
+        if (isCrouching && !isSliding)
+        {
+            targetSpeed = crouchSpeed;
+        }
+        else if (sprintAction.IsPressed() && isGrounded)
         {
             targetSpeed = sprintSpeed;
         }
@@ -202,7 +214,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void ControlDrag()
     {
-        if (isGrounded)
+        if (isSliding)
+        {
+            rb.linearDamping = slideDrag;
+        }
+        else if (isGrounded)
         {
             rb.linearDamping = groundDrag;
         }

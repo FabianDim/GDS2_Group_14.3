@@ -23,7 +23,22 @@ public class PlayerLook : MonoBehaviour
     private void Start()
     {
         playerInput = GetComponent<PlayerInput>();
-        lookAction = playerInput.actions["Look"];
+
+        if (playerInput == null)
+        {
+            Debug.LogError("PlayerLook requires a PlayerInput component on the same GameObject.");
+            enabled = false;
+            return;
+        }
+
+        lookAction = playerInput.actions.FindAction("Tools");
+
+        if (lookAction == null)
+        {
+            Debug.LogError("Could not find input action: Tools");
+            enabled = false;
+            return;
+        }
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

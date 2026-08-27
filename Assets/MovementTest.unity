@@ -416,7 +416,9 @@ GameObject:
   - component: {fileID: 1018126635}
   - component: {fileID: 1018126634}
   - component: {fileID: 1018126636}
+  - component: {fileID: 1018126639}
   - component: {fileID: 1018126637}
+  - component: {fileID: 1018126638}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -555,15 +557,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   orientation: {fileID: 364266886}
   moveSpeed: 6
-  movementMultiplier: 10
+  movementMultiplier: 8
   airMultiplier: 0.55
-  walkSpeed: 6
-  sprintSpeed: 10
+  walkSpeed: 10
+  sprintSpeed: 15
+  crouchSpeed: 5
   acceleration: 12
-  jumpForce: 7
-  gravityMultiplier: 1.8
+  jumpForce: 10
+  gravityMultiplier: 2.2
   groundDrag: 6
   airDrag: 0.1
+  slideDrag: 1
   groundCheck: {fileID: 159579450}
   groundMask:
     serializedVersion: 2
@@ -583,10 +587,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WallRun
   orientation: {fileID: 364266886}
-  wallDistance: 0.5
+  wallDistance: 1
   minimumJumpHeight: 1.5
-  wallRunGravity: 0
-  wallRunJumpForce: 0
+  wallRunGravity: 1.2
+  wallRunJumpForce: 5
   cam: {fileID: 1230641709}
   fov: 90
   wallRunfov: 110
@@ -620,6 +624,56 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &1018126638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018126629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &1018126639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018126629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 868b50301d26c9942b7c0ea146706c9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Slide
+  orientation: {fileID: 364266886}
+  cameraPosition: {fileID: 212115017}
+  crouchHeight: 1
+  crouchCameraHeight: 0.4
+  cameraCrouchSpeed: 15
+  slideForce: 6
+  slideDuration: 0.5
+  minimumSlideSpeed: 14
 --- !u!1 &1230641705
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,7 +702,7 @@ Transform:
   m_GameObject: {fileID: 1230641705}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.791, y: 0.662, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
