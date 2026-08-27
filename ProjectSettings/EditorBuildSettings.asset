@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Experimenation/K/Multiplayer Test Scene.unity
     guid: f65a03eaea3b60f49a2364613a834e0c
+  - enabled: 1
+    path: Assets/_Experimenation/Fraser/S1 Movement.unity
+    guid: 8467383d8b20c0147a555721fc12a9f4
   m_configObjects: {}
