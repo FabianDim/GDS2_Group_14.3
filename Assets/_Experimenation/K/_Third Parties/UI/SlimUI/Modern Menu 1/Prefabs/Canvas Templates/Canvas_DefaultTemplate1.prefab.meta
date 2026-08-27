@@ -1,10 +1,7 @@
 fileFormatVersion: 2
 guid: 0a68be1bd13d8694e8d8fe85574ac075
-PrefabImporter:
-  externalObjects: {}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+labels:
+- FusionPrefab
 AssetOrigin:
   serializedVersion: 1
   productId: 116144
@@ -12,3 +9,8 @@ AssetOrigin:
   packageVersion: 1.3.1
   assetPath: Assets/SlimUI/Modern Menu 1/Prefabs/Canvas Templates/Canvas_DefaultTemplate1.prefab
   uploadId: 628808
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

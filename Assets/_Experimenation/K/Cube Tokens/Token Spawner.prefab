@@ -47,9 +47,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Cube_Tokens.Scripts.TokenSpawner
   spawnInterval: 5
-  tokenPrefab: {fileID: 2267741386133362133}
+  tokenPrefab:
+    RawGuidValue: d444b523d35f9ac4285a7ab647decf92
   tokensPerSpawn: 5
-  spawnDistance: 10
+  spawnDistance: 25
   surfaceSearchRadius: 4
   surfaceOffset: 0.5
   surfaceMask:
@@ -142,17 +143,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
---- !u!114 &2267741386133362133 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4467221587229627955, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
-  m_PrefabInstance: {fileID: 2487782066983863270}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3871e991777c44459389d239148f2b12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Cube_Tokens.Scripts.Token
 --- !u!4 &2588287764820915691 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}

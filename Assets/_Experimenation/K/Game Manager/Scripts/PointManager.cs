@@ -24,7 +24,6 @@ namespace _Experimenation.K.Game_Manager.Scripts
         
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
-            if (!transform.parent.CompareTag(ev.CollectedBy)) return;
             _points += ev.Points;
             _pointText.SetText("Points: " + _points);
         }

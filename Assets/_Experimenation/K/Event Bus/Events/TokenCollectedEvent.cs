@@ -1,10 +1,13 @@
-﻿namespace _Experimenation.K.Event_Bus.Events
+﻿using _Experimenation.K.Multiplayer.Scripts;
+using Fusion;
+
+namespace _Experimenation.K.Event_Bus.Events
 {
     public class TokenCollectedEvent
     {
         public readonly int Points;
-        public readonly string CollectedBy;
-        public TokenCollectedEvent(int points, string collectedBy)
+        public readonly PlayerRole CollectedBy;
+        public TokenCollectedEvent(int points, PlayerRole collectedBy)
         {
             Points = points;
             CollectedBy = collectedBy;

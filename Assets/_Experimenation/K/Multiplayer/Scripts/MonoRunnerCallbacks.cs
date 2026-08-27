@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
+using UnityEngine;
 
 namespace _Experimenation.K.Multiplayer.Scripts
 {
-    public class NetworkRunnerCallbacks : NetworkBehaviour, INetworkRunnerCallbacks
+    public class MonoRunnerCallbacks : MonoBehaviour, INetworkRunnerCallbacks
     {
         // --- Required INetworkRunnerCallbacks stubs (leave empty unless needed) ---
         public virtual void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
