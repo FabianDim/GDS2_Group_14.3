@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class MoveCamera : MonoBehaviour
+namespace _Experimenation.Fraser.Scripts
 {
-    [SerializeField] private Transform cameraPosition;
-
-    private void LateUpdate()
+    public class MoveCamera : MonoBehaviour
     {
-        transform.position =
-            cameraPosition.position;
+        [SerializeField] private Transform cameraPosition;
+
+        private void LateUpdate()
+        {
+            transform.position =
+                cameraPosition.position;
+        }
     }
 }

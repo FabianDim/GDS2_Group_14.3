@@ -7,8 +7,13 @@ namespace _Experimenation.K.Multiplayer.Scripts
     public struct GameplayInput : INetworkInput
     {
         //Movement
-        public Vector2 MoveDirection;
+        public Vector2 MoveInput;
+        public Vector2 LookInput;
+        public bool UsingGamepadLook;
         public bool Jump;
+        public bool SprintHeld;
+        public bool CrouchHeld;
+        public bool Crouch;
         
         //Ability Selection
         public int SelectedAbility;
@@ -17,7 +22,10 @@ namespace _Experimenation.K.Multiplayer.Scripts
     public sealed class PlayerInput : NetworkRunnerCallbacks
     {
         [SerializeField] private InputActionReference moveAction;
+        [SerializeField] private InputActionReference lookAction;
         [SerializeField] private InputActionReference jumpAction;
+        [SerializeField] private InputActionReference sprintAction;
+        [SerializeField] private InputActionReference crouchAction;
         [SerializeField] private InputActionReference ability1Action;
         [SerializeField] private InputActionReference ability2Action;
         [SerializeField] private InputActionReference ability3Action;
@@ -28,6 +36,9 @@ namespace _Experimenation.K.Multiplayer.Scripts
             
             moveAction.action.Enable();
             jumpAction.action.Enable();
+            lookAction.action.Enable();
+            sprintAction.action.Enable();
+            crouchAction.action.Enable();
             ability1Action.action.Enable();
             ability2Action.action.Enable();
             ability3Action.action.Enable();
@@ -39,6 +50,9 @@ namespace _Experimenation.K.Multiplayer.Scripts
             
             moveAction.action.Disable();
             jumpAction.action.Disable();
+            lookAction.action.Disable();
+            sprintAction.action.Disable();
+            crouchAction.action.Disable();
             ability1Action.action.Disable();
             ability2Action.action.Disable();
             ability3Action.action.Disable();
@@ -49,8 +63,13 @@ namespace _Experimenation.K.Multiplayer.Scripts
             var myInput = new GameplayInput();
             
             //Movement
-            myInput.MoveDirection = moveAction.action.ReadValue<Vector2>();
+            myInput.MoveInput = moveAction.action.ReadValue<Vector2>();
+            myInput.LookInput = lookAction.action.ReadValue<Vector2>();
             myInput.Jump = jumpAction.action.ReadValue<float>() > 0.5f;
+            myInput.SprintHeld = sprintAction.action.IsPressed();
+            myInput.CrouchHeld = crouchAction.action.IsPressed();
+            myInput.Crouch = crouchAction.action.IsPressed();
+            myInput.UsingGamepadLook = lookAction.action.activeControl?.device is Gamepad;
 
             //Ability Selection
             var selectedAbility = 0;

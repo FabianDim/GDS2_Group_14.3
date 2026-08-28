@@ -1,3 +1,4 @@
+using _Experimenation.Fraser.Scripts;
 using Fusion;
 using UnityEngine;
 
@@ -67,7 +68,7 @@ public class WallRun : NetworkBehaviour
             return;
         }
 
-        if (playerMovement.isGrounded)
+        if (playerMovement.IsGrounded)
         {
             blockedWallCollider = null;
         }
@@ -75,14 +76,14 @@ public class WallRun : NetworkBehaviour
         CheckWall();
 
         grounded =
-            playerMovement.isGrounded;
+            playerMovement.IsGrounded;
 
         blockedByMovementState =
-            playerMovement.isSliding ||
-            playerMovement.isCrouching ||
-            playerMovement.isClimbing;
+            playerMovement.IsSliding ||
+            playerMovement.IsCrouching ||
+            playerMovement.IsClimbing;
 
-        if (playerMovement.isClimbing)
+        if (playerMovement.IsClimbing)
         {
             StopWallRun();
             return;
@@ -198,7 +199,7 @@ public class WallRun : NetworkBehaviour
             isWallRunning = true;
 
             playerMovement
-                .isWallRunning = true;
+                .IsWallRunning = true;
         }
 
         playerMovement.SetGravity(
@@ -216,9 +217,9 @@ public class WallRun : NetworkBehaviour
         isWallRunning = false;
 
         playerMovement
-            .isWallRunning = false;
+            .IsWallRunning = false;
 
-        if (!playerMovement.isClimbing)
+        if (!playerMovement.IsClimbing)
         {
             playerMovement.SetGravity(
                 playerMovement.NormalGravity
@@ -253,7 +254,7 @@ public class WallRun : NetworkBehaviour
         isWallRunning = false;
 
         playerMovement
-            .isWallRunning = false;
+            .IsWallRunning = false;
     }
 
     public Vector3 GetWallRunDirection(

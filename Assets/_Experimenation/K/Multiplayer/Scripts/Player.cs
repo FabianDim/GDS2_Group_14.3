@@ -49,30 +49,19 @@ namespace _Experimenation.K.Multiplayer.Scripts
         
         public override void FixedUpdateNetwork()
         {
-            if (!GetInput<GameplayInput>(out var input)) return;
+            if (!HasStateAuthority || !GetInput<GameplayInput>(out var input)) return;
+            HandleAbilitySelection(input);
+        }
 
-            if (HasStateAuthority && input.SelectedAbility != _previousSelectedAbility)
+        private void HandleAbilitySelection(GameplayInput input)
+        {
+            if (input.SelectedAbility == _previousSelectedAbility) return;
+            if (input.SelectedAbility is >= 1 and <= 3)
             {
-                if (input.SelectedAbility is >= 1 and <= 3)
-                {
-                    _abilityRoundState ??= FindFirstObjectByType<AbilityRoundState>();
-                    _abilityRoundState?.TrySelectAbility(this, input.SelectedAbility - 1);
-                }
-
-                _previousSelectedAbility = input.SelectedAbility;
+                _abilityRoundState ??= FindAnyObjectByType<AbilityRoundState>();
+                _abilityRoundState?.TrySelectAbility(this, input.SelectedAbility - 1);
             }
-
-            // Set default world space velocity and jump impulse.
-            var moveVelocity = _simpleKcc.TransformRotation * new Vector3(input.MoveDirection.x, 0.0f, input.MoveDirection.y) * 10.0f;
-            float jumpImpulse  = 0;
-
-            if (input.Jump && _simpleKcc.IsGrounded)
-            {
-                // Set upward jump impulse.
-                jumpImpulse = 10.0f;
-            }
-
-            _simpleKcc.Move(moveVelocity, jumpImpulse);
+            _previousSelectedAbility = input.SelectedAbility;
         }
     }
 }

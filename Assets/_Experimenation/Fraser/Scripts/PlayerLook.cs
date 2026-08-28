@@ -1,96 +1,50 @@
+using _Experimenation.K.Multiplayer.Scripts;
+using Fusion;
 using UnityEngine;
 
-public class PlayerLook : MonoBehaviour
+namespace _Experimenation.Fraser.Scripts
 {
-    [Header("References")]
-    [SerializeField] private WallRun wallRun;
-    [SerializeField] private Transform cam;
-    [SerializeField] private Transform orientation;
-
-    [Header("Sensitivity")]
-    [SerializeField] private float mouseSensitivityX = 0.1f;
-    [SerializeField] private float mouseSensitivityY = 0.1f;
-    [SerializeField] private float controllerSensitivityX = 180f;
-    [SerializeField] private float controllerSensitivityY = 180f;
-
-    private float xRotation;
-    private float yRotation;
-
-    private LocalMovementInput localInput;
-
-    private void Start()
+    public class PlayerLook : NetworkBehaviour
     {
-        localInput =
-            GetComponent<LocalMovementInput>();
+        [Header("References")]
+        [SerializeField] private Transform cam;
+        [SerializeField] private Transform orientation;
 
-        Cursor.lockState =
-            CursorLockMode.Locked;
+        [Header("Sensitivity")]
+        [SerializeField] private float mouseSensitivity = 0.1f;
+        [SerializeField] private float controllerSensitivity = 180f;
 
-        Cursor.visible = false;
-    }
+        private float _pitch;
+        private float _yaw;
 
-    private void Update()
-    {
-        if (localInput == null)
+        public override void Spawned()
         {
-            return;
+            if (!Object.HasInputAuthority)
+                return;
+
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
-        Vector2 lookInput =
-            localInput.LookInput;
-
-        float sensitivityX;
-        float sensitivityY;
-
-        if (localInput.UsingGamepadLook)
+        public override void FixedUpdateNetwork()
         {
-            sensitivityX =
-                controllerSensitivityX *
-                Time.deltaTime;
+            if (!Object.HasInputAuthority)
+                return;
 
-            sensitivityY =
-                controllerSensitivityY *
-                Time.deltaTime;
+            if (!GetInput<GameplayInput>(out var input))
+                return;
+
+            var sensitivity = input.UsingGamepadLook
+                ? controllerSensitivity * Runner.DeltaTime
+                : mouseSensitivity;
+            
+            _yaw += input.LookInput.x * sensitivity;
+            _pitch -= input.LookInput.y * sensitivity;
+
+            _pitch = Mathf.Clamp(_pitch, -90f, 90f);
+
+            orientation.rotation = Quaternion.Euler(0f, _yaw, 0f);
+            cam.localRotation = Quaternion.Euler(_pitch, _yaw, 0f);
         }
-        else
-        {
-            sensitivityX =
-                mouseSensitivityX;
-
-            sensitivityY =
-                mouseSensitivityY;
-        }
-
-        yRotation +=
-            lookInput.x * sensitivityX;
-
-        xRotation -=
-            lookInput.y * sensitivityY;
-
-        xRotation = Mathf.Clamp(
-            xRotation,
-            -90f,
-            90f
-        );
-
-        float cameraTilt = 0f;
-
-        if (wallRun != null)
-        {
-            cameraTilt = wallRun.tilt;
-        }
-
-        cam.rotation = Quaternion.Euler(
-            xRotation,
-            yRotation,
-            cameraTilt
-        );
-
-        orientation.rotation =
-            Quaternion.Euler(
-                0f,
-                yRotation,
-                0f
-            );
     }
 }

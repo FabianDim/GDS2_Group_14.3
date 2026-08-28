@@ -1,30 +1,41 @@
-using UnityEngine;
-using Fusion;
+using System;
 using System.Threading.Tasks;
-using UnityEngine.SceneManagement; 
+using Fusion;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class MultiPeerTest : MonoBehaviour
+namespace _Experimenation.Melony
 {
-    public NetworkRunner runnerPrefab; 
-
-    async void Start()
+    public class MultiPeerTest : MonoBehaviour
     {
-        int currSceneBuildIndex = SceneManager.GetActiveScene().buildIndex;
-        
-        await StartInstance(GameMode.Host, "LocalTestRoom", currSceneBuildIndex);
-        await StartInstance(GameMode.Client, "LocalTestRoom", currSceneBuildIndex);
-    }
+        public NetworkRunner runnerPrefab;
 
-    async Task StartInstance(GameMode mode, string roomName, int buildIndex)
-    {
-        NetworkRunner newRunner = Instantiate(runnerPrefab);
-
-        await newRunner.StartGame(new StartGameArgs()
+        private async void Start()
         {
-            GameMode = mode,
-            SessionName = roomName,
-            Scene = SceneRef.FromIndex(buildIndex), 
-            SceneManager = newRunner.GetComponent<NetworkSceneManagerDefault>()
-        });
+            try
+            {
+                int currSceneBuildIndex = SceneManager.GetActiveScene().buildIndex;
+        
+                await StartInstance(GameMode.Host, "LocalTestRoom", currSceneBuildIndex);
+                await StartInstance(GameMode.Client, "LocalTestRoom", currSceneBuildIndex);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async Task StartInstance(GameMode mode, string roomName, int buildIndex)
+        {
+            var newRunner = Instantiate(runnerPrefab);
+
+            await newRunner.StartGame(new StartGameArgs()
+            {
+                GameMode = mode,
+                SessionName = roomName,
+                Scene = SceneRef.FromIndex(buildIndex), 
+                SceneManager = newRunner.GetComponent<NetworkSceneManagerDefault>()
+            });
+        }
     }
 }
