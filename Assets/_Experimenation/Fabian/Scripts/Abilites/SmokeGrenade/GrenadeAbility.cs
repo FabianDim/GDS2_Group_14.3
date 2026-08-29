@@ -1,10 +1,11 @@
-using _Experimenation.K.Abilities.Scripts;
+using _Experimenation.K.Multiplayer.Scripts;
+using _Project.Abilities.Scripts;
 using UnityEngine;
-namespace _Experimenation.K.Abilities.Scripts
+namespace _Experimenation.Fabian.Scripts.Abilites
 {
     public class GrenadeAbility : AbilityEffect
     {
-        public override void ApplyEffect(MonoBehaviour runner)
+        public override void ApplyEffect(Player runner)
         {
             if (!runner.TryGetComponent<ThrowGrenade>(out var grenade))
             {

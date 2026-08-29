@@ -5024,8 +5024,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 925573608}
-        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
-          Assembly-CSharp
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection, Assembly-CSharp
         m_MethodName: SelectAbility1
         m_Mode: 0
         m_Arguments:
@@ -5041,8 +5040,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 925573608}
-        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
-          Assembly-CSharp
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection, Assembly-CSharp
         m_MethodName: SelectAbility2
         m_Mode: 0
         m_Arguments:
@@ -5098,8 +5096,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 925573608}
-        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
-          Assembly-CSharp
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection, Assembly-CSharp
         m_MethodName: SelectAbility3
         m_Mode: 0
         m_Arguments:
@@ -17378,79 +17375,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1001 &1834591217233821575
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2256660697941282819, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 750
-      objectReference: {fileID: 0}
-    - target: {fileID: 2256660697941282819, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 2256660697941282819, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 3611141507382420569, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_text
-      value: 'Points: 0'
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 42.17188
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.1542
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -36.39716
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4660119138894178303, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6457000302344762242, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
-      propertyPath: m_Name
-      value: Game Manager
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f648f24da4a585b4483aafddb9f40a7b, type: 3}
 --- !u!224 &1953767020624707110
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17693,6 +17617,5 @@ SceneRoots:
   - {fileID: 1090641622}
   - {fileID: 2094710568}
   - {fileID: 775793710050576872}
-  - {fileID: 1834591217233821575}
   - {fileID: 925573607}
   - {fileID: 1287581819}

@@ -281,7 +281,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dea520089bab1c41866b501cfcf26ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  smokeExplosionEffectPrefab: {fileID: 717281982352752891, guid: e4e1ba63f712a294da094c68292ac150, type: 3}
+  smokeExplosionEffectPrefab: {fileID: 2494225147758639966, guid: 3b99e628b3bc10a46bb8f6f6caf39755, type: 3}
   particleOffset: {x: 0, y: 1, z: 0}
   smokeExplosionDelay: 3
   smokeExplosionForce: 700

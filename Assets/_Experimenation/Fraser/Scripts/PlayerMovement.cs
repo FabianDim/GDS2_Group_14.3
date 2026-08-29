@@ -23,6 +23,7 @@ namespace _Experimenation.Fraser.Scripts
 
         [Header("Jumping")]
         public float jumpForce = 7f;
+        public float maxJumpForce = 14f;
 
         [Header("Gravity")]
         [SerializeField] private float gravityMultiplier = 1.8f;
@@ -92,7 +93,7 @@ namespace _Experimenation.Fraser.Scripts
                 $"HasInput: {Object.HasInputAuthority} | " +
                 $"IsSimulated: {Object.IsInSimulation}"
             );
-            
+
             if (!_kcc || !GetInput<GameplayInput>(out var input)) return;
 
             IsGrounded =
