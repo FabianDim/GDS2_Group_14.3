@@ -1,7 +1,7 @@
 using Fusion;
 using UnityEngine;
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
   /// <summary>
   /// Interactable class for the object that will be colored by the player in shared mode.
   /// </summary>

@@ -5,15 +5,15 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
-using UnityGLTF;
 using Ionic.Zip;
 using UnityEditor;
+using UnityEngine;
+using UnityGLTF;
 
 /// <summary>
 /// Class to handle imports from Sketchfab
 /// </summary>
-namespace Sketchfab
+namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts
 {
 	class SketchfabImporter
 	{

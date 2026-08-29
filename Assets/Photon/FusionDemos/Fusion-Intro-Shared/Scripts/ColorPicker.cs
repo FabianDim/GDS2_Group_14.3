@@ -1,7 +1,7 @@
 using Fusion;
 using UnityEngine;
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
   
   /// <summary>
   /// Interactable for the player to pick up a color.

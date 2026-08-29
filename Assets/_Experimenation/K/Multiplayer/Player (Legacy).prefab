@@ -150,7 +150,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Multiplayer.Scripts.PlayerInput
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  lookAction: {fileID: 8820154950242146738, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  sprintAction: {fileID: 0}
+  crouchAction: {fileID: 0}
+  ability1Action: {fileID: 0}
+  ability2Action: {fileID: 0}
+  ability3Action: {fileID: 0}
+  startRunPhase: {fileID: 0}
 --- !u!1 &6308964894088555674
 GameObject:
   m_ObjectHideFlags: 0

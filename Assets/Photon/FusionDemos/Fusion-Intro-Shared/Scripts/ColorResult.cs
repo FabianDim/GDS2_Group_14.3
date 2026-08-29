@@ -2,7 +2,7 @@ using System;
 using Fusion;
 using UnityEngine;
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
   /// <summary>
   /// Class responsible for displaying the requested color and checking if the provided colors are correct.
   /// </summary>

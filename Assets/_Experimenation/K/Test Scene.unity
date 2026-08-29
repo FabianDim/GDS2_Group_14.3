@@ -4976,7 +4976,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility1
         m_Mode: 0
@@ -4993,7 +4993,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility2
         m_Mode: 0
@@ -5050,7 +5050,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility3
         m_Mode: 0
@@ -13592,7 +13592,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility1
         m_Mode: 0
@@ -13609,7 +13609,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility2
         m_Mode: 0
@@ -13666,7 +13666,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility3
         m_Mode: 0

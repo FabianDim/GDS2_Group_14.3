@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using _Experimenation.K.Event_Bus;
+using Fusion;
 using _Experimenation.K.Event_Bus.Events;
 using TMPro;
 using UnityEngine;

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Project.UI
+namespace _Experimenation.K._Third_Parties.UI.Strategic_Warfare_UI_Starter_Pack.scripts
 {
     public class UILoopFadeColor_NoTransparent : MonoBehaviour
     {

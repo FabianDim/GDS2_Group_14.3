@@ -1,6 +1,5 @@
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
-using _Experimenation.K.Game_Manager.Abilities.Scripts;
 using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using UnityEngine;
@@ -80,17 +79,16 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
 
             var collector = player.Object.InputAuthority;
 
-            FindFirstObjectByType<AbilityRoundState>()
-                ?.RegisterTokenCollection(collector, player.Role);
-
-            // Raise the local score event only on the collector's peer. The host
-            // must not award a client collection to its own local UI.
+            // Raise the local score and ability event only on the collector's peer.
+            // AbilityRoundState consumes this event authoritatively.
+            // The host must not award a client collection to its own local UI.
             if (collector == Runner.LocalPlayer)
             {
                 EventBus.Raise(
                     new TokenCollectedEvent(
                         tokenValue,
-                        player.Role
+                        player.Role,
+                        collector
                     )
                 );
             }
@@ -109,7 +107,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
                 return;
 
             EventBus.Raise(
-                new TokenCollectedEvent(tokenValue, collectedBy)
+                new TokenCollectedEvent(tokenValue, collectedBy, collector)
             );
         }
     }

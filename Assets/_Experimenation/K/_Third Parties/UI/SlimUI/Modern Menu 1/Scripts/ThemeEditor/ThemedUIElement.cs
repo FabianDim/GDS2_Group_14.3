@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-namespace SlimUI.ModernMenu{
-	[System.Serializable]
+namespace _Experimenation.K._Third_Parties.UI.SlimUI.Modern_Menu_1.Scripts.ThemeEditor{
+	[global::System.Serializable]
 	public class ThemedUIElement : ThemedUI {
 		[Header("Parameters")]
 		Color outline;

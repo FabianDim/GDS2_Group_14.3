@@ -5024,7 +5024,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 925573608}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility1
         m_Mode: 0
@@ -5041,7 +5041,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 925573608}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility2
         m_Mode: 0
@@ -5098,7 +5098,7 @@ MonoBehaviour:
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 925573608}
-        m_TargetAssemblyTypeName: _Experimenation.K.Abilities.Scripts.AbilitySelection,
+        m_TargetAssemblyTypeName: _Project.Abilities.Scripts.AbilitySelection,
           Assembly-CSharp
         m_MethodName: SelectAbility3
         m_Mode: 0
@@ -7958,7 +7958,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9df85214b8f4d179e18d3e60cf2d102, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Abilities.Scripts.AbilitySelection
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilitySelection
   database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
   abilitiesUI: {fileID: 1507935179}
 --- !u!1 &936588490

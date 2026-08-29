@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Project.UI
+namespace _Experimenation.K._Third_Parties.UI.Strategic_Warfare_UI_Starter_Pack.scripts
 {
     public class UIPanelToggleAutoHide : MonoBehaviour
     {

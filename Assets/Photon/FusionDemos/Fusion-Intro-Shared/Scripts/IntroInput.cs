@@ -1,12 +1,9 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-#endif
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
 
   [RequireComponent(typeof(EventSystem))]
   class IntroInput : MonoBehaviour {

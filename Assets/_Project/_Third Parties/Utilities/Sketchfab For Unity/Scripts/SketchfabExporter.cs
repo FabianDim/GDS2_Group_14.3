@@ -3,17 +3,15 @@
  * License: https://github.com/sketchfab/UnityGLTF/blob/master/LICENSE
  */
 #if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
-using System;
+using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityGLTF;
-using SimpleJSON;
+using UnityEngine;
 using UnityEngine.Networking;
+using UnityGLTF;
 
-namespace Sketchfab
+namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts
 {
 	public class SketchfabExporter : EditorWindow
 	{

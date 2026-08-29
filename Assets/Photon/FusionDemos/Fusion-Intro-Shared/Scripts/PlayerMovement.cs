@@ -1,7 +1,7 @@
 using Fusion;
 using UnityEngine;
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
   /// <summary>
   /// A simple networked player movement class for shared mode.
   /// </summary>

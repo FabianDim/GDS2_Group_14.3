@@ -7,10 +7,16 @@ namespace _Experimenation.K.Event_Bus.Events
     {
         public readonly int Points;
         public readonly PlayerRole CollectedBy;
-        public TokenCollectedEvent(int points, PlayerRole collectedBy)
+        public readonly PlayerRef Collector;
+
+        public TokenCollectedEvent(
+            int points,
+            PlayerRole collectedBy,
+            PlayerRef collector = default)
         {
             Points = points;
             CollectedBy = collectedBy;
+            Collector = collector;
         }
     }
 }

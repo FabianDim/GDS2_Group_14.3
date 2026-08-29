@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace SlimUI.ModernMenu{
+namespace _Experimenation.K._Third_Parties.UI.SlimUI.Modern_Menu_1.Scripts.ThemeEditor{
 	[ExecuteInEditMode()]
-	[System.Serializable]
+	[global::System.Serializable]
 	public class ThemedUI : MonoBehaviour {
 
 		public ThemedUIData themeController;

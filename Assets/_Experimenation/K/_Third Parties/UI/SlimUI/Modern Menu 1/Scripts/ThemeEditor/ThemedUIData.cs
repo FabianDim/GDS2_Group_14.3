@@ -1,24 +1,24 @@
 ﻿using UnityEngine;
 
-namespace SlimUI.ModernMenu{
+namespace _Experimenation.K._Third_Parties.UI.SlimUI.Modern_Menu_1.Scripts.ThemeEditor{
 	[CreateAssetMenu(menuName = "ThemeSettings")]
-	[System.Serializable]
+	[global::System.Serializable]
 	public class ThemedUIData : ScriptableObject {
-		[System.Serializable]
+		[global::System.Serializable]
 		public class Custom1{
 			[Header("Text")]	
 			public Color graphic1;
 			public Color32 text1;
 		}
 
-		[System.Serializable]
+		[global::System.Serializable]
 		public class Custom2{
 			[Header("Text")]	
 			public Color graphic2;
 			public Color32 text2;
 		}
 
-		[System.Serializable]
+		[global::System.Serializable]
 		public class Custom3{
 			[Header("Text")]	
 			public Color graphic3;

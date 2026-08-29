@@ -1,11 +1,10 @@
+using System;
 using Fusion;
 using Fusion.Photon.Realtime;
-using System;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
   public class SimpleStartMenu : MonoBehaviour{
     bool _gameStarting = false;
 

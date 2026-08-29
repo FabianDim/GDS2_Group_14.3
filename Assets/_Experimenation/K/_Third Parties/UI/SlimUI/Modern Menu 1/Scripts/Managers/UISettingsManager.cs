@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-namespace SlimUI.ModernMenu{
+namespace _Experimenation.K._Third_Parties.UI.SlimUI.Modern_Menu_1.Scripts.Managers{
 	public class UISettingsManager : MonoBehaviour {
 
 		public enum Platform {Desktop, Mobile};

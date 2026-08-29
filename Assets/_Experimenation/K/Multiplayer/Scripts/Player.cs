@@ -1,6 +1,6 @@
-﻿using Fusion;
+﻿using _Project.Abilities.Scripts;
+using Fusion;
 using Fusion.Addons.SimpleKCC;
-using _Experimenation.K.Game_Manager.Abilities.Scripts;
 using UnityEngine;
 
 namespace _Experimenation.K.Multiplayer.Scripts
@@ -15,6 +15,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         private SimpleKCC _simpleKcc;
         private AbilityRoundState _abilityRoundState;
         private int _previousSelectedAbility;
+        private int _lastAcceptedSelectionSequence = -1;
 
         public override void Spawned()
         {
@@ -55,12 +56,16 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private void HandleAbilitySelection(GameplayInput input)
         {
-            if (input.SelectedAbility == _previousSelectedAbility) return;
-            if (input.SelectedAbility is >= 1 and <= 3)
-            {
-                _abilityRoundState ??= FindAnyObjectByType<AbilityRoundState>();
-                _abilityRoundState?.TrySelectAbility(this, input.SelectedAbility - 1);
-            }
+            if (input.SelectedAbility is < 1 or > 3)
+                return;
+
+            _abilityRoundState ??= FindAnyObjectByType<AbilityRoundState>();
+            if (_abilityRoundState == null)
+                return;
+
+            if (!_abilityRoundState.TrySelectAbility(this, input.SelectedAbility - 1))
+                return;
+
             _previousSelectedAbility = input.SelectedAbility;
         }
     }

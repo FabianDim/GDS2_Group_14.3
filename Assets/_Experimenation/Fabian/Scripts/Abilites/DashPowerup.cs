@@ -1,10 +1,10 @@
 using System;
-using System.Collections;
-using System.Threading.Tasks;
-using _Experimenation.K.Abilities.Scripts;
+using _Experimenation.Fraser.Scripts;
+using _Experimenation.K.Multiplayer.Scripts;
+using _Project.Abilities.Scripts;
 using UnityEngine;
 
-namespace _Experimenation.K.Abilities.Scripts
+namespace _Experimenation.Fabian.Scripts.Abilites
 {
     [System.Serializable]
     public class DashPowerup : AbilityEffect
@@ -13,28 +13,26 @@ namespace _Experimenation.K.Abilities.Scripts
         public float boostSpeed = 100f;
         public float boostDuration = 3f;
 
-        private Func<float> SpeedOverride;
-        public override void ApplyEffect(MonoBehaviour runner)
+        private Func<float> _speedOverride;
+        public override void ApplyEffect(Player target)
         {
-
-
-            if (!runner.TryGetComponent<FirstPersonMovement>(out var movement))
-            {
-                movement = UnityEngine.Object.FindAnyObjectByType<FirstPersonMovement>();
-            }
-
-            if (movement != null)
-            {
-                Debug.Log($"DashPowerup: Adding the boost of {{ {boostSpeed} }}");
-                SpeedOverride = () => boostSpeed;
-                movement.GetSpeedOverrideList().Add(SpeedOverride);
-                Debug.Log("DashPowerup: First person movement object found in the scene. Starting coroutine.");
-                movement.StartCoroutine(ExecuteAfterDelay(() => { movement.GetSpeedOverrideList().Remove(SpeedOverride); }, boostDuration));
-            }
-            else
-            {
-                Debug.LogError("DashPowerup: No FirstPersonMovement found in scene.");
-            }
+            // if (!Runner.TryGetComponent<PlayerMovement>(out var movement))
+            // {
+            //     movement = FindAnyObjectByType<PlayerMovement>();
+            // }
+            //
+            // if (movement != null)
+            // {
+            //     Debug.Log($"DashPowerup: Adding the boost of {{ {boostSpeed} }}");
+            //     _speedOverride = () => boostSpeed;
+            //     movement.GetSpeedOverrideList().Add(_speedOverride);
+            //     Debug.Log("DashPowerup: First person movement object found in the scene. Starting coroutine.");
+            //     movement.StartCoroutine(ExecuteAfterDelay(() => { movement.GetSpeedOverrideList().Remove(_speedOverride); }, boostDuration));
+            // }
+            // else
+            // {
+            //     Debug.LogError("DashPowerup: No FirstPersonMovement found in scene.");
+            // }
         }
     }
 }

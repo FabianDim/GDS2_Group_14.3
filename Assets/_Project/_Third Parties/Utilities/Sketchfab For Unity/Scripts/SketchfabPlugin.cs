@@ -3,12 +3,12 @@
  * License: https://github.com/sketchfab/UnityGLTF/blob/master/LICENSE
  */
 #if UNITY_EDITOR
+using SimpleJSON;
 using UnityEngine;
 using UnityEngine.Networking;
-using SimpleJSON;
 
 // Static data and assets related to the plugin
-namespace Sketchfab
+namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts
 {
 	public class SketchfabPlugin : MonoBehaviour
 	{

@@ -1,43 +1,37 @@
 ﻿using UnityEngine;
 
-public class Jump : MonoBehaviour
+namespace _Experimenation.K._Third_Parties.System.Mini_First_Person_Controller.Scripts.Components
 {
-    Rigidbody rigidbody;
-    public float jumpStrength = 2;
-    public event System.Action Jumped;
-
-    [SerializeField, Tooltip("Prevents jumping when the transform is in mid-air.")]
-    GroundCheck groundCheck;
-
-
-    void Reset()
+    public class Jump : MonoBehaviour
     {
-        // Try to get groundCheck.
-        groundCheck = GetComponentInChildren<GroundCheck>();
-    }
+        Rigidbody rigidbody;
+        public float jumpStrength = 2;
+        public event global::System.Action Jumped;
 
-    void Awake()
-    {
-        // Get rigidbody.
-        rigidbody = GetComponent<Rigidbody>();
-    }
+        [SerializeField, Tooltip("Prevents jumping when the transform is in mid-air.")]
+        GroundCheck groundCheck;
 
-    void LateUpdate()
-    {
-        // Jump when the Jump button is pressed and we are on the ground.
-        if (Input.GetButtonDown("Jump") && (!groundCheck || groundCheck.isGrounded))
+
+        void Reset()
         {
-            rigidbody.AddForce(Vector3.up * 100 * jumpStrength);
-            Jumped?.Invoke();
+            // Try to get groundCheck.
+            groundCheck = GetComponentInChildren<GroundCheck>();
         }
-    }
-    public float GetJumpStrength()
-    {
-        return jumpStrength;
-    }
 
-    public void SetJumpStrength(float newStrength)
-    {
-        jumpStrength = newStrength;
+        void Awake()
+        {
+            // Get rigidbody.
+            rigidbody = GetComponent<Rigidbody>();
+        }
+
+        void LateUpdate()
+        {
+            // Jump when the Jump button is pressed and we are on the ground.
+            if (Input.GetButtonDown("Jump") && (!groundCheck || groundCheck.isGrounded))
+            {
+                rigidbody.AddForce(Vector3.up * 100 * jumpStrength);
+                Jumped?.Invoke();
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Project.UI
+namespace _Experimenation.K._Third_Parties.UI.Strategic_Warfare_UI_Starter_Pack.scripts
 {
     public class ProfileScrollViewSpawner : MonoBehaviour
     {
@@ -18,7 +18,7 @@ namespace Project.UI
             Horizontal
         }
 
-        [System.Serializable]
+        [global::System.Serializable]
         public class ProgressData
         {
             public string progressName = "HP";
@@ -27,7 +27,7 @@ namespace Project.UI
             public float currentValue = 100f;
         }
 
-        [System.Serializable]
+        [global::System.Serializable]
         public class ProfileData
         {
             [Header("Profile")]

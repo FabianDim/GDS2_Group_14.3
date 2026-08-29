@@ -5,13 +5,13 @@
 
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using SimpleJSON;
-using UnityEngine.Networking;
 using System.Collections.Specialized;
+using SimpleJSON;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Networking;
 
-namespace Sketchfab
+namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts.AssetBrowser
 {
 	public enum SORT_BY
 	{

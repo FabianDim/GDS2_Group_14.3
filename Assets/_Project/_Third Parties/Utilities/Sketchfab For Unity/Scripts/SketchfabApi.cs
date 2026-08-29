@@ -4,12 +4,12 @@
  */
 
 #if UNITY_EDITOR
-using UnityEngine;
 using System.Collections.Generic;
 using SimpleJSON;
+using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Sketchfab
+namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts
 {
 	public delegate void UpdateCallback();
 	public delegate void TextRequestCallback(string response);

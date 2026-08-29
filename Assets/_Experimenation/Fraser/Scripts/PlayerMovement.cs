@@ -22,7 +22,7 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float acceleration = 12f;
 
         [Header("Jumping")]
-        [SerializeField] private float jumpForce = 7f;
+        public float jumpForce = 7f;
 
         [Header("Gravity")]
         [SerializeField] private float gravityMultiplier = 1.8f;

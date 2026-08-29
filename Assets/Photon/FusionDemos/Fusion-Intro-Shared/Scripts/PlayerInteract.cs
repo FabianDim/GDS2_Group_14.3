@@ -1,8 +1,7 @@
-using System;
 using Fusion;
 using UnityEngine;
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
   /// <summary>
   /// Class responsible for making the player pick up or deposit a color.
   /// </summary>

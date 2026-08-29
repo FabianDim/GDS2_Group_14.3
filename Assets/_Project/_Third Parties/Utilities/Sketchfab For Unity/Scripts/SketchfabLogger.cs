@@ -1,11 +1,11 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using SimpleJSON;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEditor;
-using SimpleJSON;
 
-namespace Sketchfab
+namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts
 {
 	public class SketchfabProfile
 	{

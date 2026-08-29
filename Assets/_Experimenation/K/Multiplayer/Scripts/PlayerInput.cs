@@ -17,45 +17,66 @@ namespace _Experimenation.K.Multiplayer.Scripts
         
         //Ability Selection
         public int SelectedAbility;
+        
+        //Test Console
+        public bool StartRunPhase;
     }
     
     public sealed class PlayerInput : NetworkRunnerCallbacks
     {
+        [Header("Movement")]
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference lookAction;
         [SerializeField] private InputActionReference jumpAction;
         [SerializeField] private InputActionReference sprintAction;
         [SerializeField] private InputActionReference crouchAction;
+        
+        [Space, Header("Ability Selection")]
         [SerializeField] private InputActionReference ability1Action;
         [SerializeField] private InputActionReference ability2Action;
         [SerializeField] private InputActionReference ability3Action;
+        
+        [Space, Header("Test Console")] 
+        [SerializeField] private InputActionReference startRunPhase;
         
         public override void Spawned()
         {
             Runner?.AddCallbacks(this);
             
-            moveAction.action.Enable();
-            jumpAction.action.Enable();
-            lookAction.action.Enable();
-            sprintAction.action.Enable();
-            crouchAction.action.Enable();
-            ability1Action.action.Enable();
-            ability2Action.action.Enable();
-            ability3Action.action.Enable();
+            EnableAction(moveAction);
+            EnableAction(jumpAction);
+            EnableAction(lookAction);
+            EnableAction(sprintAction);
+            EnableAction(crouchAction);
+            EnableAction(ability1Action);
+            EnableAction(ability2Action);
+            EnableAction(ability3Action);
+            EnableAction(startRunPhase);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             runner?.RemoveCallbacks(this);
             
-            moveAction.action.Disable();
-            jumpAction.action.Disable();
-            lookAction.action.Disable();
-            sprintAction.action.Disable();
-            crouchAction.action.Disable();
-            ability1Action.action.Disable();
-            ability2Action.action.Disable();
-            ability3Action.action.Disable();
+            DisableAction(moveAction);
+            DisableAction(jumpAction);
+            DisableAction(lookAction);
+            DisableAction(sprintAction);
+            DisableAction(crouchAction);
+            DisableAction(ability1Action);
+            DisableAction(ability2Action);
+            DisableAction(ability3Action);
+            DisableAction(startRunPhase);
+        }
+
+        private static void EnableAction(InputActionReference actionReference)
+        {
+            actionReference?.action?.Enable();
+        }
+
+        private static void DisableAction(InputActionReference actionReference)
+        {
+            actionReference?.action?.Disable();
         }
 
         public override void OnInput(NetworkRunner runner, NetworkInput input)
@@ -63,20 +84,23 @@ namespace _Experimenation.K.Multiplayer.Scripts
             var myInput = new GameplayInput();
             
             //Movement
-            myInput.MoveInput = moveAction.action.ReadValue<Vector2>();
-            myInput.LookInput = lookAction.action.ReadValue<Vector2>();
-            myInput.Jump = jumpAction.action.ReadValue<float>() > 0.5f;
-            myInput.SprintHeld = sprintAction.action.IsPressed();
-            myInput.CrouchHeld = crouchAction.action.IsPressed();
-            myInput.Crouch = crouchAction.action.IsPressed();
-            myInput.UsingGamepadLook = lookAction.action.activeControl?.device is Gamepad;
+            myInput.MoveInput = moveAction?.action?.ReadValue<Vector2>() ?? default;
+            myInput.LookInput = lookAction?.action?.ReadValue<Vector2>() ?? default;
+            myInput.Jump = jumpAction?.action != null && jumpAction.action.ReadValue<float>() > 0.5f;
+            myInput.SprintHeld = sprintAction?.action != null && sprintAction.action.IsPressed();
+            myInput.CrouchHeld = crouchAction?.action != null && crouchAction.action.IsPressed();
+            myInput.Crouch = crouchAction?.action != null && crouchAction.action.IsPressed();
+            myInput.UsingGamepadLook = lookAction?.action?.activeControl?.device is Gamepad;
 
             //Ability Selection
             var selectedAbility = 0;
-            if(ability1Action.action.IsPressed()) selectedAbility = 1;
-            else if(ability2Action.action.IsPressed()) selectedAbility = 2;
-            else if(ability3Action.action.IsPressed()) selectedAbility = 3;
+            if (ability1Action?.action != null && ability1Action.action.WasPressedThisFrame()) selectedAbility = 1;
+            else if (ability2Action?.action != null && ability2Action.action.WasPressedThisFrame()) selectedAbility = 2;
+            else if (ability3Action?.action != null && ability3Action.action.WasPressedThisFrame()) selectedAbility = 3;
             myInput.SelectedAbility = selectedAbility;
+            
+            //Test Console
+            myInput.StartRunPhase = startRunPhase?.action != null && startRunPhase.action.WasPressedThisFrame();
             
             input.Set(myInput);
         }

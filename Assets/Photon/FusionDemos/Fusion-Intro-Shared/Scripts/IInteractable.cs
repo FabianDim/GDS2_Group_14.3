@@ -1,7 +1,6 @@
 using Fusion;
-using UnityEngine;
 
-namespace FusionIntroShared {
+namespace Photon.FusionDemos.Fusion_Intro_Shared.Scripts {
   
   /// <summary>
   /// Interface to indicate an object that the player can interact in the world.

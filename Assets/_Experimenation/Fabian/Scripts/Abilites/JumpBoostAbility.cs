@@ -1,25 +1,27 @@
+using _Experimenation.Fraser.Scripts;
+using _Experimenation.K.Multiplayer.Scripts;
+using _Project.Abilities.Scripts;
+using Fusion;
 using UnityEngine;
-namespace _Experimenation.K.Abilities.Scripts
+
+namespace _Experimenation.Fabian.Scripts.Abilites
 {
     [System.Serializable]
 
     public class JumpBoostAbility : AbilityEffect
     {
-        public float abilityDuration = 20f;
-        public override void ApplyEffect(MonoBehaviour runner)
-        {
-            if (!runner.TryGetComponent<Jump>(out var jumper))
-            {
-                jumper = UnityEngine.Object.FindAnyObjectByType<Jump>();
-            }
+        [SerializeField] private float abilityDuration = 20f;
+        [SerializeField] private float boostMultiplayer = 2f;
+        private PlayerMovement _playerMovement;
+        private TickTimer _timer;
 
-            if (jumper)
-            {
-                Debug.Log("JumpBoost: found the jump class. Running the ability logic.");
-                float previousStrength = jumper.GetJumpStrength();
-                jumper.SetJumpStrength(previousStrength * 2f);
-                jumper.StartCoroutine(ExecuteAfterDelay(() => { jumper.SetJumpStrength(previousStrength); }, abilityDuration));
-            }
+        public override void ApplyEffect(Player target)
+        {
+            _playerMovement = target != null ? target.GetComponent<PlayerMovement>() : null;
+            if (_playerMovement == null)
+                return;
+
+            _playerMovement.jumpForce *= boostMultiplayer;
         }
     }
 }
