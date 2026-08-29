@@ -21,7 +21,15 @@ namespace _Experimenation.Fabian.Scripts.Abilites
             if (_playerMovement == null)
                 return;
 
-            _playerMovement.jumpForce *= boostMultiplayer;
+            if ((_playerMovement.jumpForce * boostMultiplayer) <= _playerMovement.maxJumpForce)
+            {
+                _playerMovement.jumpForce *= boostMultiplayer;
+            }
+            else
+            {
+                _playerMovement.jumpForce = _playerMovement.maxJumpForce;
+            }
+            target.StartCoroutine(ExecuteAfterDelay(() => { _playerMovement.jumpForce = _playerMovement.defaultJumpForce; }));
         }
     }
 }
