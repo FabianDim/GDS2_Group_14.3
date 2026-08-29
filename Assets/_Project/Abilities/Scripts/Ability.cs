@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using _Experimenation.K.Multiplayer.Scripts;
 using SerializeReferenceEditor;
@@ -34,6 +35,12 @@ namespace _Project.Abilities.Scripts
     public abstract class AbilityEffect
     {
         public abstract void ApplyEffect(Player target);
+
+        protected IEnumerator ExecuteAfterDelay(Action callback, float delay = 3f)
+        {
+            yield return new WaitForSeconds(delay);
+            callback?.Invoke();
+        }
     }
 
     #region Ability Effects
