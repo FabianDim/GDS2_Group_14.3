@@ -38,11 +38,12 @@ namespace _Experimenation.K.Multiplayer.Scripts
         
         [Space, Header("Test Console")] 
         [SerializeField] private InputActionReference startRunPhase;
-        
+
         public override void Spawned()
         {
+            if (!HasInputAuthority) return;
             Runner?.AddCallbacks(this);
-            
+
             EnableAction(moveAction);
             EnableAction(jumpAction);
             EnableAction(lookAction);
@@ -56,8 +57,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            runner?.RemoveCallbacks(this);
-            
+            runner.RemoveCallbacks(this);
+
             DisableAction(moveAction);
             DisableAction(jumpAction);
             DisableAction(lookAction);
@@ -94,13 +95,13 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             //Ability Selection
             var selectedAbility = 0;
-            if (ability1Action?.action != null && ability1Action.action.WasPressedThisFrame()) selectedAbility = 1;
-            else if (ability2Action?.action != null && ability2Action.action.WasPressedThisFrame()) selectedAbility = 2;
-            else if (ability3Action?.action != null && ability3Action.action.WasPressedThisFrame()) selectedAbility = 3;
+            if (ability1Action?.action != null && ability1Action.action.IsPressed()) selectedAbility = 1;
+            else if (ability2Action?.action != null && ability2Action.action.IsPressed()) selectedAbility = 2;
+            else if (ability3Action?.action != null && ability3Action.action.IsPressed()) selectedAbility = 3;
             myInput.SelectedAbility = selectedAbility;
             
             //Test Console
-            myInput.StartRunPhase = startRunPhase?.action != null && startRunPhase.action.WasPressedThisFrame();
+            myInput.StartRunPhase = startRunPhase?.action != null && startRunPhase.action.IsPressed();
             
             input.Set(myInput);
         }

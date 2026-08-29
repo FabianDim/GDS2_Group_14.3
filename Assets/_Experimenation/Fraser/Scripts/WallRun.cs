@@ -35,8 +35,8 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private bool blockedByMovementState;
         [SerializeField] private bool sameWallBlocked;
 
-        public bool isWallRunning { get; private set; }
-        public float tilt { get; private set; }
+        private bool IsWallRunning { get; set; }
+        private float Tilt { get; set; }
 
         public float WallJumpVerticalForce
         {
@@ -46,93 +46,83 @@ namespace _Experimenation.Fraser.Scripts
             }
         }
 
-        private RaycastHit leftWallHit;
-        private RaycastHit rightWallHit;
-        private RaycastHit currentWallHit;
+        private RaycastHit _leftWallHit;
+        private RaycastHit _rightWallHit;
+        private RaycastHit _currentWallHit;
 
-        private Collider blockedWallCollider;
+        private Collider _blockedWallCollider;
 
-        private PlayerMovement playerMovement;
+        private PlayerMovement _playerMovement;
 
-        private TickTimer wallJumpReattachTimer;
+        private TickTimer _wallJumpReattachTimer;
 
         public override void Spawned()
         {
-            playerMovement =
+            _playerMovement =
                 GetComponent<PlayerMovement>();
         }
 
         public void UpdateWallRunState()
         {
-            if (playerMovement == null)
+            if (_playerMovement == null)
             {
                 return;
             }
 
-            if (playerMovement.IsGrounded)
+            if (_playerMovement.IsGrounded)
             {
-                blockedWallCollider = null;
+                _blockedWallCollider = null;
             }
 
             CheckWall();
 
             grounded =
-                playerMovement.IsGrounded;
+                _playerMovement.IsGrounded;
 
             blockedByMovementState =
-                playerMovement.IsSliding ||
-                playerMovement.IsCrouching ||
-                playerMovement.IsClimbing;
+                _playerMovement.IsSliding ||
+                _playerMovement.IsCrouching ||
+                _playerMovement.IsClimbing;
 
-            if (playerMovement.IsClimbing)
-            {
-                StopWallRun();
-                return;
-            }
-
-            if (!wallJumpReattachTimer
-                .ExpiredOrNotRunning(Runner))
-            {
-                StopWallRun();
-                return;
-            }
-
-            if (grounded ||
+            if (_playerMovement.IsClimbing ||
+                !_wallJumpReattachTimer
+                    .ExpiredOrNotRunning(Runner) ||
+                grounded ||
                 blockedByMovementState)
             {
                 StopWallRun();
                 return;
             }
 
-            bool canUseLeftWall =
+            var canUseLeftWall =
                 wallLeft &&
-                leftWallHit.collider !=
-                blockedWallCollider;
+                _leftWallHit.collider !=
+                _blockedWallCollider;
 
-            bool canUseRightWall =
+            var canUseRightWall =
                 wallRight &&
-                rightWallHit.collider !=
-                blockedWallCollider;
+                _rightWallHit.collider !=
+                _blockedWallCollider;
 
             sameWallBlocked =
                 (wallLeft &&
-                 leftWallHit.collider ==
-                 blockedWallCollider) ||
+                 _leftWallHit.collider ==
+                 _blockedWallCollider) ||
                 (wallRight &&
-                 rightWallHit.collider ==
-                 blockedWallCollider);
+                 _rightWallHit.collider ==
+                 _blockedWallCollider);
 
             if (canUseLeftWall)
             {
-                currentWallHit =
-                    leftWallHit;
+                _currentWallHit =
+                    _leftWallHit;
 
                 StartWallRun();
             }
             else if (canUseRightWall)
             {
-                currentWallHit =
-                    rightWallHit;
+                _currentWallHit =
+                    _rightWallHit;
 
                 StartWallRun();
             }
@@ -144,10 +134,10 @@ namespace _Experimenation.Fraser.Scripts
 
         private void CheckWall()
         {
-            PhysicsScene physicsScene =
+            var physicsScene =
                 Runner.GetPhysicsScene();
 
-            Vector3 checkPosition =
+            var checkPosition =
                 transform.position +
                 Vector3.up *
                 wallCheckHeight;
@@ -157,7 +147,7 @@ namespace _Experimenation.Fraser.Scripts
                     checkPosition,
                     wallCheckRadius,
                     -orientation.right,
-                    out leftWallHit,
+                    out _leftWallHit,
                     wallDistance,
                     wallMask,
                     QueryTriggerInteraction.Ignore
@@ -168,7 +158,7 @@ namespace _Experimenation.Fraser.Scripts
                     checkPosition,
                     wallCheckRadius,
                     orientation.right,
-                    out rightWallHit,
+                    out _rightWallHit,
                     wallDistance,
                     wallMask,
                     QueryTriggerInteraction.Ignore
@@ -195,48 +185,48 @@ namespace _Experimenation.Fraser.Scripts
 
         private void StartWallRun()
         {
-            if (!isWallRunning)
+            if (!IsWallRunning)
             {
-                isWallRunning = true;
+                IsWallRunning = true;
 
-                playerMovement
+                _playerMovement
                     .IsWallRunning = true;
             }
 
-            playerMovement.SetGravity(
+            _playerMovement.SetGravity(
                 wallRunGravity
             );
         }
 
         private void StopWallRun()
         {
-            if (!isWallRunning)
+            if (!IsWallRunning)
             {
                 return;
             }
 
-            isWallRunning = false;
+            IsWallRunning = false;
 
-            playerMovement
+            _playerMovement
                 .IsWallRunning = false;
 
-            if (!playerMovement.IsClimbing)
+            if (!_playerMovement.IsClimbing)
             {
-                playerMovement.SetGravity(
-                    playerMovement.NormalGravity
+                _playerMovement.SetGravity(
+                    _playerMovement.NormalGravity
                 );
             }
         }
 
         public void StopWallRunFromJump()
         {
-            if (currentWallHit.collider != null)
+            if (_currentWallHit.collider != null)
             {
-                blockedWallCollider =
-                    currentWallHit.collider;
+                _blockedWallCollider =
+                    _currentWallHit.collider;
             }
 
-            wallJumpReattachTimer =
+            _wallJumpReattachTimer =
                 TickTimer.CreateFromSeconds(
                     Runner,
                     wallJumpReattachDelay
@@ -247,14 +237,14 @@ namespace _Experimenation.Fraser.Scripts
 
         public void StopWallRunFromClimb()
         {
-            if (!isWallRunning)
+            if (!IsWallRunning)
             {
                 return;
             }
 
-            isWallRunning = false;
+            IsWallRunning = false;
 
-            playerMovement
+            _playerMovement
                 .IsWallRunning = false;
         }
 
@@ -262,10 +252,10 @@ namespace _Experimenation.Fraser.Scripts
             Vector3 inputDirection
         )
         {
-            Vector3 wallDirection =
+            var wallDirection =
                 Vector3.ProjectOnPlane(
                     inputDirection,
-                    currentWallHit.normal
+                    _currentWallHit.normal
                 );
 
             wallDirection.y = 0f;
@@ -283,10 +273,10 @@ namespace _Experimenation.Fraser.Scripts
             Vector3 currentVelocity
         )
         {
-            Vector3 velocityAlongWall =
+            var velocityAlongWall =
                 Vector3.ProjectOnPlane(
                     currentVelocity,
-                    currentWallHit.normal
+                    _currentWallHit.normal
                 );
 
             velocityAlongWall.y = 0f;
@@ -297,8 +287,8 @@ namespace _Experimenation.Fraser.Scripts
         public Vector3
             GetWallJumpHorizontalImpulse()
         {
-            Vector3 awayFromWall =
-                currentWallHit.normal;
+            var awayFromWall =
+                _currentWallHit.normal;
 
             awayFromWall.y = 0f;
 
@@ -321,7 +311,7 @@ namespace _Experimenation.Fraser.Scripts
 
             float targetFov;
 
-            if (isWallRunning)
+            if (IsWallRunning)
             {
                 targetFov =
                     wallRunFov;
@@ -340,9 +330,9 @@ namespace _Experimenation.Fraser.Scripts
                     Time.deltaTime
                 );
 
-            float targetTilt = 0f;
+            var targetTilt = 0f;
 
-            if (isWallRunning)
+            if (IsWallRunning)
             {
                 if (wallLeft)
                 {
@@ -356,9 +346,9 @@ namespace _Experimenation.Fraser.Scripts
                 }
             }
 
-            tilt =
+            Tilt =
                 Mathf.Lerp(
-                    tilt,
+                    Tilt,
                     targetTilt,
                     camTiltTime *
                     Time.deltaTime

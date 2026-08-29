@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 7679303397507352776}
   - component: {fileID: 3192902738133240270}
   - component: {fileID: 4978868535457396490}
-  - component: {fileID: 8922735842832967654}
   m_Layer: 0
   m_Name: Player (Legacy)
   m_TagString: Untagged
@@ -122,7 +121,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 7679303397507352776}
   - {fileID: 4978868535457396490}
-  - {fileID: 8922735842832967654}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &4978868535457396490
 MonoBehaviour:
@@ -137,27 +135,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Multiplayer.Scripts.Player
   _Role: 0
---- !u!114 &8922735842832967654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2266240551656800350}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bccb4ab7e7774959a587e1fd3de1f538, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Multiplayer.Scripts.PlayerInput
-  moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  lookAction: {fileID: 8820154950242146738, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  sprintAction: {fileID: 0}
-  crouchAction: {fileID: 0}
-  ability1Action: {fileID: 0}
-  ability2Action: {fileID: 0}
-  ability3Action: {fileID: 0}
-  startRunPhase: {fileID: 0}
 --- !u!1 &6308964894088555674
 GameObject:
   m_ObjectHideFlags: 0
