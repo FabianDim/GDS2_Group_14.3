@@ -23,6 +23,8 @@ namespace _Experimenation.Fraser.Scripts
 
         [Header("Jumping")]
         public float jumpForce = 7f;
+
+        public float defaultJumpForce = 7f;
         public float maxJumpForce = 14f;
 
         [Header("Gravity")]

@@ -29,6 +29,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
             {
                 _playerMovement.jumpForce = _playerMovement.maxJumpForce;
             }
+            target.StartCoroutine(ExecuteAfterDelay(() => { _playerMovement.jumpForce = _playerMovement.defaultJumpForce; }));
         }
     }
 }
