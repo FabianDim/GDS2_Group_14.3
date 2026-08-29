@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+        
 public class Jump : MonoBehaviour
 {
     Rigidbody rigidbody;

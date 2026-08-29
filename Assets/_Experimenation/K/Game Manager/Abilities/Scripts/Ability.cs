@@ -33,7 +33,7 @@ namespace _Experimenation.K.Abilities.Scripts
     [Serializable]
     public abstract class AbilityEffect
     {
-        public abstract void ApplyEffect(MonoBehaviour runner);
+        public abstract void ApplyEffect(MonoBehaviour runner = null);
 
         protected IEnumerator ExecuteAfterDelay(Action callback, float delay = 3f)
         {
