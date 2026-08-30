@@ -10,9 +10,13 @@ namespace _Experimenation.K.Game_Manager.Scripts
 {
     public class GameManager : NetworkRunnerCallbacks
     {
+        [Header("Players")]
         [SerializeField] private NetworkPrefabRef playerPrefab;
         [SerializeField] private Transform[] spawnPoints;
         private GameObject _runPhaseItems;
+        
+        [Header("Exfiltration Pod")]
+        [SerializeField] private NetworkPrefabRef exitPodPrefab;
 
         private readonly Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
         private NetworkRunner _networkRunner;
@@ -40,6 +44,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         public override void OnSceneLoadDone(NetworkRunner runner)
         {
             if (!runner.IsServer) return;
+            SpawnExitPod();
             SpawnPlayers();
         }
 
@@ -72,6 +77,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
             runnerObject.GetComponent<Player>().Role = PlayerRole.Runner;
             chaserObject.GetComponent<Player>().Role = PlayerRole.Chaser;
+            
+            EventBus.Raise(new PlayersSpawnedEvent(runnerObject, chaserObject));
             return;
 
             NetworkObject SpawnPlayer(PlayerRef player, PlayerRole role, int spawnPointIndex)
@@ -95,8 +102,15 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 }
 
                 _spawnedPlayers[player] = playerObject;
+            
                 return playerObject;
             }
+            
+        }
+
+        private void SpawnExitPod()
+        {
+            NetworkObject pod = _networkRunner.Spawn(exitPodPrefab);
         }
 
         public override void OnPlayerLeft(NetworkRunner runner, PlayerRef player)

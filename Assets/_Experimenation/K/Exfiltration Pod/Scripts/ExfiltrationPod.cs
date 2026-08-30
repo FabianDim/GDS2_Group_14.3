@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
+using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using UnityEngine;
 
@@ -27,34 +28,38 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
         {
             //_runner = GameObject.FindGameObjectWithTag("Runner");
             _pod = transform.GetChild(0).gameObject;
-            _pod.SetActive(false);
             /*_podAvailableTime = new WaitForSeconds(podAvailableTime);
             _podUnavailableTime = new WaitForSeconds(podUnavailableTime);*/
             
             EventBus.Subscribe<TimeRunsOutEvent>(OnTimeRunsOut);
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
+            EventBus.Subscribe<PlayersSpawnedEvent>(OnPlayersSpawned);
         }
-        
+
         public override void Spawned()
         {
+            _pod.SetActive(false);
+            
             if (!Object.HasStateAuthority) return;
 
-            // find the runner network object 
+            /*// find the runner network object 
             foreach (var player in Runner.ActivePlayers)
             {
                 var obj = Runner.GetPlayerObject(player);
-                if (obj != null && obj.CompareTag("Runner"))
+                if (obj != null && obj.GetComponent<Player>().Role == PlayerRole.Runner)
                 {
+                    Debug.Log($"Runner found.");
                     _runner = obj;
                     break;
                 }
-            }
+            }*/
         }
 
         private void OnDestroy()
         {
             EventBus.Unsubscribe<TimeRunsOutEvent>(OnTimeRunsOut);
             EventBus.Unsubscribe<TokenCollectedEvent>(OnTokenCollected);
+            EventBus.Unsubscribe<PlayersSpawnedEvent>(OnPlayersSpawned);
         }
         
         public override void FixedUpdateNetwork()
@@ -62,6 +67,7 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
             if (Object.HasStateAuthority)
             {
                 // converted pod coroutine behaviour 
+                if (_runner == null) return;
                 if (!_conditionCleared) return;
 
                 if (PodActive)
@@ -90,7 +96,6 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
                     }
                 }
             }
-
             _pod.SetActive(PodActive);
         }
 
@@ -119,6 +124,7 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
         #region Event Bus Handlers
         private void OnTimeRunsOut(TimeRunsOutEvent ev)
         {
+            if (!Object.HasStateAuthority) return;
             if(_conditionCleared) return;
             //StartCoroutine(SpawnPod());
             _conditionCleared = true;
@@ -128,13 +134,20 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
 
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
+            if (!Object.HasStateAuthority) return;
             if(_conditionCleared) return;
             pointTarget -= ev.Points;
             if (pointTarget > 0) return;
             //StartCoroutine(SpawnPod());
+            SpawnPod();
             _conditionCleared = true;
             PodTimer = TickTimer.CreateFromSeconds(Runner, podAvailableTime);
             PodActive = true;
+        }
+        
+        private void OnPlayersSpawned(PlayersSpawnedEvent ev)
+        {
+            _runner = ev.Runner;
         }
 
         /*private IEnumerator SpawnPod()

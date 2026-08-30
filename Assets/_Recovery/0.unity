@@ -626,14 +626,6 @@ PrefabInstance:
       propertyPath: 'spawnPoints.Array.data[1]'
       value: 
       objectReference: {fileID: 1283508728}
-    - target: {fileID: 6442138911610842659, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
-      propertyPath: 'exitPodPrefab.RawGuidValue.Array.data[0]'
-      value: 3799342324231322576
-      objectReference: {fileID: 0}
-    - target: {fileID: 6442138911610842659, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
-      propertyPath: 'exitPodPrefab.RawGuidValue.Array.data[1]'
-      value: -566263446800840357
-      objectReference: {fileID: 0}
     - target: {fileID: 6894551653928419215, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
       propertyPath: SortKey
       value: 1153494255
@@ -1553,6 +1545,72 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4254303996877836135, guid: 9f9bac2bf3030b0439706f487659e3b7, type: 3}
   m_PrefabInstance: {fileID: 217587019}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &253290712
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 551086544}
+    m_Modifications:
+    - target: {fileID: 6054745952688444280, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_Name
+      value: Exfiltration Pod
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.197099
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.319543
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -15.345122
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6782632779581396447, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+      propertyPath: SortKey
+      value: 2710121904
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+--- !u!4 &253290713 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6748524616555936114, guid: d03beacfb6f9b9345bc92534653a24f8, type: 3}
+  m_PrefabInstance: {fileID: 253290712}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &264421423
 PrefabInstance:
@@ -4320,6 +4378,7 @@ Transform:
   - {fileID: 406271330}
   - {fileID: 1304943568}
   - {fileID: 1283508728}
+  - {fileID: 253290713}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &560944680
