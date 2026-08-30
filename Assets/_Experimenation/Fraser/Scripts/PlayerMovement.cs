@@ -11,7 +11,10 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private Transform orientation;
 
         [Header("Movement")]
-        [SerializeField] private float moveSpeed = 10f;
+        [SerializeField] public float moveSpeed = 10f;
+        public float defaultMoveSpeed = 10f;
+        [SerializeField] public float maxMoveSpeed = 40f;
+
         [SerializeField] private float movementMultiplier = 10f;
         [SerializeField] private float airMultiplier = 0.55f;
 
