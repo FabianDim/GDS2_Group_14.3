@@ -10,6 +10,7 @@ public class SmokeExplosion : MonoBehaviour
     [SerializeField] private float smokeExplosionDelay = 3f;
     [SerializeField] private float smokeExplosionForce = 700f;
     [SerializeField] private float explosionRadius = 5f;
+    [SerializeField] private bool testExplosion = false;
 
     private float countDown;
     private bool hasExploded = false;
@@ -22,6 +23,12 @@ public class SmokeExplosion : MonoBehaviour
 
     private void Update()
     {
+        if (testExplosion == true)
+        {
+            CreateSmokeExplosion();
+            hasExploded = true;
+        }
+
         if (!hasExploded && isArmed)
         {
             countDown -= Time.deltaTime;

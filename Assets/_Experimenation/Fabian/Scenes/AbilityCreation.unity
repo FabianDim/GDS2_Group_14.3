@@ -5109,6 +5109,14 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 26275a96-7fde-46ad-86d4-0a55b0f9093d
     m_ActionName: 'Player/Ability 3[/Keyboard/3]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b14b98be-2552-4fb5-a14b-300c9c7ce1cf
+    m_ActionName: 'Player/Look[/Mouse/delta]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9c515728-b286-40f2-bb3c-9d15d16d6a7c
+    m_ActionName: 'Test/Start Run Phase[/Keyboard/numpad1]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -16700,6 +16708,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4207293392497186, guid: 11aaea5348574644a9eb4f4504fcce3f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114503055206606986, guid: 11aaea5348574644a9eb4f4504fcce3f, type: 3}
+      propertyPath: isGrounded
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
