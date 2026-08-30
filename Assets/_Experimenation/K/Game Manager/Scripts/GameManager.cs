@@ -16,7 +16,6 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         private readonly Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
         private NetworkRunner _networkRunner;
-        private PlayerRef? _runnerPlayer;
 
         public void Awake()
         {
@@ -58,11 +57,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 return;
             }
 
-            // Choose the Runner once so a retry cannot swap roles after a partial spawn.
-            _runnerPlayer ??= players[Random.Range(0, 2)];
-
-            var runnerPlayer = _runnerPlayer.Value;
-            var chaserPlayer = players[0] == runnerPlayer ? players[1] : players[0];
+            // The host (local server player) is always the Chaser; the client is always the Runner.
+            var runnerPlayer = _networkRunner.LocalPlayer;
+            var chaserPlayer = players.First(p => p != runnerPlayer);
 
             var runnerObject = SpawnPlayer(runnerPlayer, PlayerRole.Runner, 0);
             var chaserObject = SpawnPlayer(chaserPlayer, PlayerRole.Chaser, 1);
@@ -72,6 +69,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
             runnerObject.GetComponent<Player>().Role = PlayerRole.Runner;
             chaserObject.GetComponent<Player>().Role = PlayerRole.Chaser;
+            
+            EventBus.Raise(new AllPlayersSpawnedEvent());
             return;
 
             NetworkObject SpawnPlayer(PlayerRef player, PlayerRole role, int spawnPointIndex)

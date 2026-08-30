@@ -637,27 +637,54 @@ PrefabInstance:
     - target: {fileID: 6894551653928419215, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[1]'
       value: 
-      objectReference: {fileID: 82700211}
-    - target: {fileID: 6894551653928419215, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[2]'
-      value: 
-      objectReference: {fileID: 82700211}
+      objectReference: {fileID: 82700213}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 475349711318425100, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 82700213}
+    - targetCorrespondingSourceObject: {fileID: 475349711318425100, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 82700214}
   m_SourcePrefab: {fileID: 100100000, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
---- !u!114 &82700211 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3815147534239640877, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
+--- !u!1 &82700211 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 475349711318425100, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
   m_PrefabInstance: {fileID: 82700210}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+--- !u!224 &82700212 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2397422060773857009, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
+  m_PrefabInstance: {fileID: 82700210}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &82700213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82700211}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f7e9b1e8d6b4f3da5b1c2e7a9d4f801, type: 3}
+  m_Script: {fileID: 11500000, guid: 57cbefeb050f41978e650efb79bc57d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilityRoundState
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilitySystem
+  database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
+--- !u!114 &82700214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82700211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ab2860530124867890ae41f07d7debc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilityUIManager
+  ui: {fileID: 82700212}
 --- !u!1001 &107496470
 PrefabInstance:
   m_ObjectHideFlags: 0

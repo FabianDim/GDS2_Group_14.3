@@ -11,6 +11,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
     {
         [SerializeField] private NetworkRunner runnerPrefab;
         [SerializeField] private TextMeshProUGUI connectionText;
+        [SerializeField] private TMP_InputField roomId;
 
         private NetworkRunner _networkRunner;
         private bool _gameStarted;
@@ -43,7 +44,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
             var result = await _networkRunner.StartGame(new StartGameArgs
             {
                 GameMode = mode,
-                SessionName = "TestRoom1v1", // hardcoded room name for a demo; later make this a text field
+                SessionName = roomId.text,
                 SceneManager = _networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 ObjectProvider = _networkRunner.GetComponent<INetworkObjectProvider>()
             });

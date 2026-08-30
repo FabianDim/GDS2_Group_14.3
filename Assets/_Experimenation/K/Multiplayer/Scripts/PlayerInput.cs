@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using _Project.Menu.Scripts;
+using Fusion;
 using Fusion.Addons.SimpleKCC;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,9 +30,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
     
     public sealed class PlayerInput : NetworkBehaviour, IBeforeUpdate
     {
-        [Header("Sensitivity")]
-        [SerializeField] private float mouseSensitivity = 0.1f;
-        [SerializeField] private float controllerSensitivity = 90f;
+        [Header("Settings")]
+        [SerializeField] private MenuSettings menuSettings;
         private GameplayInput _accumulatedInput;
         private readonly Vector2Accumulator _lookRotationAccumulator = 
             new(0.02f, true);
@@ -104,7 +104,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
             _accumulatedInput.MoveInput = moveAction?.action?.ReadValue<Vector2>() ?? default;
             var lookValue = lookAction.action.ReadValue<Vector2>();
             var lookSensitivity = Gamepad.current != null ? 
-                    controllerSensitivity : mouseSensitivity;
+                    menuSettings.gamepadSensitivity : menuSettings.mouseSensitivity;
             var lookRotationDelta = new Vector2(-lookValue.y, lookValue.x) * lookSensitivity / 60f;
             _lookRotationAccumulator.Accumulate(lookRotationDelta);
             

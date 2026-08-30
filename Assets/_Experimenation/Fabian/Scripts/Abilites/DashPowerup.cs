@@ -22,7 +22,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
                 return;
             }
             _playerMovement.moveSpeed = Mathf.Clamp(_playerMovement.moveSpeed * boostMultiplier, _playerMovement.defaultMoveSpeed, _playerMovement.maxMoveSpeed);
-            _playerMovement.StartCoroutine(ExecuteAfterDelay(() => { _playerMovement.moveSpeed = _playerMovement.defaultMoveSpeed; }, boostDuration));
+            _playerMovement.StartCoroutine(EndEffect(() => { _playerMovement.moveSpeed = _playerMovement.defaultMoveSpeed; }, boostDuration));
         }
     }
 }
