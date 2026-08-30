@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using Fusion.Addons.SimpleKCC;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,25 +7,36 @@ namespace _Experimenation.K.Multiplayer.Scripts
 {
     public struct GameplayInput : INetworkInput
     {
-        //Movement
         public Vector2 MoveInput;
-        public Vector2 LookInput;
-        public bool UsingGamepadLook;
-        public bool Jump;
-        public bool SprintHeld;
-        public bool CrouchHeld;
-        public bool Crouch;
+        public Vector2 LookRotationDelta;
+        public NetworkButtons Buttons;
+    }
+
+    public enum InputButton
+    {
+        //Movement
+        Jump,
+        SprintHeld,
+        CrouchHeld,
+        Crouch,
         
         //Ability Selection
-        public int SelectedAbility;
+        Ability1, Ability2, Ability3,
         
-        //Test Console
-        public bool StartRunPhase;
+        //Test Consol
+        StartRunPhase
     }
     
-    public sealed class PlayerInput : NetworkRunnerCallbacks
+    public sealed class PlayerInput : NetworkBehaviour, IBeforeUpdate
     {
-        [Header("Movement")]
+        [Header("Sensitivity")]
+        [SerializeField] private float mouseSensitivity = 0.1f;
+        [SerializeField] private float controllerSensitivity = 90f;
+        private GameplayInput _accumulatedInput;
+        private readonly Vector2Accumulator _lookRotationAccumulator = 
+            new(0.02f, true);
+        
+        [Space, Header("Movement")]
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference lookAction;
         [SerializeField] private InputActionReference jumpAction;
@@ -42,7 +54,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         public override void Spawned()
         {
             if (!HasInputAuthority) return;
-            Runner?.AddCallbacks(this);
+            Runner.GetComponent<NetworkEvents>()?.OnInput.AddListener(OnInput);
 
             EnableAction(moveAction);
             EnableAction(jumpAction);
@@ -57,7 +69,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            runner.RemoveCallbacks(this);
+            Runner.GetComponent<NetworkEvents>()?.OnInput.RemoveListener(OnInput);
 
             DisableAction(moveAction);
             DisableAction(jumpAction);
@@ -80,30 +92,45 @@ namespace _Experimenation.K.Multiplayer.Scripts
             actionReference?.action?.Disable();
         }
 
-        public override void OnInput(NetworkRunner runner, NetworkInput input)
+        void IBeforeUpdate.BeforeUpdate()
         {
-            var myInput = new GameplayInput();
+            if (!HasInputAuthority) return;
             
-            //Movement
-            myInput.MoveInput = moveAction?.action?.ReadValue<Vector2>() ?? default;
-            myInput.LookInput = lookAction?.action?.ReadValue<Vector2>() ?? default;
-            myInput.Jump = jumpAction?.action != null && jumpAction.action.ReadValue<float>() > 0.5f;
-            myInput.SprintHeld = sprintAction?.action != null && sprintAction.action.IsPressed();
-            myInput.CrouchHeld = crouchAction?.action != null && crouchAction.action.IsPressed();
-            myInput.Crouch = crouchAction?.action != null && crouchAction.action.IsPressed();
-            myInput.UsingGamepadLook = lookAction?.action?.activeControl?.device is Gamepad;
-
+            // Accumulate input only if the cursor is locked.
+            if (Cursor.lockState != CursorLockMode.Locked)
+                return;
+            
+            //Move and Look
+            _accumulatedInput.MoveInput = moveAction?.action?.ReadValue<Vector2>() ?? default;
+            var lookValue = lookAction.action.ReadValue<Vector2>();
+            var lookSensitivity = Gamepad.current != null ? 
+                    controllerSensitivity : mouseSensitivity;
+            var lookRotationDelta = new Vector2(-lookValue.y, lookValue.x) * lookSensitivity / 60f;
+            _lookRotationAccumulator.Accumulate(lookRotationDelta);
+            
+            //Movement Buttons
+            _accumulatedInput.Buttons.Set(InputButton.Jump, jumpAction.action.IsPressed());
+            _accumulatedInput.Buttons.Set(InputButton.SprintHeld, sprintAction.action.IsPressed());
+            _accumulatedInput.Buttons.Set(InputButton.CrouchHeld, crouchAction.action.IsPressed());
+            _accumulatedInput.Buttons.Set(InputButton.Crouch, crouchAction.action.IsPressed());
+            
             //Ability Selection
-            var selectedAbility = 0;
-            if (ability1Action?.action != null && ability1Action.action.IsPressed()) selectedAbility = 1;
-            else if (ability2Action?.action != null && ability2Action.action.IsPressed()) selectedAbility = 2;
-            else if (ability3Action?.action != null && ability3Action.action.IsPressed()) selectedAbility = 3;
-            myInput.SelectedAbility = selectedAbility;
+            _accumulatedInput.Buttons.Set(InputButton.Ability1, ability1Action.action.IsPressed());
+            _accumulatedInput.Buttons.Set(InputButton.Ability2, ability2Action.action.IsPressed());
+            _accumulatedInput.Buttons.Set(InputButton.Ability3, ability3Action.action.IsPressed());
             
             //Test Console
-            myInput.StartRunPhase = startRunPhase?.action != null && startRunPhase.action.IsPressed();
-            
-            input.Set(myInput);
+            _accumulatedInput.Buttons.Set(InputButton.StartRunPhase, startRunPhase.action.IsPressed());
+        }
+
+        private void OnInput(NetworkRunner runner, NetworkInput input)
+        {
+            // Mouse movement (delta values) is aligned to engine update.
+            // To get perfectly smooth interpolated look, we need to align the mouse input with Fusion ticks.
+            _accumulatedInput.LookRotationDelta = _lookRotationAccumulator.ConsumeTickAligned(runner);
+
+            // Fusion polls accumulated input. This callback can be executed multiple times in a row if there is a performance spike.
+            input.Set(_accumulatedInput);
         }
     }
 }

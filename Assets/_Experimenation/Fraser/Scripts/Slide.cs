@@ -16,6 +16,7 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float crouchHeight = 1f;
         [SerializeField] private float crouchCameraHeight = 0.4f;
         [SerializeField] private float cameraCrouchSpeed = 15f;
+        [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         [Header("Sliding")]
         [SerializeField] private float slideForce = 6f;
@@ -54,7 +55,7 @@ namespace _Experimenation.Fraser.Scripts
                 return;
             }
 
-            if (input.Crouch)
+            if (input.Buttons.WasPressed(PreviousButtons, InputButton.Crouch))
             {
                 StartCrouch();
 
@@ -64,7 +65,7 @@ namespace _Experimenation.Fraser.Scripts
                 }
             }
 
-            if (!input.CrouchHeld)
+            if (!input.Buttons.WasPressed(PreviousButtons, InputButton.CrouchHeld))
             {
                 StopSlide();
                 TryStopCrouch();
@@ -77,6 +78,8 @@ namespace _Experimenation.Fraser.Scripts
             {
                 StopSlide();
             }
+            
+            PreviousButtons = input.Buttons;
         }
 
         private void LateUpdate()

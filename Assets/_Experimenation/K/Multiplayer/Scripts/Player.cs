@@ -11,6 +11,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
     {
         [OnChangedRender(nameof(OnRoleChanged))]
         [Networked] public PlayerRole Role { get; set; }
+        [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         private SimpleKCC _simpleKcc;
         private AbilityRoundState _abilityRoundState;
@@ -41,9 +42,6 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             if (audioListener != null)
                 audioListener.enabled = isLocalPlayer;
-
-            if (isLocalPlayer)
-                Debug.Log($"Player camera enabled for local player {Object.InputAuthority}.");
         }
 
         private void OnRoleChanged()
@@ -64,14 +62,18 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private void HandleAbilitySelection(GameplayInput input)
         {
-            if (input.SelectedAbility is < 1 or > 3)
-                return;
-
             _abilityRoundState ??= FindAnyObjectByType<AbilityRoundState>();
             if (_abilityRoundState == null)
                 return;
 
-            _abilityRoundState.TrySelectAbility(this, input.SelectedAbility - 1);
+            var selectedAbility = 1;
+            if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability2)) 
+                selectedAbility = 2;
+            else if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability3)) 
+                selectedAbility = 3;
+            _abilityRoundState.TrySelectAbility(this, selectedAbility - 1);
+            
+            PreviousButtons = input.Buttons;
         }
     }
 }

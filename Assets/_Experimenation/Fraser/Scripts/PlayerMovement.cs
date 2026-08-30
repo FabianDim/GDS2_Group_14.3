@@ -23,6 +23,7 @@ namespace _Experimenation.Fraser.Scripts
 
         [Header("Jumping")]
         public float jumpForce = 7f;
+        [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         [Header("Gravity")]
         [SerializeField] private float gravityMultiplier = 1.8f;
@@ -64,7 +65,7 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void Spawned()
         {
-            if (!HasStateAuthority) return;
+            if(!HasStateAuthority) return;
 
             _kcc =
                 GetComponent<SimpleKCC>();
@@ -87,7 +88,7 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority || _kcc == null || !GetInput(out GameplayInput input)) return;
+            if (_kcc == null || !GetInput(out GameplayInput input)) return;
 
             IsGrounded =
                 _kcc.IsGrounded;
@@ -160,7 +161,7 @@ namespace _Experimenation.Fraser.Scripts
 
             var jumpImpulse = 0f;
 
-            if (input.Jump)
+            if (input.Buttons.WasPressed(PreviousButtons, InputButton.Jump))
             {
                 if (IsWallRunning &&
                     _wallRun != null)
@@ -197,6 +198,8 @@ namespace _Experimenation.Fraser.Scripts
                 movementVelocity,
                 jumpImpulse
             );
+            
+            PreviousButtons = input.Buttons;
         }
 
         private void GroundMovement(
@@ -308,11 +311,10 @@ namespace _Experimenation.Fraser.Scripts
 
         private void ControlSpeed(GameplayInput input)
         {
-
             var targetSpeed = IsGrounded switch
             {
                 true when IsCrouching && !IsSliding => crouchSpeed,
-                true when input.SprintHeld => sprintSpeed,
+                true when input.Buttons.IsSet(InputButton.SprintHeld) => sprintSpeed,
                 true => walkSpeed,
                 _ => moveSpeed
             };
@@ -331,7 +333,7 @@ namespace _Experimenation.Fraser.Scripts
             float force
         )
         {
-            if (!HasStateAuthority) return;
+            
             _horizontalVelocity +=
                 direction.normalized *
                 force;
@@ -339,7 +341,7 @@ namespace _Experimenation.Fraser.Scripts
 
         public void ClearMovementVelocity()
         {
-            if (!HasStateAuthority) return;
+            
             _horizontalVelocity =
                 Vector3.zero;
         }
@@ -348,7 +350,7 @@ namespace _Experimenation.Fraser.Scripts
             float gravity
         )
         {
-            if (!HasStateAuthority) return;
+            
             if (_kcc != null)
             {
                 _kcc.SetGravity(
