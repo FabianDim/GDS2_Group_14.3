@@ -241,7 +241,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.06
-  m_Center: {x: -1.65, y: 0.01, z: 0.32}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &2079421889371735370
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -286,6 +286,7 @@ MonoBehaviour:
   smokeExplosionDelay: 3
   smokeExplosionForce: 700
   explosionRadius: 5
+  testExplosion: 0
 --- !u!1 &6437303193026772368
 GameObject:
   m_ObjectHideFlags: 0
