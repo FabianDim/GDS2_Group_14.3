@@ -12,6 +12,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         [OnChangedRender(nameof(OnRoleChanged))]
         [Networked] public PlayerRole Role { get; set; }
         [Networked] private NetworkButtons PreviousButtons { get; set; }
+        private bool _roundEnded;
 
         public override void Spawned()
         {
@@ -50,8 +51,35 @@ namespace _Experimenation.K.Multiplayer.Scripts
         
         public override void FixedUpdateNetwork()
         {
+            if (HasStateAuthority)
+                CheckForChaserCapture();
+
             if (!GetInput(out GameplayInput input)) return;
             HandleAbilitySelection(input);
+        }
+
+        private void CheckForChaserCapture()
+        {
+            if (_roundEnded || Role != PlayerRole.Chaser)
+                return;
+
+            var colliders = Physics.OverlapSphere(
+                transform.position,
+                1f,
+                ~0,
+                QueryTriggerInteraction.Ignore
+            );
+
+            foreach (var collider in colliders)
+            {
+                var runner = collider.GetComponentInParent<Player>();
+                if (runner == null || runner == this || runner.Role != PlayerRole.Runner)
+                    continue;
+
+                _roundEnded = true;
+                EventBus.Raise(new RoundOverEvent(false));
+                return;
+            }
         }
 
         private void HandleAbilitySelection(GameplayInput input)

@@ -39,7 +39,10 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag("Runner")) return;
+            var player = other.GetComponentInParent<_Experimenation.K.Multiplayer.Scripts.Player>();
+            if (player == null || player.Role != _Experimenation.K.Multiplayer.Scripts.PlayerRole.Runner)
+                return;
+
             EventBus.Raise(new RoundOverEvent(true));
         }
         

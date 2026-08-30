@@ -25,7 +25,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         private void OnRoundOver(RoundOverEvent ev)
         {
-            _text.SetText(ev.RunnerWins ? "Runner Wins!" : "Chaser Wins!");
+            _text.SetText(ev.RunnerWins ? "Runner wins!" : "Chaser caught Runner!");
             _screen.SetActive(true);
         }
     }

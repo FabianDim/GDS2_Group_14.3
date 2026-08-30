@@ -2669,6 +2669,10 @@ PrefabInstance:
       propertyPath: NestedObjects.Array.size
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8525490924620471011, guid: e034eef1ae6bd6a49b10275ec465a5bf, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6514885713161899602, guid: e034eef1ae6bd6a49b10275ec465a5bf, type: 3}

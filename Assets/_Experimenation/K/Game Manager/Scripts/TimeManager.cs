@@ -33,6 +33,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 _timeText.SetText(_roundDuration.ToString(@"mm\:ss"));
             }
             EventBus.Raise(new TimeRunsOutEvent());
+            EventBus.Raise(new RoundOverEvent(true));
         }
     }
 }

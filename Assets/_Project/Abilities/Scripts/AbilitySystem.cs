@@ -58,7 +58,8 @@ namespace _Project.Abilities.Scripts
 
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
-            if (_isShowingAbilities || !ev.CollectedBy.Equals(PlayerRole.Chaser)) 
+            if (_isShowingAbilities || 
+                !ev.CollectedBy.Equals(PlayerRole.Chaser)) 
                 return;
 
             _isShowingAbilities = true;
