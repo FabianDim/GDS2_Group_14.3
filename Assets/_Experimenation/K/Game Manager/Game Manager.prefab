@@ -475,9 +475,9 @@ RectTransform:
   - {fileID: 7451090280710392665}
   m_Father: {fileID: 2397422060773857009}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1041.6666, y: -65.58685}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 116.900024, y: 106.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7523073881400857487
@@ -1091,9 +1091,9 @@ RectTransform:
   - {fileID: 7377112817698813680}
   m_Father: {fileID: 2058597340825049626}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 959.9079, y: -184.41315}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1250, y: 131.1737}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1021670200210513068
@@ -1741,9 +1741,9 @@ RectTransform:
   - {fileID: 7890172135314572592}
   m_Father: {fileID: 2058597340825049626}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 959.9079, y: -59.413147}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 116.900024, y: 106.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2561404888785980037
@@ -1797,7 +1797,6 @@ GameObject:
   - component: {fileID: 6800130484805404427}
   - component: {fileID: 6687819866612302987}
   - component: {fileID: 6442138911610842659}
-  - component: {fileID: 7026419853146792201}
   - component: {fileID: 6894551653928419215}
   m_Layer: 5
   m_Name: Game Manager
@@ -1909,20 +1908,6 @@ MonoBehaviour:
   spawnPoints:
   - {fileID: 0}
   - {fileID: 0}
---- !u!114 &7026419853146792201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5890195215599673364}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f7e9b1e8d6b4f3da5b1c2e7a9d4f801, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilityRoundState
-  database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
-  _CurrentChoiceStart: 0
 --- !u!114 &6894551653928419215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1943,7 +1928,6 @@ MonoBehaviour:
   - {fileID: 4198991808505325467}
   NetworkedBehaviours:
   - {fileID: 6442138911610842659}
-  - {fileID: 7026419853146792201}
   - {fileID: 3815147534239640877}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &5986051136074763612
@@ -1979,9 +1963,9 @@ RectTransform:
   - {fileID: 7427231217744414479}
   m_Father: {fileID: 2397422060773857009}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 625, y: -65.58685}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 116.900024, y: 106.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2646288362219195736
@@ -2232,9 +2216,9 @@ RectTransform:
   - {fileID: 4109230903185387806}
   m_Father: {fileID: 2397422060773857009}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 208.33333, y: -65.58685}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 116.900024, y: 106.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &660513467257179491

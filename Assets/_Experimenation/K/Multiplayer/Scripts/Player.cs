@@ -14,8 +14,6 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private SimpleKCC _simpleKcc;
         private AbilityRoundState _abilityRoundState;
-        private int _previousSelectedAbility;
-        private int _lastAcceptedSelectionSequence = -1;
 
         public override void Spawned()
         {
@@ -32,10 +30,20 @@ namespace _Experimenation.K.Multiplayer.Scripts
             var isLocalPlayer = HasInputAuthority;
 
             if (playerCamera != null)
+            {
                 playerCamera.gameObject.SetActive(isLocalPlayer);
+                if (isLocalPlayer)
+                {
+                    playerCamera.tag = "MainCamera";
+                    playerCamera.enabled = true;
+                }
+            }
 
             if (audioListener != null)
                 audioListener.enabled = isLocalPlayer;
+
+            if (isLocalPlayer)
+                Debug.Log($"Player camera enabled for local player {Object.InputAuthority}.");
         }
 
         private void OnRoleChanged()
@@ -50,7 +58,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority || !GetInput<GameplayInput>(out var input)) return;
+            if (!GetInput(out GameplayInput input)) return;
             HandleAbilitySelection(input);
         }
 
@@ -63,10 +71,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
             if (_abilityRoundState == null)
                 return;
 
-            if (!_abilityRoundState.TrySelectAbility(this, input.SelectedAbility - 1))
-                return;
-
-            _previousSelectedAbility = input.SelectedAbility;
+            _abilityRoundState.TrySelectAbility(this, input.SelectedAbility - 1);
         }
     }
 }

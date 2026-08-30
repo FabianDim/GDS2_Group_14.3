@@ -49,7 +49,7 @@ namespace _Experimenation.Fraser.Scripts
         {
             if (_kcc == null ||
                 _playerMovement == null ||
-                !GetInput<GameplayInput>(out var input))
+                !GetInput(out GameplayInput input))
             {
                 return;
             }

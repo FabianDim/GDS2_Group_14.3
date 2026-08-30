@@ -300,7 +300,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bccb4ab7e7774959a587e1fd3de1f538, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Multiplayer.Scripts.PlayerInput
+  m_EditorClassIdentifier: 
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   lookAction: {fileID: -6103460885919747716, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   jumpAction: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
@@ -309,6 +309,7 @@ MonoBehaviour:
   ability1Action: {fileID: 6351299234884927223, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   ability2Action: {fileID: 5724174579971124104, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   ability3Action: {fileID: 4170820193278323613, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  startRunPhase: {fileID: 0}
 --- !u!114 &5856628787027839950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,13 +360,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee6ee67c3520a4846a694a3faa518aa8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLook
-  wallRun: {fileID: 4129810929460629075}
   cam: {fileID: 6317446918843064033}
   orientation: {fileID: 7080436893792028912}
-  mouseSensitivityX: 0.1
-  mouseSensitivityY: 0.1
-  controllerSensitivityX: 180
-  controllerSensitivityY: 180
+  mouseSensitivity: 0.1
+  controllerSensitivity: 180
 --- !u!114 &8238484208877708968
 MonoBehaviour:
   m_ObjectHideFlags: 0

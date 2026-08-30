@@ -12,6 +12,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
     {
         [SerializeField] private float abilityDuration = 20f;
         [SerializeField] private float boostMultiplayer = 2f;
+        [SerializeField] private float maxJumpForce;
         private PlayerMovement _playerMovement;
         private TickTimer _timer;
 
@@ -21,9 +22,10 @@ namespace _Experimenation.Fabian.Scripts.Abilites
             if (_playerMovement == null)
                 return;
 
-            _playerMovement.jumpForce = Mathf.Clamp(_playerMovement.jumpForce * boostMultiplayer, _playerMovement.defaultJumpForce, _playerMovement.maxJumpForce);
-
-            target.StartCoroutine(ExecuteAfterDelay(() => { _playerMovement.jumpForce = _playerMovement.defaultJumpForce; }));
+            var defaultJumpForce = _playerMovement.jumpForce;
+            _playerMovement.jumpForce = Mathf.Min(maxJumpForce, defaultJumpForce * boostMultiplayer);
+                
+            target.StartCoroutine(ExecuteAfterDelay(() => { _playerMovement.jumpForce = defaultJumpForce; }));
         }
     }
 }

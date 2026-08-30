@@ -22924,7 +22924,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Multiplayer.Scripts.MenuConnector
   runnerPrefab: {fileID: 5541435066032819259, guid: cbc6396a57c1d6246a098fa41c630735, type: 3}
-  connectionText: {fileID: 6956281441404141728}
 --- !u!114 &5267087213616333551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22942,7 +22941,8 @@ MonoBehaviour:
   EnableInterpolation: 1
   Flags: 262146
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 1118730240602260361}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &352915749616479018
 GameObject:
@@ -34361,17 +34361,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8306388515897323698, guid: 3248a6e35ff26a14ca264ee7dc923828, type: 3}
   m_PrefabInstance: {fileID: 2602406641409734048}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6956281441404141728 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4941634134265132288, guid: 3248a6e35ff26a14ca264ee7dc923828, type: 3}
-  m_PrefabInstance: {fileID: 2602406641409734048}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &3849855849782740849
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -217,7 +217,6 @@ namespace _Experimenation.Fraser.Scripts
 
         public Vector3 GetClimbVelocity(GameplayInput playerInput)
         {
-
             var currentWallHit = wallInFront ? _wallHit : _lowerWallHit;
 
             var wallSideDirection =

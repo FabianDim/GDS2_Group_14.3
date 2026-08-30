@@ -27,9 +27,6 @@ namespace _Experimenation.Fraser.Scripts
         [Header("Jumping")]
         public float jumpForce = 7f;
 
-        public float defaultJumpForce = 7f;
-        public float maxJumpForce = 14f;
-
         [Header("Gravity")]
         [SerializeField] private float gravityMultiplier = 1.8f;
 
@@ -70,6 +67,8 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void Spawned()
         {
+            if (!HasStateAuthority) return;
+
             _kcc =
                 GetComponent<SimpleKCC>();
 
@@ -91,15 +90,7 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void FixedUpdateNetwork()
         {
-            Debug.Log(
-                $"Object: {Object.Id} | " +
-                $"InputAuthority: {Object.InputAuthority} | " +
-                $"StateAuthority: {Object.StateAuthority} | " +
-                $"HasInput: {Object.HasInputAuthority} | " +
-                $"IsSimulated: {Object.IsInSimulation}"
-            );
-
-            if (!_kcc || !GetInput<GameplayInput>(out var input)) return;
+            if (!HasStateAuthority || _kcc == null || !GetInput(out GameplayInput input)) return;
 
             IsGrounded =
                 _kcc.IsGrounded;
@@ -343,6 +334,7 @@ namespace _Experimenation.Fraser.Scripts
             float force
         )
         {
+            if (!HasStateAuthority) return;
             _horizontalVelocity +=
                 direction.normalized *
                 force;
@@ -350,6 +342,7 @@ namespace _Experimenation.Fraser.Scripts
 
         public void ClearMovementVelocity()
         {
+            if (!HasStateAuthority) return;
             _horizontalVelocity =
                 Vector3.zero;
         }
@@ -358,6 +351,7 @@ namespace _Experimenation.Fraser.Scripts
             float gravity
         )
         {
+            if (!HasStateAuthority) return;
             if (_kcc != null)
             {
                 _kcc.SetGravity(

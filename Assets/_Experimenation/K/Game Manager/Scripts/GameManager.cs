@@ -26,16 +26,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 Debug.LogError("GameManager: no NetworkRunner found in scene.");
                 return;
             }
-            if (!_networkRunner.IsRunning)
-            {
-                Debug.LogWarning("GameManager: runner is not running yet; scene callbacks may be delayed.");
-            }
-
             _networkRunner.AddCallbacks(this);
-
-            _runPhaseItems = transform.childCount > 0
-                ? transform.GetChild(0).gameObject
-                : null;
+            _runPhaseItems = transform.GetChild(0).gameObject;
 
             EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
         }
@@ -47,20 +39,12 @@ namespace _Experimenation.K.Game_Manager.Scripts
         
         public override void OnSceneLoadDone(NetworkRunner runner)
         {
-            if (!runner.IsServer || runner != _networkRunner)
-                return;
-
+            if (!runner.IsServer) return;
             SpawnPlayers();
         }
 
         private void SpawnPlayers()
         {
-            if (_networkRunner == null || !_networkRunner.IsRunning)
-            {
-                Debug.LogError("GameManager: cannot spawn players without a running NetworkRunner.");
-                return;
-            }
-
             var players = _networkRunner.ActivePlayers.ToList();
             if (players.Count != 2)
             {
@@ -86,16 +70,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
             // Roles are assigned only after both objects have spawned successfully.
             if (runnerObject == null || chaserObject == null) return;
 
-            var runner = runnerObject.GetComponent<Player>();
-            var chaser = chaserObject.GetComponent<Player>();
-            if (runner == null || chaser == null)
-            {
-                Debug.LogError("GameManager: spawned player prefab is missing Player.");
-                return;
-            }
-
-            runner.Role = PlayerRole.Runner;
-            chaser.Role = PlayerRole.Chaser;
+            runnerObject.GetComponent<Player>().Role = PlayerRole.Runner;
+            chaserObject.GetComponent<Player>().Role = PlayerRole.Chaser;
             return;
 
             NetworkObject SpawnPlayer(PlayerRef player, PlayerRole role, int spawnPointIndex)
@@ -105,12 +81,6 @@ namespace _Experimenation.K.Game_Manager.Scripts
                     return existingObject;
 
                 var spawnPoint = spawnPoints[spawnPointIndex];
-                if (!playerPrefab.IsValid)
-                {
-                    Debug.LogError("GameManager: player NetworkPrefabRef is not assigned or invalid.");
-                    return null;
-                }
-
                 var playerObject = _networkRunner.Spawn(
                     playerPrefab,
                     spawnPoint.position,
@@ -133,28 +103,13 @@ namespace _Experimenation.K.Game_Manager.Scripts
         {
             if (!runner.IsServer) return;
 
-            if (!_spawnedPlayers.TryGetValue(player, out var playerObject))
-                return;
-
-            if (playerObject != null && playerObject.IsValid)
-                runner.Despawn(playerObject);
-
+            if (!_spawnedPlayers.TryGetValue(player, out var playerObject)) return;
+            runner.Despawn(playerObject);
             _spawnedPlayers.Remove(player);
         }
 
-        private void OnRunPhaseStarts(RunPhaseStartsEvent ev)
-        {
-            if (!HasStateAuthority || _runPhaseItems == null)
-                return;
-
-            RpcStartsRunPhase();
-        }
-
+        private void OnRunPhaseStarts(RunPhaseStartsEvent ev) => RpcStartsRunPhase();
         [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
-        private void RpcStartsRunPhase()
-        {
-            if (_runPhaseItems != null)
-                _runPhaseItems.SetActive(true);
-        }
+        private void RpcStartsRunPhase() => _runPhaseItems.SetActive(true);
     }
 }
