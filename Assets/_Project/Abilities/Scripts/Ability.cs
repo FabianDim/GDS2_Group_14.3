@@ -15,6 +15,7 @@ namespace _Project.Abilities.Scripts
     public class Ability : ScriptableObject
     {
         public string abilityName;
+        public Sprite abilityImage;
         public Color abilityColor;
         public AbilityType abilityType;
         public AbilityScope abilityScope;
@@ -22,7 +23,6 @@ namespace _Project.Abilities.Scripts
         [SerializeReference, SR] public List<AbilityEffect> effects;
         public int AbilityPrice;
         public Image image;
-        public int multiBuy = 100; //How many times can this object be bought in one buy phase;
 
 
 
