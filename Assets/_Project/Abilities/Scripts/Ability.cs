@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using _Experimenation.K.Multiplayer.Scripts;
 using SerializeReferenceEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace _Project.Abilities.Scripts
 {
@@ -19,6 +20,11 @@ namespace _Project.Abilities.Scripts
         public AbilityScope abilityScope;
         public string abilityDescription;
         [SerializeReference, SR] public List<AbilityEffect> effects;
+        public int AbilityPrice;
+        public Image image;
+        public int multiBuy = 100; //How many times can this object be bought in one buy phase;
+
+
 
         public void OnEnable()
         {

@@ -19,36 +19,37 @@ namespace _Experimenation.K.Multiplayer.Scripts
         SprintHeld,
         CrouchHeld,
         Crouch,
-        
+
         //Ability Selection
         Ability1, Ability2, Ability3,
-        
+
         //Test Consol
-        StartRunPhase
+        StartRunPhase,
+        OpenBuyMenu
     }
-    
+
     public sealed class PlayerInput : NetworkBehaviour, IBeforeUpdate
     {
         [Header("Sensitivity")]
         [SerializeField] private float mouseSensitivity = 0.1f;
         [SerializeField] private float controllerSensitivity = 90f;
         private GameplayInput _accumulatedInput;
-        private readonly Vector2Accumulator _lookRotationAccumulator = 
+        private readonly Vector2Accumulator _lookRotationAccumulator =
             new(0.02f, true);
-        
+
         [Space, Header("Movement")]
         [SerializeField] private InputActionReference moveAction;
         [SerializeField] private InputActionReference lookAction;
         [SerializeField] private InputActionReference jumpAction;
         [SerializeField] private InputActionReference sprintAction;
         [SerializeField] private InputActionReference crouchAction;
-        
+
         [Space, Header("Ability Selection")]
         [SerializeField] private InputActionReference ability1Action;
         [SerializeField] private InputActionReference ability2Action;
         [SerializeField] private InputActionReference ability3Action;
-        
-        [Space, Header("Test Console")] 
+
+        [Space, Header("Test Console")]
         [SerializeField] private InputActionReference startRunPhase;
 
         public override void Spawned()
@@ -95,30 +96,30 @@ namespace _Experimenation.K.Multiplayer.Scripts
         void IBeforeUpdate.BeforeUpdate()
         {
             if (!HasInputAuthority) return;
-            
+
             // Accumulate input only if the cursor is locked.
             if (Cursor.lockState != CursorLockMode.Locked)
                 return;
-            
+
             //Move and Look
             _accumulatedInput.MoveInput = moveAction?.action?.ReadValue<Vector2>() ?? default;
             var lookValue = lookAction.action.ReadValue<Vector2>();
-            var lookSensitivity = Gamepad.current != null ? 
+            var lookSensitivity = Gamepad.current != null ?
                     controllerSensitivity : mouseSensitivity;
             var lookRotationDelta = new Vector2(-lookValue.y, lookValue.x) * lookSensitivity / 60f;
             _lookRotationAccumulator.Accumulate(lookRotationDelta);
-            
+
             //Movement Buttons
             _accumulatedInput.Buttons.Set(InputButton.Jump, jumpAction.action.IsPressed());
             _accumulatedInput.Buttons.Set(InputButton.SprintHeld, sprintAction.action.IsPressed());
             _accumulatedInput.Buttons.Set(InputButton.CrouchHeld, crouchAction.action.IsPressed());
             _accumulatedInput.Buttons.Set(InputButton.Crouch, crouchAction.action.IsPressed());
-            
+
             //Ability Selection
             _accumulatedInput.Buttons.Set(InputButton.Ability1, ability1Action.action.IsPressed());
             _accumulatedInput.Buttons.Set(InputButton.Ability2, ability2Action.action.IsPressed());
             _accumulatedInput.Buttons.Set(InputButton.Ability3, ability3Action.action.IsPressed());
-            
+
             //Test Console
             _accumulatedInput.Buttons.Set(InputButton.StartRunPhase, startRunPhase.action.IsPressed());
         }
