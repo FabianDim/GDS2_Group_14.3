@@ -7,14 +7,26 @@ using UnityEngine;
 
 namespace _Experimenation.K.Multiplayer.Scripts
 {
-    public class MenuConnector : NetworkRunnerCallbacks
+    public class MenuConnector : MonoRunnerCallbacks
     {
         [SerializeField] private NetworkRunner runnerPrefab;
         [SerializeField] private TextMeshProUGUI connectionText;
         [SerializeField] private TMP_InputField roomId;
+        [SerializeField] private TextMeshProUGUI multiplayerLog;
 
         private NetworkRunner _networkRunner;
         private bool _gameStarted;
+
+        private void Awake()
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            
+            var log = MultiplayerLog.GetLog();
+            if (log == null) return;
+            multiplayerLog.SetText(log);
+            multiplayerLog.transform.parent.gameObject.SetActive(true);
+        }
 
         public void HostGame() => Connect(GameMode.Host);
         public void JoinGame() => Connect(GameMode.Client);

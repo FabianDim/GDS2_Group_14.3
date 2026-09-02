@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using _Experimenation.K.Event_Bus;
@@ -5,6 +6,7 @@ using _Experimenation.K.Event_Bus.Events;
 using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace _Experimenation.K.Game_Manager.Scripts
 {
@@ -15,25 +17,20 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private GameObject _runPhaseItems;
 
         private readonly Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
-        private NetworkRunner _networkRunner;
 
-        public void Awake()
+        public override void Spawned()
         {
-            _networkRunner = FindAnyObjectByType<NetworkRunner>();
-            if (_networkRunner == null)
-            {
-                Debug.LogError("GameManager: no NetworkRunner found in scene.");
-                return;
-            }
-            _networkRunner.AddCallbacks(this);
+            Runner.AddCallbacks(this);
             _runPhaseItems = transform.GetChild(0).gameObject;
 
-            EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+            if(HasStateAuthority)
+                EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
         }
 
-        private void OnDestroy()
+        public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+            if(HasStateAuthority)
+                EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
         }
         
         public override void OnSceneLoadDone(NetworkRunner runner)
@@ -44,7 +41,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         private void SpawnPlayers()
         {
-            var players = _networkRunner.ActivePlayers.ToList();
+            var players = Runner.ActivePlayers.ToList();
             if (players.Count != 2)
             {
                 Debug.LogWarning("GameManager: expected exactly two active players before spawning.");
@@ -58,7 +55,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
             }
 
             // The host (local server player) is always the Chaser; the client is always the Runner.
-            var runnerPlayer = _networkRunner.LocalPlayer;
+            var runnerPlayer = Runner.LocalPlayer;
             var chaserPlayer = players.First(p => p != runnerPlayer);
 
             var runnerObject = SpawnPlayer(runnerPlayer, PlayerRole.Runner, 0);
@@ -80,7 +77,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
                     return existingObject;
 
                 var spawnPoint = spawnPoints[spawnPointIndex];
-                var playerObject = _networkRunner.Spawn(
+                var playerObject = Runner.Spawn(
                     playerPrefab,
                     spawnPoint.position,
                     spawnPoint.rotation,
@@ -98,13 +95,25 @@ namespace _Experimenation.K.Game_Manager.Scripts
             }
         }
 
-        public override void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        public override void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-            if (!runner.IsServer) return;
+            MultiplayerLog.LogShutdown(runner, shutdownReason);
+            EndGame();
+        }
 
-            if (!_spawnedPlayers.TryGetValue(player, out var playerObject)) return;
-            runner.Despawn(playerObject);
-            _spawnedPlayers.Remove(player);
+        public override void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => EndGame();
+
+        private async void EndGame()
+        {
+            try
+            {
+                await Runner.Shutdown();
+                SceneManager.LoadScene(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error from GameManager.cs:\n {e}");
+            }
         }
 
         private void OnRunPhaseStarts(RunPhaseStartsEvent ev) => RpcStartsRunPhase();

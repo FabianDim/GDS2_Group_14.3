@@ -1898,6 +1898,7 @@ MonoBehaviour:
   - {fileID: 4198991808505325467}
   NetworkedBehaviours:
   - {fileID: 6442138911610842659}
+  - {fileID: 7743648350992339341}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &5986051136074763612
 GameObject:
