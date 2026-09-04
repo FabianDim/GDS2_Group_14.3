@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using _Experimenation.K.Event_Bus;
@@ -5,6 +6,7 @@ using _Experimenation.K.Event_Bus.Events;
 using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace _Experimenation.K.Game_Manager.Scripts
 {
@@ -23,34 +25,20 @@ namespace _Experimenation.K.Game_Manager.Scripts
         }
 
         private readonly Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
-        private NetworkRunner _networkRunner;
-        private PlayerRef? _runnerPlayer;
 
-        public void Awake()
+        public override void Spawned()
         {
-            _networkRunner = FindAnyObjectByType<NetworkRunner>();
-            if (_networkRunner == null)
-            {
-                Debug.LogError("GameManager: no NetworkRunner found in scene.");
-                return;
-            }
-            if (!_networkRunner.IsRunning)
-            {
-                Debug.LogWarning("GameManager: runner is not running yet; scene callbacks may be delayed.");
-            }
+            Runner.AddCallbacks(this);
+            _runPhaseItems = transform.GetChild(0).gameObject;
 
-            _networkRunner.AddCallbacks(this);
-
-            _runPhaseItems = transform.childCount > 0
-                ? transform.GetChild(0).gameObject
-                : null;
-
-            EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+            if(HasStateAuthority)
+                EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
         }
 
-        private void OnDestroy()
+        public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+            if(HasStateAuthority)
+                EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
         }
 
         public override void OnSceneLoadDone(NetworkRunner runner)
@@ -63,13 +51,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         private void SpawnPlayers()
         {
-            if (_networkRunner == null || !_networkRunner.IsRunning)
-            {
-                Debug.LogError("GameManager: cannot spawn players without a running NetworkRunner.");
-                return;
-            }
-
-            var players = _networkRunner.ActivePlayers.ToList();
+            var players = Runner.ActivePlayers.ToList();
             if (players.Count != 2)
             {
                 Debug.LogWarning("GameManager: expected exactly two active players before spawning.");
@@ -82,11 +64,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 return;
             }
 
-            // Choose the Runner once so a retry cannot swap roles after a partial spawn.
-            _runnerPlayer ??= players[Random.Range(0, 2)];
-
-            var runnerPlayer = _runnerPlayer.Value;
-            var chaserPlayer = players[0] == runnerPlayer ? players[1] : players[0];
+            // The host (local server player) is always the Chaser; the client is always the Runner.
+            var runnerPlayer = Runner.LocalPlayer;
+            var chaserPlayer = players.First(p => p != runnerPlayer);
 
             var runnerObject = SpawnPlayer(runnerPlayer, PlayerRole.Runner, 0);
             var chaserObject = SpawnPlayer(chaserPlayer, PlayerRole.Chaser, 1);
@@ -94,16 +74,10 @@ namespace _Experimenation.K.Game_Manager.Scripts
             // Roles are assigned only after both objects have spawned successfully.
             if (runnerObject == null || chaserObject == null) return;
 
-            var runner = runnerObject.GetComponent<Player>();
-            var chaser = chaserObject.GetComponent<Player>();
-            if (runner == null || chaser == null)
-            {
-                Debug.LogError("GameManager: spawned player prefab is missing Player.");
-                return;
-            }
-
-            runner.Role = PlayerRole.Runner;
-            chaser.Role = PlayerRole.Chaser;
+            runnerObject.GetComponent<Player>().Role = PlayerRole.Runner;
+            chaserObject.GetComponent<Player>().Role = PlayerRole.Chaser;
+            
+            EventBus.Raise(new AllPlayersSpawnedEvent());
             return;
 
             NetworkObject SpawnPlayer(PlayerRef player, PlayerRole role, int spawnPointIndex)
@@ -113,13 +87,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
                     return existingObject;
 
                 var spawnPoint = spawnPoints[spawnPointIndex];
-                if (!playerPrefab.IsValid)
-                {
-                    Debug.LogError("GameManager: player NetworkPrefabRef is not assigned or invalid.");
-                    return null;
-                }
-
-                var playerObject = _networkRunner.Spawn(
+                var playerObject = Runner.Spawn(
                     playerPrefab,
                     spawnPoint.position,
                     spawnPoint.rotation,
@@ -137,17 +105,25 @@ namespace _Experimenation.K.Game_Manager.Scripts
             }
         }
 
-        public override void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        public override void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-            if (!runner.IsServer) return;
+            MultiplayerLog.LogShutdown(runner, shutdownReason);
+            EndGame();
+        }
 
-            if (!_spawnedPlayers.TryGetValue(player, out var playerObject))
-                return;
+        public override void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => EndGame();
 
-            if (playerObject != null && playerObject.IsValid)
-                runner.Despawn(playerObject);
-
-            _spawnedPlayers.Remove(player);
+        private async void EndGame()
+        {
+            try
+            {
+                await Runner.Shutdown();
+                SceneManager.LoadScene(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error from GameManager.cs:\n {e}");
+            }
         }
 
         private void OnRunPhaseStarts(RunPhaseStartsEvent ev)

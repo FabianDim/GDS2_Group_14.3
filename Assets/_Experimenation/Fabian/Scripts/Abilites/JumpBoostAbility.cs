@@ -25,7 +25,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
             var defaultJumpForce = _playerMovement.jumpForce;
             _playerMovement.jumpForce = Mathf.Min(maxJumpForce, defaultJumpForce * boostMultiplayer);
                 
-            target.StartCoroutine(ExecuteAfterDelay(() => { _playerMovement.jumpForce = defaultJumpForce; }));
+            target.StartCoroutine(EndEffect(() => { _playerMovement.jumpForce = defaultJumpForce; }));
         }
     }
 }

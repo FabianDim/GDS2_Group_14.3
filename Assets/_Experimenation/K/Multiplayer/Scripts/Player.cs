@@ -1,6 +1,6 @@
-﻿using _Project.Abilities.Scripts;
+﻿using _Experimenation.K.Event_Bus;
+using _Experimenation.K.Event_Bus.Events;
 using Fusion;
-using Fusion.Addons.SimpleKCC;
 using UnityEngine;
 
 namespace _Experimenation.K.Multiplayer.Scripts
@@ -13,14 +13,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
         [Networked] public PlayerRole Role { get; set; }
         [Networked] private NetworkButtons PreviousButtons { get; set; }
 
-        private SimpleKCC _simpleKcc;
-        private AbilityRoundState _abilityRoundState;
-
         public override void Spawned()
         {
-            _simpleKcc = GetComponent<SimpleKCC>();
-            _simpleKcc.SetGravity(-25.0f);
-
             // OnChangedRender is not guaranteed to run for the initial value,
             // so apply the current role when this instance is spawned as well.
             OnRoleChanged();
@@ -61,17 +55,17 @@ namespace _Experimenation.K.Multiplayer.Scripts
         }
 
         private void HandleAbilitySelection(GameplayInput input)
-        {
-            _abilityRoundState ??= FindAnyObjectByType<AbilityRoundState>();
-            if (_abilityRoundState == null)
-                return;
-
-            var selectedAbility = 1;
+        {   
+            var selectedAbility = 0;
+            if(input.Buttons.WasPressed(PreviousButtons, InputButton.Ability1)) 
+                selectedAbility = 1;
             if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability2)) 
                 selectedAbility = 2;
             else if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability3)) 
                 selectedAbility = 3;
-            _abilityRoundState.TrySelectAbility(this, selectedAbility - 1);
+            
+            if(selectedAbility != 0) 
+                EventBus.Raise(new AbilitySelectedEvent(selectedAbility));
             
             PreviousButtons = input.Buttons;
         }

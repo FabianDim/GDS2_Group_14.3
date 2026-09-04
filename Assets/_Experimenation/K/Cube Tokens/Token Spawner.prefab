@@ -74,7 +74,7 @@ MonoBehaviour:
   EnableInterpolation: 1
   Flags: 262146
   NestedObjects:
-  - {fileID: 6798849754191473172}
+  - {fileID: 2658390344503206103}
   NetworkedBehaviours:
   - {fileID: 3579785908903549545}
   ForceRemoteRenderTimeframe: 0
@@ -130,6 +130,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 459964699641389873, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+      propertyPath: SortKey
+      value: 2450284848
+      objectReference: {fileID: 0}
     - target: {fileID: 8714437318731189684, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
       propertyPath: m_Name
       value: Token
@@ -148,9 +152,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 102758818387785229, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
   m_PrefabInstance: {fileID: 2487782066983863270}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6798849754191473172 stripped
+--- !u!114 &2658390344503206103 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: -226238468760753678, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
+  m_CorrespondingSourceObject: {fileID: 459964699641389873, guid: d444b523d35f9ac4285a7ab647decf92, type: 3}
   m_PrefabInstance: {fileID: 2487782066983863270}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}

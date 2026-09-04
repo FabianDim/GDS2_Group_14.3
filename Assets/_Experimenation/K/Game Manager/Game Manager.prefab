@@ -148,8 +148,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2058597340825049626}
   - component: {fileID: 2587475144630807776}
-  - component: {fileID: 5477519847254506711}
-  - component: {fileID: 3815147534239640877}
   m_Layer: 5
   m_Name: Ability Selection
   m_TagString: Untagged
@@ -204,34 +202,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &5477519847254506711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 475349711318425100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9df85214b8f4d179e18d3e60cf2d102, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilitySelection
-  database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
-  abilitiesUI: {fileID: 2397422060773857009}
---- !u!114 &3815147534239640877
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 475349711318425100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f7e9b1e8d6b4f3da5b1c2e7a9d4f801, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilityRoundState
-  database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
-  _CurrentChoiceStart: 0
 --- !u!1 &506095104964037381
 GameObject:
   m_ObjectHideFlags: 0
@@ -1928,7 +1898,7 @@ MonoBehaviour:
   - {fileID: 4198991808505325467}
   NetworkedBehaviours:
   - {fileID: 6442138911610842659}
-  - {fileID: 3815147534239640877}
+  - {fileID: 7743648350992339341}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &5986051136074763612
 GameObject:
@@ -2699,6 +2669,10 @@ PrefabInstance:
     - target: {fileID: 8525490924620471011, guid: e034eef1ae6bd6a49b10275ec465a5bf, type: 3}
       propertyPath: NestedObjects.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8525490924620471011, guid: e034eef1ae6bd6a49b10275ec465a5bf, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

@@ -38,11 +38,19 @@ namespace _Project.Abilities.Scripts
     }
 
     [Serializable]
-    public abstract class AbilityEffect
+    public class AbilityEffect
     {
-        public abstract void ApplyEffect(Player target);
+        public virtual void ApplyEffect()
+        {
+            
+        }
 
-        protected IEnumerator ExecuteAfterDelay(Action callback, float delay = 3f)
+        public virtual void ApplyEffect(Player target)
+        {
+            
+        }
+
+        protected IEnumerator EndEffect(Action callback, float delay = 3f)
         {
             yield return new WaitForSeconds(delay);
             callback?.Invoke();
@@ -53,7 +61,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability1 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability1 Activated");
         }
@@ -62,7 +70,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability2 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability2 Activated");
         }
@@ -71,7 +79,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability3 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability3 Activated");
         }
@@ -80,7 +88,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability4 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability4 Activated");
         }
@@ -89,7 +97,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability5 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability5 Activated");
         }
@@ -98,7 +106,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability6 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability6 Activated");
         }
@@ -107,7 +115,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability7 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability7 Activated");
         }
@@ -116,7 +124,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability8 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability8 Activated");
         }
@@ -125,7 +133,7 @@ namespace _Project.Abilities.Scripts
     [Serializable]
     public class Ability9 : AbilityEffect
     {
-        public override void ApplyEffect(Player target)
+        public override void ApplyEffect()
         {
             Debug.Log("Ability9 Activated");
         }
