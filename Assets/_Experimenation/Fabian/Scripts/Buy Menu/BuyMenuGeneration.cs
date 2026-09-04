@@ -10,7 +10,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
         [SerializeField] private AbilityDatabase database;
 
         [Header("UI")]
-        [SerializeField] private Transform content;
+        [SerializeField] private RectTransform content;
         [SerializeField] private BuyMenuItem abilityCardPrefab;
 
 
@@ -42,11 +42,6 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             ClearExistingCards();
 
 
-            Vector3 menuSize = content.localScale;
-
-            Vector2[] positions;
-
-            float xAxis = menuSize.x / 3;
 
 
 
@@ -68,5 +63,11 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             foreach (Transform child in content)
                 Destroy(child.gameObject);
         }
+        private Vector2 PositionGenerator(int index)
+        {
+            int columns = 3;
+        }
     }
+
+
 }
