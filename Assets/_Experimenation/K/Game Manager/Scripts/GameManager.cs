@@ -43,7 +43,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         public override void OnSceneLoadDone(NetworkRunner runner)
         {
-            if (!runner.IsServer || runner != _networkRunner)
+            if (!runner.IsServer)
                 return;
 
             SpawnPlayers();
