@@ -13,15 +13,19 @@ MonoBehaviour:
   m_Name: SmokeGrenade
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Abilities.Scripts.Ability
   abilityName: Smoke grenade
+  abilityImage: {fileID: 0}
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
   abilityType: 0
   abilityScope: 0
   abilityDescription: 
   effects:
   - rid: 4304078436455153986
+  AbilityPrice: 0
+  image: {fileID: 0}
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 4304078436455153986
       type: {class: GrenadeAbility, ns: _Experimenation.K.Abilities.Scripts, asm: Assembly-CSharp}
-      data: 

@@ -22,8 +22,6 @@ namespace _Project.Abilities.Scripts
         public string abilityDescription;
         [SerializeReference, SR] public List<AbilityEffect> effects;
         public int AbilityPrice;
-        public Image image;
-
 
 
         public void OnEnable()
@@ -42,12 +40,12 @@ namespace _Project.Abilities.Scripts
     {
         public virtual void ApplyEffect()
         {
-            
+
         }
 
         public virtual void ApplyEffect(Player target)
         {
-            
+
         }
 
         protected IEnumerator EndEffect(Action callback, float delay = 3f)

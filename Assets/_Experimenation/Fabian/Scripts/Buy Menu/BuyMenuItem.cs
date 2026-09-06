@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 public class BuyMenuItem : MonoBehaviour
 {
-    [SerializeField] private Sprite abilitySprite;
     [SerializeField] private Image abilityImage;
     [SerializeField] private TMP_Text[] abilityName;
     [SerializeField] private TMP_Text[] description;
@@ -13,8 +12,8 @@ public class BuyMenuItem : MonoBehaviour
 
     public void Setup(Ability ability)
     {
-        abilitySprite = ability.abilityImage;
-        abilityImage.sprite = abilitySprite;
+        if (abilityImage != null)
+            abilityImage.sprite = ability.abilityImage;
 
         foreach (TMP_Text item in abilityName)
         {
