@@ -16,16 +16,16 @@ namespace _Experimenation.K.Multiplayer.Scripts
     public enum InputButton
     {
         //Movement
-        Jump,
-        SprintHeld,
-        CrouchHeld,
-        Crouch,
+        Jump, SprintHeld, CrouchHeld, Crouch,
         
         //Ability Selection
         Ability1, Ability2, Ability3,
         
-        //Test Consol
-        StartRunPhase
+        //Test Console
+        StartRunPhase,
+        
+        //QTE Fight
+        QteFight, CatchUp, CatchDown, CatchLeft, CatchRight,
     }
     
     public sealed class PlayerInput : NetworkBehaviour, IBeforeUpdate
@@ -50,6 +50,13 @@ namespace _Experimenation.K.Multiplayer.Scripts
         
         [Space, Header("Test Console")] 
         [SerializeField] private InputActionReference startRunPhase;
+        
+        [Space, Header("QTE Fight")]
+        [SerializeField] private InputActionReference qteFightAction;
+        [SerializeField] private InputActionReference catchUpAction;
+        [SerializeField] private InputActionReference catchDownAction;
+        [SerializeField] private InputActionReference catchLeftAction;
+        [SerializeField] private InputActionReference catchRightAction;
 
         public override void Spawned()
         {
@@ -65,6 +72,11 @@ namespace _Experimenation.K.Multiplayer.Scripts
             EnableAction(ability2Action);
             EnableAction(ability3Action);
             EnableAction(startRunPhase);
+            EnableAction(qteFightAction);
+            EnableAction(catchUpAction);
+            EnableAction(catchDownAction);
+            EnableAction(catchLeftAction);
+            EnableAction(catchRightAction);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -80,6 +92,11 @@ namespace _Experimenation.K.Multiplayer.Scripts
             DisableAction(ability2Action);
             DisableAction(ability3Action);
             DisableAction(startRunPhase);
+            DisableAction(qteFightAction);
+            DisableAction(catchUpAction);
+            DisableAction(catchDownAction);
+            DisableAction(catchLeftAction);
+            DisableAction(catchRightAction);
         }
 
         private static void EnableAction(InputActionReference actionReference)
@@ -91,6 +108,9 @@ namespace _Experimenation.K.Multiplayer.Scripts
         {
             actionReference?.action?.Disable();
         }
+
+        private void MapButton(InputButton button, InputActionReference mapping) =>
+            _accumulatedInput.Buttons.Set(button, mapping.action.IsPressed());
 
         void IBeforeUpdate.BeforeUpdate()
         {
@@ -109,18 +129,25 @@ namespace _Experimenation.K.Multiplayer.Scripts
             _lookRotationAccumulator.Accumulate(lookRotationDelta);
             
             //Movement Buttons
-            _accumulatedInput.Buttons.Set(InputButton.Jump, jumpAction.action.IsPressed());
-            _accumulatedInput.Buttons.Set(InputButton.SprintHeld, sprintAction.action.IsPressed());
-            _accumulatedInput.Buttons.Set(InputButton.CrouchHeld, crouchAction.action.IsPressed());
-            _accumulatedInput.Buttons.Set(InputButton.Crouch, crouchAction.action.IsPressed());
+            MapButton(InputButton.Jump, jumpAction);
+            MapButton(InputButton.SprintHeld, sprintAction);
+            MapButton(InputButton.CrouchHeld, crouchAction);
+            MapButton(InputButton.Crouch, crouchAction);
             
             //Ability Selection
-            _accumulatedInput.Buttons.Set(InputButton.Ability1, ability1Action.action.IsPressed());
-            _accumulatedInput.Buttons.Set(InputButton.Ability2, ability2Action.action.IsPressed());
-            _accumulatedInput.Buttons.Set(InputButton.Ability3, ability3Action.action.IsPressed());
+            MapButton(InputButton.Ability1, ability1Action);
+            MapButton(InputButton.Ability2, ability2Action);
+            MapButton(InputButton.Ability3, ability3Action);
             
             //Test Console
-            _accumulatedInput.Buttons.Set(InputButton.StartRunPhase, startRunPhase.action.IsPressed());
+            MapButton(InputButton.StartRunPhase, startRunPhase);
+            
+            //QTE Fight
+            MapButton(InputButton.QteFight, qteFightAction);
+            MapButton(InputButton.CatchUp, catchUpAction);
+            MapButton(InputButton.CatchDown, catchDownAction);
+            MapButton(InputButton.CatchLeft, catchLeftAction);
+            MapButton(InputButton.CatchRight, catchRightAction);
         }
 
         private void OnInput(NetworkRunner runner, NetworkInput input)

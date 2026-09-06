@@ -1,39 +1,36 @@
-﻿using System;
-using System.Collections;
-using _Experimenation.K.Event_Bus;
-using Fusion;
-using _Experimenation.K.Event_Bus.Events;
+﻿using Fusion;
 using TMPro;
 using UnityEngine;
 
 namespace _Experimenation.K.Game_Manager.Scripts
 {
-    public class TimeManager : MonoBehaviour
+    public class TimeManager : NetworkBehaviour
     {
         [SerializeField] private int roundDuration = 180;
-        private TimeSpan _roundDuration;
-        private readonly TimeSpan _1S = new(0, 0, 1);
-        private readonly WaitForSeconds _wait1S = new(1);
+        [Networked] private TickTimer Timer { get; set; }
         
         private TextMeshProUGUI _timeText;
         
-        private void Awake()
+        public override void Spawned()
         {
             _timeText = GetComponentInChildren<TextMeshProUGUI>();
-            _roundDuration = TimeSpan.FromSeconds(roundDuration);
-            _timeText.SetText(_roundDuration.ToString(@"mm\:ss"));
         }
 
-        private IEnumerator Start()
+        private void OnEnable() => Timer = TickTimer.CreateFromSeconds(Runner, roundDuration);
+        
+        private void Update()
         {
-            while (roundDuration > 0)
+            if (!Timer.IsRunning)
             {
-                yield return _wait1S;
-                _roundDuration -= _1S;
-                _timeText.SetText(_roundDuration.ToString(@"mm\:ss"));
+                _timeText.SetText("0:00");
+                return;
             }
-            EventBus.Raise(new TimeRunsOutEvent());
-            EventBus.Raise(new RoundOverEvent(true));
+
+            var remaining = Mathf.CeilToInt((float)Timer.RemainingTime(Runner));
+
+            _timeText.SetText(
+                $"{remaining / 60}:{remaining % 60:00}"
+            );
         }
     }
 }

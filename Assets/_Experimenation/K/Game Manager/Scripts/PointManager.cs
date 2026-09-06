@@ -2,6 +2,7 @@ using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
 using Fusion;
 using TMPro;
+using UnityEngine;
 
 namespace _Experimenation.K.Game_Manager.Scripts
 {
@@ -9,6 +10,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
     {
         private TextMeshProUGUI _pointText;
         private int _points;
+        [SerializeField] private GameData gameData;
 
         private void Awake()
         {
@@ -27,6 +29,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
             if (!ev.CollectedBy.HasInputAuthority) return;
             _points += ev.Points;
             _pointText.SetText("Points: " + _points);
+            
+            if(HasStateAuthority) gameData.p1Points = _points;
+            else gameData.p2Points = _points;
         }
     }
 }

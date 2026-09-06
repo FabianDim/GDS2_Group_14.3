@@ -15,6 +15,10 @@ namespace _Experimenation.Fraser.Scripts
         public float defaultMoveSpeed = 10f;
         [SerializeField] public float maxMoveSpeed = 40f;
 
+        // Set by State Authority (e.g. the QTE Runner boost) and replicated so
+        // server simulation and client prediction stay in sync.
+        [Networked] public float SpeedBoostMultiplier { get; set; }
+
         [SerializeField] private float movementMultiplier = 10f;
         [SerializeField] private float airMultiplier = 0.55f;
 
@@ -314,12 +318,13 @@ namespace _Experimenation.Fraser.Scripts
 
         private void ControlSpeed(GameplayInput input)
         {
+            var speedMultiplier = Mathf.Max(1f, SpeedBoostMultiplier);
             var targetSpeed = IsGrounded switch
             {
-                true when IsCrouching && !IsSliding => crouchSpeed,
-                true when input.Buttons.IsSet(InputButton.SprintHeld) => sprintSpeed,
-                true => walkSpeed,
-                _ => moveSpeed
+                true when IsCrouching && !IsSliding => crouchSpeed * speedMultiplier,
+                true when input.Buttons.IsSet(InputButton.SprintHeld) => sprintSpeed * speedMultiplier,
+                true => walkSpeed * speedMultiplier,
+                _ => moveSpeed * speedMultiplier
             };
 
             moveSpeed =

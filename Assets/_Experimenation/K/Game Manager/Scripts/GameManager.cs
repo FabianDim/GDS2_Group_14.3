@@ -15,8 +15,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
         [SerializeField] private NetworkPrefabRef playerPrefab;
         [SerializeField] private Transform[] spawnPoints;
         private GameObject _runPhaseItems;
+        [SerializeField] private GameData gameData;
 
-        private readonly Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
+        public static Dictionary<PlayerRef, NetworkObject> SpawnedPlayers { get; private set; } = new();
 
         public override void Spawned()
         {
@@ -55,25 +56,26 @@ namespace _Experimenation.K.Game_Manager.Scripts
             }
 
             // The host (local server player) is always the Chaser; the client is always the Runner.
-            var runnerPlayer = Runner.LocalPlayer;
-            var chaserPlayer = players.First(p => p != runnerPlayer);
+            var p1Ref = Runner.LocalPlayer;
+            var p2Ref = players.First(p => p != p1Ref);
 
-            var runnerObject = SpawnPlayer(runnerPlayer, PlayerRole.Runner, 0);
-            var chaserObject = SpawnPlayer(chaserPlayer, PlayerRole.Chaser, 1);
+            var p1 = SpawnPlayer(p1Ref, 0);
+            var p2 = SpawnPlayer(p2Ref, 1);
 
             // Roles are assigned only after both objects have spawned successfully.
-            if (runnerObject == null || chaserObject == null) return;
+            if (p1 == null || p2 == null) return;
 
-            runnerObject.GetComponent<Player>().Role = PlayerRole.Runner;
-            chaserObject.GetComponent<Player>().Role = PlayerRole.Chaser;
+            gameData.GenerateRole();
+            p1.GetComponent<Player>().Role = gameData.p1Role;
+            p2.GetComponent<Player>().Role = gameData.p2Role;
             
             EventBus.Raise(new AllPlayersSpawnedEvent());
             return;
 
-            NetworkObject SpawnPlayer(PlayerRef player, PlayerRole role, int spawnPointIndex)
+            NetworkObject SpawnPlayer(PlayerRef player, int spawnPointIndex)
             {
                 // This also makes retries safe if one spawn succeeds and the other fails.
-                if (_spawnedPlayers.TryGetValue(player, out var existingObject) && existingObject != null)
+                if (SpawnedPlayers.TryGetValue(player, out var existingObject) && existingObject)
                     return existingObject;
 
                 var spawnPoint = spawnPoints[spawnPointIndex];
@@ -84,13 +86,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
                     player
                 );
 
-                if (playerObject == null)
-                {
-                    Debug.LogWarning($"GameManager: failed to spawn {role} player {player}.");
-                    return null;
-                }
-
-                _spawnedPlayers[player] = playerObject;
+                SpawnedPlayers[player] = playerObject;
                 return playerObject;
             }
         }
@@ -98,6 +94,10 @@ namespace _Experimenation.K.Game_Manager.Scripts
         public override void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
             MultiplayerLog.LogShutdown(runner, shutdownReason);
+
+            // Static state must never survive into the next match or scene load.
+            SpawnedPlayers.Clear();
+
             EndGame();
         }
 
