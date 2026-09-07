@@ -262,6 +262,11 @@ MonoBehaviour:
   ability2Action: {fileID: 5724174579971124104, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   ability3Action: {fileID: 4170820193278323613, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   startRunPhase: {fileID: -8233780872175136204, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  qteFightAction: {fileID: 7659840476263111996, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  catchUpAction: {fileID: 667586304176544533, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  catchDownAction: {fileID: -654362234646396781, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  catchLeftAction: {fileID: 5172619980748720269, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  catchRightAction: {fileID: -3350918037111773671, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!114 &3241989403578629798
 MonoBehaviour:
   m_ObjectHideFlags: 0

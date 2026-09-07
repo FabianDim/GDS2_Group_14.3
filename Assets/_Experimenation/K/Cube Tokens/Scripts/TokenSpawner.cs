@@ -1,4 +1,6 @@
 using System.Linq;
+using _Experimenation.K.Event_Bus;
+using _Experimenation.K.Event_Bus.Events;
 using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using UnityEngine;
@@ -28,23 +30,25 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
 
         public override void Spawned()
         {
-            if (!HasStateAuthority)
-                return;
-
-            _runnerPlayer = FindObjectsByType<Player>()
-                .FirstOrDefault(player => player.Role == PlayerRole.Runner)
-                ?.transform;
+            if (!HasStateAuthority) return;
 
             _spawnTimer = TickTimer.CreateFromSeconds(
                 Runner,
                 spawnInterval
             );
+            
+            EventBus.Subscribe<AllPlayersSpawnedEvent>(OnAllPlayersSpawned);
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (!HasStateAuthority) return;
+            EventBus.Unsubscribe<AllPlayersSpawnedEvent>(OnAllPlayersSpawned);
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority || !_spawnTimer.Expired(Runner))
-                return;
+            if (!HasStateAuthority || !_spawnTimer.Expired(Runner)) return;
             
             _spawnTimer = TickTimer.CreateFromSeconds(
                 Runner,
@@ -66,6 +70,13 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
                     spawnRotation
                 );
             }
+        }
+
+        private void OnAllPlayersSpawned(AllPlayersSpawnedEvent ev)
+        {
+            _runnerPlayer = FindObjectsByType<Player>()
+                .FirstOrDefault(player => player.Role == PlayerRole.Runner)
+                ?.transform;
         }
 
         #region Spawning Utilities

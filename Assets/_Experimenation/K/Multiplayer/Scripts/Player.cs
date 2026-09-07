@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _Experimenation.K.Multiplayer.Scripts
 {
-    public enum PlayerRole {Runner, Chaser}
+    public enum PlayerRole {Runner = 1, Chaser = 2}
     
     public class Player : NetworkBehaviour
     {
@@ -50,16 +50,16 @@ namespace _Experimenation.K.Multiplayer.Scripts
         
         public override void FixedUpdateNetwork()
         {
-            if (!GetInput(out GameplayInput input)) return;
-            HandleAbilitySelection(input);
+            HandleAbilitySelection();
         }
 
-        private void HandleAbilitySelection(GameplayInput input)
+        private void HandleAbilitySelection()
         {   
+            if(!GetInput(out GameplayInput input)) return;
             var selectedAbility = 0;
             if(input.Buttons.WasPressed(PreviousButtons, InputButton.Ability1)) 
                 selectedAbility = 1;
-            if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability2)) 
+            else if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability2)) 
                 selectedAbility = 2;
             else if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability3)) 
                 selectedAbility = 3;

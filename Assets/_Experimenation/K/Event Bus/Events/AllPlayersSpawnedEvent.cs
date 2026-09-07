@@ -1,4 +1,4 @@
-﻿namespace _Experimenation.K.Game_Manager.Scripts
+﻿namespace _Experimenation.K.Event_Bus.Events
 {
     public class AllPlayersSpawnedEvent
     {

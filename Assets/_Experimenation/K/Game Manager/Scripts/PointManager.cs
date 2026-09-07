@@ -9,10 +9,12 @@ namespace _Experimenation.K.Game_Manager.Scripts
     {
         private TextMeshProUGUI _pointText;
         private int _points;
+        private readonly GameData _gameData = GameData.Instance;
 
         private void Awake()
         {
             _pointText = GetComponentInChildren<TextMeshProUGUI>();
+            _points = HasStateAuthority ? _gameData.P1Data.Points : _gameData.P2Data.Points;
             _pointText.SetText("Points: " + _points);
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
         }
@@ -27,6 +29,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
             if (!ev.CollectedBy.HasInputAuthority) return;
             _points += ev.Points;
             _pointText.SetText("Points: " + _points);
+            
+            if(HasStateAuthority) _gameData.P1Data.Points = _points;
+            else _gameData.P2Data.Points = _points;
         }
     }
 }
