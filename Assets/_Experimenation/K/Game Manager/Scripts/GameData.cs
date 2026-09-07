@@ -1,38 +1,72 @@
-﻿using _Experimenation.K.Multiplayer.Scripts;
-using UnityEngine;
+﻿using System;
+using _Experimenation.K.Multiplayer.Scripts;
+using Fusion;
+using Random = UnityEngine.Random;
 
 namespace _Experimenation.K.Game_Manager.Scripts
 {
-    [CreateAssetMenu(menuName = "Game Data", fileName = "GameData")]
-    public class GameData : ScriptableObject
+    public struct PlayerData : INetworkStruct, IEquatable<PlayerData>
     {
-        public int p1Points;
-        public int p2Points;
-        public int p1Score;
-        public int p2Score;
-        public PlayerRole p1Role;
-        public PlayerRole p2Role;
+        public NetworkString<_32> Username;
+        public int Points;
+        public int Score;
+        public PlayerRole Role;
 
+        public static bool operator ==(PlayerData x, PlayerData y) =>
+            x.Equals(y);
+        public static bool operator !=(PlayerData x, PlayerData y) =>
+            !(x == y);
+
+        public bool Equals(PlayerData other)
+        {
+            return Points == other.Points && Score == other.Score && Role == other.Role;
+        }
+        
+        public override bool Equals(object obj)
+        {
+            return obj is PlayerData other && Equals(other);
+        }
+        
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Points, Score, (int)Role);
+        }
+    }
+    
+    public class GameData : NetworkBehaviour
+    {
+        public static GameData Instance;
+        
+        [Networked] public ref PlayerData P1Data => ref MakeRef<PlayerData>();
+        [Networked] public ref PlayerData P2Data => ref MakeRef<PlayerData>();
         public int numberOfRounds;
-        public int currentRound;
+        public int currentRound = 1;
+
+        public override void Spawned()
+        {
+            if (!Instance && FindAnyObjectByType<GameData>() != this)
+                Runner.Despawn(Object);
+            else Instance = this;
+            Runner.MakeDontDestroyOnLoad(gameObject);
+        }
 
         public void GenerateRole()
         {
-            if (p1Role == 0 || p2Role == 0)
+            if (P1Data.Role == 0 || P2Data.Role == 0)
             {
-                p1Role = (PlayerRole)Random.Range(1, 3);
-                p2Role = p1Role == PlayerRole.Chaser ? PlayerRole.Runner : PlayerRole.Chaser;
+                P1Data.Role = (PlayerRole)Random.Range(1, 3);
+                P2Data.Role = P1Data.Role == PlayerRole.Chaser ? PlayerRole.Runner : PlayerRole.Chaser;
             }
             else
-                (p1Role, p2Role) = (p2Role, p1Role);
+                (P1Data.Role, P2Data.Role) = (P2Data.Role, P1Data.Role);
         }
 
         public void UpdateScore(bool runnerScores)
         {
-            var runnerScore = p1Role == PlayerRole.Runner ? p1Score : p2Score;
-            var chaserScore = runnerScore == p1Score ? p2Score : p1Score;
-            if(runnerScores) runnerScore++;
-            else chaserScore++;
+            var runner = P1Data.Role == PlayerRole.Runner ? P1Data : P2Data;
+            var chaser = runner == P1Data ? P2Data : P1Data;
+            if(runnerScores) runner.Score++;
+            else chaser.Score++;
         }
     }
 }

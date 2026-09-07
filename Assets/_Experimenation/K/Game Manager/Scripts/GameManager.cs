@@ -15,9 +15,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
         [SerializeField] private NetworkPrefabRef playerPrefab;
         [SerializeField] private Transform[] spawnPoints;
         private GameObject _runPhaseItems;
-        [SerializeField] private GameData gameData;
 
         public static Dictionary<PlayerRef, NetworkObject> SpawnedPlayers { get; private set; } = new();
+        private readonly GameData _gameData = GameData.Instance;
 
         public override void Spawned()
         {
@@ -30,6 +30,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
+            // Use the runner supplied by Fusion; the Runner property may already
+            // be invalid while this network object is being despawned.
+            runner?.RemoveCallbacks(this);
             if(HasStateAuthority)
                 EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
         }
@@ -65,9 +68,9 @@ namespace _Experimenation.K.Game_Manager.Scripts
             // Roles are assigned only after both objects have spawned successfully.
             if (p1 == null || p2 == null) return;
 
-            gameData.GenerateRole();
-            p1.GetComponent<Player>().Role = gameData.p1Role;
-            p2.GetComponent<Player>().Role = gameData.p2Role;
+            _gameData.GenerateRole();
+            p1.GetComponent<Player>().Role = _gameData.P1Data.Role;
+            p2.GetComponent<Player>().Role = _gameData.P2Data.Role;
             
             EventBus.Raise(new AllPlayersSpawnedEvent());
             return;

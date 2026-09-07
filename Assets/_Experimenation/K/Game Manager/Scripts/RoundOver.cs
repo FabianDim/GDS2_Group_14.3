@@ -1,8 +1,10 @@
+using System;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
 using Fusion;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace _Experimenation.K.Game_Manager.Scripts
 {
@@ -15,7 +17,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private TickTimer _timer;
         private bool _sceneLoadTriggered;
         
-        [SerializeField] private GameData gameData;
+        private readonly GameData _gameData = GameData.Instance;
 
         public override void Spawned()
         {
@@ -43,18 +45,18 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 return;
 
             _sceneLoadTriggered = true;
-            if(gameData.currentRound >= gameData.numberOfRounds)
-                Runner.LoadScene(SceneRef.FromIndex(2));
+            if(_gameData.currentRound >= _gameData.numberOfRounds)
+                RPC_GameOver();
             else
             {
-                gameData.currentRound++;
+                _gameData.currentRound++;
                 Runner.LoadScene(SceneRef.FromIndex(1));
             }
         }
 
         private void OnRoundOver(RoundOverEvent ev)
         {
-            gameData.UpdateScore(ev.RunnerWins);
+            _gameData.UpdateScore(ev.RunnerWins);
             _timer = TickTimer.CreateFromSeconds(Runner, duration);
             RPC_ShowScreen(ev.RunnerWins);
         }
@@ -64,6 +66,22 @@ namespace _Experimenation.K.Game_Manager.Scripts
         {
             _text.SetText(runnerWins ? "Runner wins!" : "Chaser caught Runner!");
             _screen.SetActive(true);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
+        private void RPC_GameOver() => GameOver();
+
+        private async void GameOver()
+        {
+            try
+            {
+                await Runner.Shutdown();
+                SceneManager.LoadScene(2);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"From RoundOver.cs: {e}");
+            }
         }
     }
 }

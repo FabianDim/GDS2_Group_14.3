@@ -24,6 +24,13 @@ namespace _Experimenation.K.QTE_Fight.Scripts
     /// </summary>
     public class QteFight : NetworkBehaviour
     {
+        private enum QtePhase : byte
+        {
+            Idle,
+            Mash,
+            Catch,
+        }
+
         [Header("Distances")]
         [SerializeField] private float triggerDistance = 10f;
         [SerializeField] private float catchingDistance = 0.1f;
@@ -47,23 +54,28 @@ namespace _Experimenation.K.QTE_Fight.Scripts
         [SerializeField] private string mashKeyboardLabel = "J";
         [SerializeField] private string mashGamepadLabel = "Y";
 
-        [Space, SerializeField] private float qteCooldown;
-        private TickTimer _qteCooldownTimer;
+        [Space, Header("Cooldown")]
+        [SerializeField, Min(0f)] private float qteCooldown = 5f;
 
         private static readonly InputButton[] CatchButtons =
         {
-            InputButton.CatchUp, InputButton.CatchDown, InputButton.CatchLeft, InputButton.CatchRight,
+            InputButton.CatchUp,
+            InputButton.CatchDown,
+            InputButton.CatchLeft,
+            InputButton.CatchRight,
         };
 
         private Slider _meter;
         private TextMeshProUGUI _keyPrompt;
+        private bool _meterVisible;
+        private bool _roundEnded;
+        private bool _distanceCooldownApplied;
+        private bool _subscribedToEvents;
 
+        private TickTimer _qteCooldownTimer;
         private TickTimer _mashTimer;
         private TickTimer _catchTimer;
         private TickTimer _runnerBoostTimer;
-        private bool _canCatch;
-        private bool _roundEnded;
-        private bool _meterVisible;
 
         private PlayerRef _chaserPlayer;
         private PlayerRef _runnerPlayer;
@@ -83,24 +95,32 @@ namespace _Experimenation.K.QTE_Fight.Scripts
 
         [Networked] private float MeterValue { get; set; }
         [Networked] private int CurrentKeyIndex { get; set; }
-        [Networked] private NetworkBool KeyPhaseActive { get; set; }
-        [Networked] private NetworkBool MashPhaseActive { get; set; }
+        [Networked] private QtePhase Phase { get; set; }
 
         public override void Spawned()
         {
             _meter = GetComponentInChildren<Slider>(true);
             _keyPrompt = GetComponentInChildren<TextMeshProUGUI>(true);
+
+            if (_meter != null)
+                _meter.gameObject.SetActive(false);
             if (_keyPrompt != null)
                 _keyPrompt.gameObject.SetActive(false);
 
-            if (!HasStateAuthority) return;
+            if (!HasStateAuthority)
+                return;
+
             EventBus.Subscribe<AllPlayersSpawnedEvent>(OnAllPlayersSpawned);
+            _subscribedToEvents = true;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            if (!HasStateAuthority) return;
+            if (!_subscribedToEvents)
+                return;
+
             EventBus.Unsubscribe<AllPlayersSpawnedEvent>(OnAllPlayersSpawned);
+            _subscribedToEvents = false;
         }
 
         public override void FixedUpdateNetwork()
@@ -108,70 +128,77 @@ namespace _Experimenation.K.QTE_Fight.Scripts
             if (!HasStateAuthority || _roundEnded)
                 return;
 
-            // A default (never-started) TickTimer reports Expired() == false, so the
-            // cooldown must be gated on IsRunning - an unconditional Expired check
-            // here would block CheckDistance (and everything after it) forever.
-            var qteOnCooldown = _qteCooldownTimer.IsRunning;
-            if (qteOnCooldown && _qteCooldownTimer.Expired(Runner))
+            var qteOnCooldown = UpdateCooldown();
+            UpdateRunnerBoost();
+
+            if (!TryGetPlayerDistance(out var distance))
+                return;
+
+            if (HandleOutOfRange(distance))
+                return;
+
+            // The players are back in range, so a future separation can start a
+            // new distance-based cooldown. An already-running timer continues.
+            _distanceCooldownApplied = false;
+
+            // Direct contact always wins, even while a QTE cooldown is active.
+            if (distance <= _contactDistance)
             {
-                _qteCooldownTimer = default;
-                qteOnCooldown = false;
+                EndRound(false);
+                return;
             }
 
-            CheckDistance(qteOnCooldown);
+            if (qteOnCooldown)
+                return;
 
-            // Runner speed boost expiry - replicated multiplier back to 1x.
-            if (_runnerBoostTimer.IsRunning && _runnerBoostTimer.Expired(Runner))
-            {
-                _runnerBoostTimer = default;
-                if (_runnerMovement != null)
-                    _runnerMovement.SpeedBoostMultiplier = 1f;
-            }
-
-            if (_canCatch)
-                HandleCatchKeyInput();
-            else if (_mashTimer.IsRunning)
-                HandleMashInput();
+            SetMeterVisible(true);
+            UpdateQtePhase();
         }
 
         private void Update()
         {
-            if (_meter)
+            if (_meter != null)
                 _meter.value = MeterValue;
 
+            UpdatePrompt();
+        }
+
+        private void UpdatePrompt()
+        {
             if (_keyPrompt == null)
                 return;
 
-            if (KeyPhaseActive)
+            switch (Phase)
             {
-                _keyPrompt.gameObject.SetActive(true);
-                _keyPrompt.SetText($"Press {GetKeyLabel(CurrentKeyIndex)}!");
-            }
-            else if (MashPhaseActive)
-            {
-                _keyPrompt.gameObject.SetActive(true);
-                _keyPrompt.SetText($"Mash {GetMashLabel()}!");
-            }
-            else
-            {
-                _keyPrompt.gameObject.SetActive(false);
+                case QtePhase.Mash:
+                    ShowPrompt($"Mash {GetMashLabel()}!");
+                    break;
+
+                case QtePhase.Catch:
+                    ShowPrompt($"Press {GetKeyLabel(CurrentKeyIndex)}!");
+                    break;
+
+                default:
+                    _keyPrompt.gameObject.SetActive(false);
+                    break;
             }
         }
 
-        /// <summary>Distributed round end. Safe to call from any machine; only State Authority acts.</summary>
+        private void ShowPrompt(string text)
+        {
+            _keyPrompt.gameObject.SetActive(true);
+            _keyPrompt.SetText(text);
+        }
+
+        /// <summary>Distributed round end. Only State Authority can finish the round.</summary>
         private void EndRound(bool runnerWins)
         {
             if (!HasStateAuthority || _roundEnded)
                 return;
 
             _roundEnded = true;
-            KeyPhaseActive = false;
-            MashPhaseActive = false;
-            if (_meterVisible)
-            {
-                RPC_ShowMeter(false);
-                _meterVisible = false;
-            }
+            ResetQteState();
+            _qteCooldownTimer = default;
             RPC_EndRound(runnerWins);
         }
 
@@ -181,106 +208,163 @@ namespace _Experimenation.K.QTE_Fight.Scripts
             EventBus.Raise(new RoundOverEvent(runnerWins));
         }
 
-        private void CheckDistance(bool qteOnCooldown)
+        private bool TryGetPlayerDistance(out float distance)
         {
+            distance = 0f;
             if (_chaserTransform == null || _runnerTransform == null)
-                return;
+                return false;
 
-            var distance = Vector3.Distance(_chaserTransform.position, _runnerTransform.position);
+            distance = Vector3.Distance(_chaserTransform.position, _runnerTransform.position);
+            return true;
+        }
 
-            // Too far apart - idle.
-            if (distance > triggerDistance)
+        private bool HandleOutOfRange(float distance)
+        {
+            if (distance <= triggerDistance)
+                return false;
+
+            CancelQte();
+
+            if (!_distanceCooldownApplied)
             {
-                if (KeyPhaseActive || MashPhaseActive || _mashTimer.IsRunning || _meterVisible)
-                {
-                    if (_meterVisible)
-                    {
-                        RPC_ShowMeter(false);
-                        _meterVisible = false;
-                    }
-                    KeyPhaseActive = false;
-                    MashPhaseActive = false;
-                    _canCatch = false;
-                    _mashTimer = default;
-                    _catchTimer = default;
-                }
-                MeterValue = mashStartValue;
-                return;
+                _distanceCooldownApplied = true;
+                StartCooldown();
             }
 
-            // Direct physical contact - instant catch. Never gated by the QTE
-            // cooldown, and measured against the physical capsule-contact distance,
-            // not the raw serialized value (pivots can never get that close).
-            if (distance <= _contactDistance)
+            return true;
+        }
+
+        private void UpdateQtePhase()
+        {
+            switch (Phase)
             {
-                EndRound(false);
-                return;
+                case QtePhase.Idle:
+                    StartMashPhase();
+                    break;
+
+                case QtePhase.Mash:
+                    UpdateMashPhase();
+                    break;
+
+                case QtePhase.Catch:
+                    UpdateCatchPhase();
+                    break;
+
+                default:
+                    ResetQteState();
+                    return;
             }
 
-            // The escape cooldown only delays the next mash/key phase,
-            // not the direct-contact catch above.
-            if (qteOnCooldown)
-                return;
-
-            if (!_meterVisible)
+            // Resolve the phase first. This preserves the existing behavior where
+            // a Chaser can press the catch key on the same tick the mash phase ends.
+            switch (Phase)
             {
-                RPC_ShowMeter(true);
-                _meterVisible = true;
-            }
+                case QtePhase.Mash:
+                    HandleMashInput();
+                    break;
 
-            // Key phase - waiting for the Chaser to press the shown key.
-            if (_canCatch)
-            {
-                // Chaser failed the key phase - the Runner escapes with a Speed Boost.
-                if (_catchTimer.IsRunning && _catchTimer.Expired(Runner))
-                {
-                    EndQte();
-                    GiveRunnerBoost();
-                }
-                return;
+                case QtePhase.Catch:
+                    HandleCatchKeyInput();
+                    break;
             }
+        }
 
-            // Mash phase - start the tug-of-war timer once.
+        private void StartMashPhase()
+        {
+            MeterValue = mashStartValue;
+            _mashTimer = TickTimer.CreateFromSeconds(Runner, qteDuration);
+            Phase = QtePhase.Mash;
+        }
+
+        private void UpdateMashPhase()
+        {
             if (!_mashTimer.IsRunning)
             {
-                _mashTimer = TickTimer.CreateFromSeconds(Runner, qteDuration);
-                MashPhaseActive = true;
+                StartMashPhase();
                 return;
             }
 
-            // Mash phase - resolve when the timer expires.
-            if (_mashTimer.Expired(Runner))
-            {
-                if (MeterValue >= chaserWinThreshold)
-                {
-                    MashPhaseActive = false;
-                    StartKeyPhase();
-                }
-                else
-                {
-                    // Runner won the QTE - they escape with a Speed Boost, round continues.
-                    EndQte();
-                    GiveRunnerBoost();
-                }
-            }
+            if (!TimerExpired(_mashTimer))
+                return;
+
+            if (MeterValue >= chaserWinThreshold)
+                StartCatchPhase();
+            else
+                RunnerEscapes();
+        }
+
+        private void StartCatchPhase()
+        {
+            CurrentKeyIndex = Random.Range(0, CatchButtons.Length);
+            _catchTimer = TickTimer.CreateFromSeconds(Runner, catchDuration);
+            Phase = QtePhase.Catch;
+        }
+
+        private void UpdateCatchPhase()
+        {
+            if (TimerExpired(_catchTimer))
+                RunnerEscapes();
+        }
+
+        /// <summary>Ends the current QTE and gives the Runner a temporary escape boost.</summary>
+        private void RunnerEscapes()
+        {
+            EndQte();
+            GiveRunnerBoost();
         }
 
         /// <summary>Ends the QTE without ending the round - play continues.</summary>
         private void EndQte()
         {
-            KeyPhaseActive = false;
-            MashPhaseActive = false;
-            _canCatch = false;
+            ResetQteState();
+            StartCooldown();
+        }
+
+        private void ResetQteState()
+        {
+            Phase = QtePhase.Idle;
             _mashTimer = default;
             _catchTimer = default;
             MeterValue = mashStartValue;
-            if (_meterVisible)
+            SetMeterVisible(false);
+        }
+
+        private void CancelQte()
+        {
+            if (Phase != QtePhase.Idle || _mashTimer.IsRunning || _catchTimer.IsRunning || _meterVisible)
+                ResetQteState();
+            else
+                MeterValue = mashStartValue;
+        }
+
+        private void StartCooldown()
+        {
+            if (qteCooldown <= 0f)
             {
-                RPC_ShowMeter(false);
-                _meterVisible = false;
+                _qteCooldownTimer = default;
+                return;
             }
 
-            _qteCooldownTimer = TickTimer.CreateFromSeconds(Runner, qteCooldown);
+            if (!_qteCooldownTimer.IsRunning)
+                _qteCooldownTimer = TickTimer.CreateFromSeconds(Runner, qteCooldown);
+        }
+
+        private bool UpdateCooldown()
+        {
+            if (TimerExpired(_qteCooldownTimer))
+                _qteCooldownTimer = default;
+
+            return _qteCooldownTimer.IsRunning;
+        }
+
+        private void UpdateRunnerBoost()
+        {
+            if (!_runnerBoostTimer.IsRunning || !_runnerBoostTimer.Expired(Runner))
+                return;
+
+            _runnerBoostTimer = default;
+            if (_runnerMovement != null)
+                _runnerMovement.SpeedBoostMultiplier = 1f;
         }
 
         private void GiveRunnerBoost()
@@ -291,61 +375,53 @@ namespace _Experimenation.K.QTE_Fight.Scripts
             _runnerMovement.SpeedBoostMultiplier = runnerBoostMultiplier;
 
             // Extend the active boost rather than restarting it if one is still running.
-            // RemainingTime is a nullable double - null when the timer is not running, so
-            // coalesce to 0 to avoid an InvalidOperationException from the (float) cast.
+            // RemainingTime is nullable when a timer is not running, so coalesce to 0.
             var remaining = _runnerBoostTimer.IsRunning
                 ? (float)(_runnerBoostTimer.RemainingTime(Runner) ?? 0d)
                 : 0f;
             _runnerBoostTimer = TickTimer.CreateFromSeconds(Runner, remaining + runnerBoostDuration);
         }
 
-        private void StartKeyPhase()
-        {
-            _canCatch = true;
-            CurrentKeyIndex = Random.Range(0, CatchButtons.Length);
-            KeyPhaseActive = true;
-            _catchTimer = TickTimer.CreateFromSeconds(Runner, catchDuration);
-        }
-
         private void HandleMashInput()
         {
-            if (Runner.TryGetInputForPlayer(_chaserPlayer, out GameplayInput chaserInput))
-            {
-                if (chaserInput.Buttons.WasPressed(_chaserPreviousButtons, InputButton.QteFight))
-                    MeterValue = Mathf.Clamp01(MeterValue + qteStrength);
-                _chaserPreviousButtons = chaserInput.Buttons;
-            }
+            if (PlayerPressed(_chaserPlayer, ref _chaserPreviousButtons, InputButton.QteFight))
+                MeterValue = Mathf.Clamp01(MeterValue - qteStrength);
 
-            if (Runner.TryGetInputForPlayer(_runnerPlayer, out GameplayInput runnerInput))
-            {
-                if (runnerInput.Buttons.WasPressed(_runnerPreviousButtons, InputButton.QteFight))
-                    MeterValue = Mathf.Clamp01(MeterValue - qteStrength);
-                _runnerPreviousButtons = runnerInput.Buttons;
-            }
+            if (PlayerPressed(_runnerPlayer, ref _runnerPreviousButtons, InputButton.QteFight))
+                MeterValue = Mathf.Clamp01(MeterValue + qteStrength);
         }
 
         private void HandleCatchKeyInput()
         {
-            if (!Runner.TryGetInputForPlayer(_chaserPlayer, out GameplayInput chaserInput))
+            if (CurrentKeyIndex < 0 || CurrentKeyIndex >= CatchButtons.Length)
                 return;
 
             var requiredButton = CatchButtons[CurrentKeyIndex];
-            if (chaserInput.Buttons.WasPressed(_chaserPreviousButtons, requiredButton))
-            {
+            if (PlayerPressed(_chaserPlayer, ref _chaserPreviousButtons, requiredButton))
                 EndRound(false);
-                return;
-            }
+        }
 
-            // Wrong key or no press is NOT an immediate fail - the phase only fails
-            // when the catch timer expires (handled in CheckDistance).
-            _chaserPreviousButtons = chaserInput.Buttons;
+        private bool PlayerPressed(PlayerRef player, ref NetworkButtons previousButtons, InputButton button)
+        {
+            if (!Runner.TryGetInputForPlayer(player, out GameplayInput input))
+                return false;
+
+            var wasPressed = input.Buttons.WasPressed(previousButtons, button);
+            previousButtons = input.Buttons;
+            return wasPressed;
+        }
+
+        private bool TimerExpired(TickTimer timer)
+        {
+            return timer.IsRunning && timer.Expired(Runner);
         }
 
         private string GetKeyLabel(int index)
         {
             var labels = Gamepad.current != null ? gamepadKeyLabels : keyboardKeyLabels;
-            if (index < 0 || index >= labels.Length)
+            if (labels == null || index < 0 || index >= labels.Length)
                 return "?";
+
             return labels[index];
         }
 
@@ -354,14 +430,35 @@ namespace _Experimenation.K.QTE_Fight.Scripts
             return Gamepad.current != null ? mashGamepadLabel : mashKeyboardLabel;
         }
 
+        private void SetMeterVisible(bool visible)
+        {
+            if (_meterVisible == visible)
+                return;
+
+            _meterVisible = visible;
+            RPC_ShowMeter(visible);
+        }
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
-        private void RPC_ShowMeter(bool show) =>
-            _meter.gameObject.SetActive(show);
+        private void RPC_ShowMeter(bool show)
+        {
+            if (_meter != null)
+                _meter.gameObject.SetActive(show);
+        }
 
         private void OnAllPlayersSpawned(AllPlayersSpawnedEvent ev)
         {
+            _chaserTransform = null;
+            _runnerTransform = null;
+            _runnerMovement = null;
+            _chaserController = null;
+            _runnerController = null;
+
             foreach (var pair in GameManager.SpawnedPlayers)
             {
+                if (pair.Value == null)
+                    continue;
+
                 var player = pair.Value.GetComponent<Player>();
                 if (player == null)
                     continue;
@@ -372,7 +469,7 @@ namespace _Experimenation.K.QTE_Fight.Scripts
                     _chaserTransform = pair.Value.transform;
                     _chaserController = pair.Value.GetComponent<CharacterController>();
                 }
-                else
+                else if (player.Role == PlayerRole.Runner)
                 {
                     _runnerPlayer = pair.Key;
                     _runnerTransform = pair.Value.transform;
