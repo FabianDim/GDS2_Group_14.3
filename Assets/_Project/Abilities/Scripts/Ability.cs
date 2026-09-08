@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using _Experimenation.K.Multiplayer.Scripts;
 using SerializeReferenceEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace _Project.Abilities.Scripts
 {
@@ -14,11 +15,14 @@ namespace _Project.Abilities.Scripts
     public class Ability : ScriptableObject
     {
         public string abilityName;
+        public Sprite abilityImage;
         public Color abilityColor;
         public AbilityType abilityType;
         public AbilityScope abilityScope;
         public string abilityDescription;
         [SerializeReference, SR] public List<AbilityEffect> effects;
+        public int AbilityPrice;
+
 
         public void OnEnable()
         {
@@ -36,12 +40,12 @@ namespace _Project.Abilities.Scripts
     {
         public virtual void ApplyEffect()
         {
-            
+
         }
 
         public virtual void ApplyEffect(Player target)
         {
-            
+
         }
 
         protected IEnumerator EndEffect(Action callback, float delay = 3f)

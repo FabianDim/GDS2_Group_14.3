@@ -683,6 +683,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: d55690b943c06334b82bad9ff9500036, type: 2}
     - target: {fileID: 6442138911610842659, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
+      propertyPath: _runPhaseItems
+      value: 
+      objectReference: {fileID: 82700211}
+    - target: {fileID: 6442138911610842659, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
       propertyPath: 'spawnPoints.Array.data[0]'
       value: 
       objectReference: {fileID: 1304943568}
@@ -759,6 +763,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
+--- !u!1 &82700211 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6184000093662703899, guid: f63cde0740845314a9f02e5425ee7651, type: 3}
+  m_PrefabInstance: {fileID: 82700210}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &107496470
 PrefabInstance:
   m_ObjectHideFlags: 0

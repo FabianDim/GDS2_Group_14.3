@@ -19,9 +19,14 @@ MonoBehaviour:
   abilityDescription: 
   effects:
   - rid: 4304078436455153758
+  AbilityPrice: 0
+  image: {fileID: 0}
+  multiBuy: 100
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 4304078436455153758
       type: {class: JumpBoostAbility, ns: _Experimenation.K.Abilities.Scripts, asm: Assembly-CSharp}
       data:

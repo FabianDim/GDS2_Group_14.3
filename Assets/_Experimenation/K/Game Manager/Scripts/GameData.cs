@@ -50,6 +50,15 @@ namespace _Experimenation.K.Game_Manager.Scripts
             Runner.MakeDontDestroyOnLoad(gameObject);
         }
 
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        public void SetUsernameRpc(NetworkString<_32> username, RpcInfo info = default)
+        {
+            if (info.Source == Runner.LocalPlayer)
+                P1Data.Username = username;
+            else
+                P2Data.Username = username;
+        }
+
         public void GenerateRole()
         {
             if (P1Data.Role == 0 || P2Data.Role == 0)

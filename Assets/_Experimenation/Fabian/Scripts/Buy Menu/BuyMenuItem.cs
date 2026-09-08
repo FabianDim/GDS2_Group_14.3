@@ -1,20 +1,28 @@
+using _Project.Abilities.Scripts;
+using TMPro;
 using UnityEngine;
-
-namespace _Experimenation.Fabian.Scripts.Buy_Menu
+using UnityEngine.UI;
+public class BuyMenuItem : MonoBehaviour
 {
-    public enum BuyCategory
-    {
-    }
+    [SerializeField] private Image abilityImage;
+    [SerializeField] private TMP_Text[] abilityName;
+    [SerializeField] private TMP_Text[] description;
+    [SerializeField] private TMP_Text price;
+    [SerializeField] private TMP_Text KeyBind;
 
-    [CreateAssetMenu(menuName = "Buy Menu/Item")]
-    public class BuyMenuItem : ScriptableObject
+    public void Setup(Ability ability)
     {
-        public string itemName;
-        public int price;
-        public Sprite image;
-        public KeyCode keybind;
-        public string inputLabel;
-        public BuyCategory category;
-        public GameObject itemPrefab;
+        if (abilityImage != null)
+            abilityImage.sprite = ability.abilityImage;
+
+        foreach (TMP_Text item in abilityName)
+        {
+            item.SetText(ability.abilityName);
+        }
+        foreach (TMP_Text item in description)
+        {
+            item.SetText(ability.abilityDescription);
+        }
+        price.SetText($"{ability.AbilityPrice}");
     }
 }

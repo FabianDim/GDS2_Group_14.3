@@ -24,7 +24,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
-            
+
             var log = MultiplayerLog.GetLog();
             if (log == null) return;
             multiplayerLog.SetText(log);
@@ -76,6 +76,20 @@ namespace _Experimenation.K.Multiplayer.Scripts
             RemoveRunnerCallbacks(runner);
         }
 
+        public override void OnSceneLoadDone(NetworkRunner runner)
+        {
+            if (GameData.Instance == null)
+            {
+                Debug.LogError("GameData was not spawned before the gameplay scene finished loading.");
+                return;
+            }
+
+            var defaultUsername = runner.IsSceneAuthority ? "Player1" : "Player2";
+            var localUsername = string.IsNullOrWhiteSpace(username.text) ? defaultUsername : username.text;
+            username.text = localUsername;
+            GameData.Instance.SetUsernameRpc(localUsername);
+        }
+
         private void OnDestroy()
         {
             RemoveRunnerCallbacks(_networkRunner);
@@ -94,16 +108,10 @@ namespace _Experimenation.K.Multiplayer.Scripts
         {
             // Only the scene authority (the host, in Host Mode) decides when
             // the match is ready to transition.
-            if (runner.IsSceneAuthority)
-            {
-                GameData.Instance.P1Data.Username = username.text;
-            }
-            else
-            {
-                GameData.Instance.P2Data.Username = username.text;
-                return;
-            }
-            
+            var defaultUsername = runner.IsSceneAuthority ? "Player1" : "Player2";
+            if (string.IsNullOrWhiteSpace(username.text))
+                username.text = defaultUsername;
+
             if (_gameStarted) return;
             if (runner.ActivePlayers.Count() < 2)
             {
