@@ -14,7 +14,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
     {
         [SerializeField] private NetworkPrefabRef playerPrefab;
         [SerializeField] private Transform[] spawnPoints;
-        private GameObject _runPhaseItems;
+        [SerializeField] private GameObject _runPhaseItems;
+        [SerializeField] private GameObject _buyPhaseItems;
 
         public enum GamePhase
         {
@@ -31,10 +32,17 @@ namespace _Experimenation.K.Game_Manager.Scripts
         public override void Spawned()
         {
             Runner.AddCallbacks(this);
-            _runPhaseItems = transform.GetChild(0).gameObject;
 
-            if(HasStateAuthority)
+            if (!_runPhaseItems || !_buyPhaseItems)
+            {
+                return;
+            }
+
+            if (HasStateAuthority)
+            {
+                EventBus.Subscribe<BuyPhaseStartEvent>(OnBuyPhaseStarts);
                 EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+            }
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -42,8 +50,11 @@ namespace _Experimenation.K.Game_Manager.Scripts
             // Use the runner supplied by Fusion; the Runner property may already
             // be invalid while this network object is being despawned.
             runner?.RemoveCallbacks(this);
-            if(HasStateAuthority)
+            if (HasStateAuthority)
+            {
+                EventBus.Unsubscribe<BuyPhaseStartEvent>(OnBuyPhaseStarts);
                 EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+            }
         }
 
         public override void OnSceneLoadDone(NetworkRunner runner)
@@ -82,7 +93,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
             _gameData.GenerateRole();
             p1.GetComponent<Player>().Role = _gameData.P1Data.Role;
             p2.GetComponent<Player>().Role = _gameData.P2Data.Role;
-            
+
             EventBus.Raise(new AllPlayersSpawnedEvent());
             return;
 
@@ -138,11 +149,35 @@ namespace _Experimenation.K.Game_Manager.Scripts
             RpcStartsRunPhase();
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
+
+        private void OnBuyPhaseStarts(BuyPhaseStartEvent ev)
+        {
+            if (!HasStateAuthority || _buyPhaseItems == null)
+                return;
+
+            RpcStartsBuyPhase();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All,
+            Channel = RpcChannel.Reliable)]
         private void RpcStartsRunPhase()
         {
             if (_runPhaseItems != null)
                 _runPhaseItems.SetActive(true);
+
+            if (_buyPhaseItems != null)
+                _buyPhaseItems.SetActive(false);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All,
+            Channel = RpcChannel.Reliable)]
+        private void RpcStartsBuyPhase()
+        {
+            if (_buyPhaseItems != null)
+                _buyPhaseItems.SetActive(true);
+
+            if (_runPhaseItems != null)
+                _runPhaseItems.SetActive(false);
         }
     }
 }

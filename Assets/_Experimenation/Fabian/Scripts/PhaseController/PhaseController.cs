@@ -1,47 +1,45 @@
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
-using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
-using UnityEngine;
 using static _Experimenation.K.Game_Manager.Scripts.GameManager;
 
-public class PhaseController : NetworkBehaviour
+namespace _Experimenation.Fabian.Scripts
 {
-    [Networked] private NetworkButtons PreviousButton { get; set; }
-
-    [Networked] private GamePhase CurrentPhase { get; set; }
-
-    public override void Spawned()
+    public class PhaseController : NetworkBehaviour
     {
-        CurrentPhase = GamePhase.GAMESTART;
-    }
+        private float buyPhaseDuration = 10f;
 
-    public override void FixedUpdateNetwork()
-    {
-        if (!HasStateAuthority) return;
+        [Networked]
+        private GamePhase CurrentPhase { get; set; }
 
-        if (CurrentPhase == GamePhase.GAMESTART)
+        private TickTimer _buyPhaseTimer;
+
+        public override void Spawned()
         {
-            StartBuyPhase();
+            if (HasStateAuthority)
+                CurrentPhase = GamePhase.GAMESTART;
         }
 
-        if (!GetInput(out GameplayInput input)) return;
+        public override void FixedUpdateNetwork()
+        {
+            if (!HasStateAuthority)
+                return;
 
-        if (input.Buttons.WasPressed(PreviousButton, InputButton.StartRunPhase))
-            StartRunPhase();
+            if (CurrentPhase == GamePhase.GAMESTART)
+            {
+                CurrentPhase = GamePhase.BUYPHASE;
+                _buyPhaseTimer = TickTimer.CreateFromSeconds(Runner, buyPhaseDuration);
+                EventBus.Raise(new BuyPhaseStartEvent());
+                return;
+            }
 
-        PreviousButton = input.Buttons;
-    }
-
-    private void StartRunPhase()
-    {
-
-        EventBus.Raise(new RunPhaseStartsEvent());
-    }
-
-    private void StartBuyPhase()
-    {
-        CurrentPhase = GamePhase.BUYPHASE;
-        EventBus.Raise(new BuyPhaseStartEvent());
+            if (CurrentPhase == GamePhase.BUYPHASE &&
+                _buyPhaseTimer.IsRunning &&
+                _buyPhaseTimer.Expired(Runner))
+            {
+                CurrentPhase = GamePhase.RUNPHASE;
+                EventBus.Raise(new RunPhaseStartsEvent());
+            }
+        }
     }
 }
