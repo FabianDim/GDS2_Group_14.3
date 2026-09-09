@@ -283,6 +283,7 @@ MonoBehaviour:
   moveSpeed: 10
   defaultMoveSpeed: 10
   maxMoveSpeed: 40
+  _SpeedBoostMultiplier: 0
   movementMultiplier: 10
   airMultiplier: 0.3
   walkSpeed: 10
@@ -404,9 +405,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 3680376527914010129}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abc60b0a733e4934dbf38c32b62feff3, type: 3}
+  m_Script: {fileID: 11500000, guid: dafc8f5141ae0134c92784f934597953, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.TestConsole
+  orientation: {fileID: 5108438730762093802}
+  climbMask:
+    serializedVersion: 2
+    m_Bits: 0
+  climbDistance: 0.8
+  wallCheckHeight: 1
+  lowerCheckHeight: 0.35
+  wallCheckRadius: 0.15
+  climbSpeed: 5
+  climbSideSpeed: 2.5
+  wallPullSpeed: 1
+  climbHeightMultiplier: 5
+  topOutForwardSpeed: 3
+  wallInFront: 0
+  lowerWallInFront: 0
+  climbLocked: 0
+  climbDistanceUsed: 0
 --- !u!1 &6582706624164020743
 GameObject:
   m_ObjectHideFlags: 0

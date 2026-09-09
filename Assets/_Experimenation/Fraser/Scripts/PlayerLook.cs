@@ -25,8 +25,14 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out GameplayInput input)) ProcessInput(input);
-            RefreshCamera();
+            // Look input stays ungated: in host mode the host simulates every
+            // player's look rotation, including remote players.
+            if (GetInput(out GameplayInput input))
+                ProcessInput(input);
+
+            // RefreshCamera was removed here - it only matters for the local
+            // player and already runs in LateUpdate (input-authority gated),
+            // so per-tick camera work for remote players is skipped.
         }
 
         private void LateUpdate()

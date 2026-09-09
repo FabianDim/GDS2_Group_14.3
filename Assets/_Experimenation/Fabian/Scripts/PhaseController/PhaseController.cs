@@ -1,45 +1,36 @@
-using _Experimenation.K.Event_Bus;
-using _Experimenation.K.Event_Bus.Events;
+using _Experimenation.K.Game_Manager.Scripts;
 using Fusion;
-using static _Experimenation.K.Game_Manager.Scripts.GameManager;
+using UnityEngine;
 
-namespace _Experimenation.Fabian.Scripts
+namespace _Experimenation.Fabian.Scripts.PhaseController
 {
+    
     public class PhaseController : NetworkBehaviour
     {
-        private float buyPhaseDuration = 10f;
-
-        [Networked]
-        private GamePhase CurrentPhase { get; set; }
-
-        private TickTimer _buyPhaseTimer;
+        [SerializeField] private GameObject buyPhaseItems;
+        [SerializeField] private ParticleSystem buyPhaseEndsPS;
+        [SerializeField] private GameObject runPhaseItems;
+        private TickTimer _timer;
 
         public override void Spawned()
         {
-            if (HasStateAuthority)
-                CurrentPhase = GamePhase.GAMESTART;
+            if(!HasStateAuthority) return;
+            _timer = TickTimer.CreateFromSeconds(Runner, GameData.Instance.roundDuration * 0.25f);
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority)
-                return;
+            if (!HasStateAuthority || !_timer.Expired(Runner)) return;
+            RPC_StartRunPhase();
+        }
 
-            if (CurrentPhase == GamePhase.GAMESTART)
-            {
-                CurrentPhase = GamePhase.BUYPHASE;
-                _buyPhaseTimer = TickTimer.CreateFromSeconds(Runner, buyPhaseDuration);
-                EventBus.Raise(new BuyPhaseStartEvent());
-                return;
-            }
-
-            if (CurrentPhase == GamePhase.BUYPHASE &&
-                _buyPhaseTimer.IsRunning &&
-                _buyPhaseTimer.Expired(Runner))
-            {
-                CurrentPhase = GamePhase.RUNPHASE;
-                EventBus.Raise(new RunPhaseStartsEvent());
-            }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
+        private void RPC_StartRunPhase()
+        {
+            runPhaseItems.SetActive(true);
+            buyPhaseEndsPS.Play();
+            buyPhaseItems.SetActive(false);
+            enabled = false;
         }
     }
 }

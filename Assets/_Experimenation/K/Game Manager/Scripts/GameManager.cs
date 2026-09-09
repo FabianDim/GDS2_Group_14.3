@@ -12,172 +12,281 @@ namespace _Experimenation.K.Game_Manager.Scripts
 {
     public class GameManager : NetworkRunnerCallbacks
     {
+        private const int ExpectedPlayerCount = 2;
+        private const int HostSpawnPointIndex = 0;
+        private const int ClientSpawnPointIndex = 1;
+        private const int MenuSceneIndex = 0;
+
+        [Header("Player Spawning")]
         [SerializeField] private NetworkPrefabRef playerPrefab;
         [SerializeField] private Transform[] spawnPoints;
-        [SerializeField] private GameObject _runPhaseItems;
-        [SerializeField] private GameObject _buyPhaseItems;
 
-        public enum GamePhase
-        {
-            BUYPHASE,
-            RUNPHASE,
-            ROUNDCHANGE,
-            GAMESTART
-        }
+        // QteFight uses this registry to find the two players after spawning.
+        public static Dictionary<PlayerRef, NetworkObject> SpawnedPlayers { get; } = new();
+        
+        private bool _shutdownRequested;
+        private bool _menuLoadRequested;
 
-        private readonly Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new();
-        public static Dictionary<PlayerRef, NetworkObject> SpawnedPlayers { get; private set; } = new();
-        private readonly GameData _gameData = GameData.Instance;
+        #region Fusion lifecycle
 
         public override void Spawned()
         {
-            Runner.AddCallbacks(this);
-
-            if (!_runPhaseItems || !_buyPhaseItems)
+            if (Runner == null)
             {
+                Debug.LogError("GameManager spawned without a NetworkRunner.");
                 return;
             }
 
-            if (HasStateAuthority)
-            {
-                EventBus.Subscribe<BuyPhaseStartEvent>(OnBuyPhaseStarts);
-                EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
-            }
+            Runner.AddCallbacks(this);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            // Use the runner supplied by Fusion; the Runner property may already
-            // be invalid while this network object is being despawned.
+            // Use Fusion's runner argument because the Runner property may already
+            // be unavailable while this object is being despawned.
             runner?.RemoveCallbacks(this);
-            if (HasStateAuthority)
-            {
-                EventBus.Unsubscribe<BuyPhaseStartEvent>(OnBuyPhaseStarts);
-                EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
-            }
         }
 
         public override void OnSceneLoadDone(NetworkRunner runner)
         {
-            if (!runner.IsServer)
+            if (runner == null || !runner.IsServer || !HasStateAuthority)
                 return;
 
-            SpawnPlayers();
-        }
-
-        private void SpawnPlayers()
-        {
-            var players = Runner.ActivePlayers.ToList();
-            if (players.Count != 2)
-            {
-                Debug.LogWarning("GameManager: expected exactly two active players before spawning.");
-                return;
-            }
-
-            if (spawnPoints == null || spawnPoints.Length < 2)
-            {
-                Debug.LogError("GameManager: two spawn points are required.");
-                return;
-            }
-
-            // The host (local server player) is always the Chaser; the client is always the Runner.
-            var p1Ref = Runner.LocalPlayer;
-            var p2Ref = players.First(p => p != p1Ref);
-
-            var p1 = SpawnPlayer(p1Ref, 0);
-            var p2 = SpawnPlayer(p2Ref, 1);
-
-            // Roles are assigned only after both objects have spawned successfully.
-            if (p1 == null || p2 == null) return;
-
-            _gameData.GenerateRole();
-            p1.GetComponent<Player>().Role = _gameData.P1Data.Role;
-            p2.GetComponent<Player>().Role = _gameData.P2Data.Role;
-
-            EventBus.Raise(new AllPlayersSpawnedEvent());
-            return;
-
-            NetworkObject SpawnPlayer(PlayerRef player, int spawnPointIndex)
-            {
-                // This also makes retries safe if one spawn succeeds and the other fails.
-                if (SpawnedPlayers.TryGetValue(player, out var existingObject) && existingObject)
-                    return existingObject;
-
-                var spawnPoint = spawnPoints[spawnPointIndex];
-                var playerObject = Runner.Spawn(
-                    playerPrefab,
-                    spawnPoint.position,
-                    spawnPoint.rotation,
-                    player
-                );
-
-                SpawnedPlayers[player] = playerObject;
-                return playerObject;
-            }
+            SpawnPlayers(runner);
         }
 
         public override void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-            MultiplayerLog.LogShutdown(runner, shutdownReason);
+            if (runner != null)
+                MultiplayerLog.LogShutdown(runner, shutdownReason);
 
-            // Static state must never survive into the next match or scene load.
             SpawnedPlayers.Clear();
-
-            EndGame();
+            Cube_Tokens.Scripts.Token.ResetLiveCount();
+            LoadMenuScene();
         }
 
-        public override void OnPlayerLeft(NetworkRunner runner, PlayerRef player) => EndGame();
+        public override void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
+            ShutdownRunnerAndReturnToMenu(runner);
+        }
 
-        private async void EndGame()
+        #endregion
+
+        #region Player spawning
+
+        private void SpawnPlayers(NetworkRunner runner)
+        {
+            if (!TryGetHostAndClient(runner, out var host, out var client))
+                return;
+
+            var hostObject = SpawnPlayer(runner, host, HostSpawnPointIndex);
+            var clientObject = SpawnPlayer(runner, client, ClientSpawnPointIndex);
+
+            if (!TryAssignRoles(hostObject, clientObject))
+                return;
+
+            EventBus.Raise(new AllPlayersSpawnedEvent());
+        }
+
+        private bool TryGetHostAndClient(
+            NetworkRunner runner,
+            out PlayerRef host,
+            out PlayerRef client)
+        {
+            host = default;
+            client = default;
+
+            if (!ValidateSpawnConfiguration(runner))
+                return false;
+
+            var activePlayers = runner.ActivePlayers.ToList();
+            if (activePlayers.Count != ExpectedPlayerCount)
+            {
+                Debug.LogWarning(
+                    $"GameManager: expected {ExpectedPlayerCount} active players, " +
+                    $"but found {activePlayers.Count}.");
+                return false;
+            }
+
+            // In Host Mode, LocalPlayer is the host. The other active player is
+            // therefore the joining client.
+            host = runner.LocalPlayer;
+            if (!host.IsValid || !activePlayers.Contains(host))
+            {
+                Debug.LogError("GameManager: the host is not present in ActivePlayers.");
+                return false;
+            }
+
+            var @ref = host;
+            client = activePlayers.FirstOrDefault(player => player != @ref);
+            if (!client.IsValid)
+            {
+                Debug.LogError("GameManager: could not find the joining client.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ValidateSpawnConfiguration(NetworkRunner runner)
+        {
+            if (runner == null || !runner.IsRunning || runner.IsShutdown)
+            {
+                Debug.LogError("GameManager: the network runner is not ready for spawning.");
+                return false;
+            }
+
+            if (!playerPrefab.IsValid)
+            {
+                Debug.LogError("GameManager: playerPrefab is not assigned or is invalid.");
+                return false;
+            }
+
+            if (spawnPoints == null || spawnPoints.Length < ExpectedPlayerCount)
+            {
+                Debug.LogError(
+                    $"GameManager: {ExpectedPlayerCount} spawn points are required.");
+                return false;
+            }
+
+            for (var index = 0; index < ExpectedPlayerCount; index++)
+            {
+                if (spawnPoints[index] != null)
+                    continue;
+
+                Debug.LogError($"GameManager: spawn point {index} is not assigned.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private NetworkObject SpawnPlayer(
+            NetworkRunner runner,
+            PlayerRef player,
+            int spawnPointIndex)
+        {
+            if (SpawnedPlayers.TryGetValue(player, out var existingObject))
+            {
+                if (existingObject != null)
+                    return existingObject;
+
+                // Remove a destroyed object left over from a previous scene load.
+                SpawnedPlayers.Remove(player);
+            }
+
+            var spawnPoint = spawnPoints[spawnPointIndex];
+            try
+            {
+                var playerObject = runner.Spawn(
+                    playerPrefab,
+                    spawnPoint.position,
+                    spawnPoint.rotation,
+                    player);
+
+                if (playerObject == null)
+                {
+                    Debug.LogError($"GameManager: Fusion failed to spawn player {player}.");
+                    return null;
+                }
+
+                SpawnedPlayers[player] = playerObject;
+                return playerObject;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError(
+                    $"GameManager: exception while spawning player {player}: {exception}");
+                return null;
+            }
+        }
+
+        private bool TryAssignRoles(NetworkObject hostObject, NetworkObject clientObject)
+        {
+            if (hostObject == null || clientObject == null)
+            {
+                Debug.LogError("GameManager: both player objects must spawn before assigning roles.");
+                return false;
+            }
+
+            if (!hostObject.TryGetComponent<Player>(out var hostPlayer))
+            {
+                Debug.LogError("GameManager: the host player prefab has no Player component.");
+                return false;
+            }
+
+            if (!clientObject.TryGetComponent<Player>(out var clientPlayer))
+            {
+                Debug.LogError("GameManager: the client player prefab has no Player component.");
+                return false;
+            }
+
+            var gameData = GameData.Instance;
+            if (gameData == null)
+            {
+                Debug.LogError("GameManager: GameData is not available when players are spawned.");
+                return false;
+            }
+
+            if (!gameData.HasStateAuthority)
+            {
+                Debug.LogError("GameManager: only GameData state authority can assign roles.");
+                return false;
+            }
+
+            gameData.GenerateRole();
+
+            // P1 is the host and P2 is the joining client in this project.
+            hostPlayer.Role = gameData.P1Data.Role;
+            clientPlayer.Role = gameData.P2Data.Role;
+            return true;
+        }
+
+        #endregion
+
+        #region Shutdown
+
+        private async void ShutdownRunnerAndReturnToMenu(NetworkRunner runner)
         {
             try
             {
-                await Runner.Shutdown();
-                SceneManager.LoadScene(0);
+                if (_shutdownRequested)
+                    return;
+
+                _shutdownRequested = true;
+
+                try
+                {
+                    if (runner != null && runner.IsRunning)
+                        await runner.Shutdown();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError($"Error shutting down the network runner:\n{exception}");
+                }
+                finally
+                {
+                    LoadMenuScene();
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error from GameManager.cs:\n {e}");
+                Debug.LogError($"From GameManager.cs: {e}");
             }
         }
 
-        private void OnRunPhaseStarts(RunPhaseStartsEvent ev)
+        private void LoadMenuScene()
         {
-            if (!HasStateAuthority || _runPhaseItems == null)
+            if (_menuLoadRequested)
                 return;
 
-            RpcStartsRunPhase();
-        }
-
-
-        private void OnBuyPhaseStarts(BuyPhaseStartEvent ev)
-        {
-            if (!HasStateAuthority || _buyPhaseItems == null)
+            if (SceneManager.GetActiveScene().buildIndex == MenuSceneIndex)
                 return;
 
-            RpcStartsBuyPhase();
+            _menuLoadRequested = true;
+            SceneManager.LoadScene(MenuSceneIndex);
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All,
-            Channel = RpcChannel.Reliable)]
-        private void RpcStartsRunPhase()
-        {
-            if (_runPhaseItems != null)
-                _runPhaseItems.SetActive(true);
-
-            if (_buyPhaseItems != null)
-                _buyPhaseItems.SetActive(false);
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All,
-            Channel = RpcChannel.Reliable)]
-        private void RpcStartsBuyPhase()
-        {
-            if (_buyPhaseItems != null)
-                _buyPhaseItems.SetActive(true);
-
-            if (_runPhaseItems != null)
-                _runPhaseItems.SetActive(false);
-        }
+        #endregion
     }
 }

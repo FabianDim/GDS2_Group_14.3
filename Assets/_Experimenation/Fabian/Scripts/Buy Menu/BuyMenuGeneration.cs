@@ -1,3 +1,4 @@
+using _Experimenation.K.Game_Manager.Scripts;
 using _Project.Abilities.Scripts;
 using UnityEngine;
 
@@ -8,10 +9,19 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
         [Header("Data")]
         [SerializeField] private AbilityDatabase database;
 
-        [Header("UI")]
+        [Space, Header("UI")]
         [SerializeField] private RectTransform content;
         [SerializeField] private BuyMenuItem abilityCardPrefab;
 
+        [Space, Header("Spawn Locations")]
+        [SerializeField] private Transform p1BuyMenuLocation;
+        [SerializeField] private Transform p2BuyMenuLocation;
+
+        private void Awake()
+        {
+            var spawnLocation = GameData.Instance.HasStateAuthority ? p1BuyMenuLocation : p2BuyMenuLocation;
+            transform.SetPositionAndRotation(spawnLocation.position, spawnLocation.rotation);
+        }
 
         private void Start()
         {
