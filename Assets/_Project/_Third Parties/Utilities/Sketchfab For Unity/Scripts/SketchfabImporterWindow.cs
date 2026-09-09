@@ -5,11 +5,11 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.IO;
-using Ionic.Zip;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using Ionic.Zip;
 
-namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts
+namespace Sketchfab
 {
 	class SketchfabImporterWindow : EditorWindow
 	{

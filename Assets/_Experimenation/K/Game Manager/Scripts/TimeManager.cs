@@ -6,7 +6,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
 {
     public class TimeManager : NetworkBehaviour
     {
-        private readonly float _roundDuration = GameData.Instance.roundDuration * 0.75f;
+        private float _roundDuration;
         [Networked] private TickTimer Timer { get; set; }
         
         private TextMeshProUGUI _timeText;
@@ -14,6 +14,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         
         public override void Spawned()
         {
+            _roundDuration = GameData.Instance.roundDuration * 0.75f;
             _timeText = GetComponentInChildren<TextMeshProUGUI>();
         }
 

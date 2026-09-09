@@ -1,5 +1,7 @@
+using System.Collections;
 using _Experimenation.K.Game_Manager.Scripts;
 using _Project.Abilities.Scripts;
+using TMPro;
 using UnityEngine;
 
 namespace _Experimenation.Fabian.Scripts.Buy_Menu
@@ -12,20 +14,31 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
         [Space, Header("UI")]
         [SerializeField] private RectTransform content;
         [SerializeField] private BuyMenuItem abilityCardPrefab;
+        [SerializeField] private TextMeshProUGUI timeLeftText;
 
         [Space, Header("Spawn Locations")]
         [SerializeField] private Transform p1BuyMenuLocation;
         [SerializeField] private Transform p2BuyMenuLocation;
+        
+        private readonly WaitForSeconds _1S = new(1);
 
-        private void Awake()
+        private IEnumerator Start()
         {
+            yield return new WaitUntil(() => GameData.Instance);
             var spawnLocation = GameData.Instance.HasStateAuthority ? p1BuyMenuLocation : p2BuyMenuLocation;
             transform.SetPositionAndRotation(spawnLocation.position, spawnLocation.rotation);
+            
+            GenerateAbilityCards();
+            StartCoroutine(ShowTimeLeft());
         }
 
-        private void Start()
+        private IEnumerator ShowTimeLeft()
         {
-            GenerateAbilityCards();
+            for (var i = GameData.Instance.roundDuration * 0.25; i > 0; i--)
+            {
+                timeLeftText.SetText($"Time until Start: {(int)i}");
+                yield return _1S;
+            }
         }
 
         private void GenerateAbilityCards()

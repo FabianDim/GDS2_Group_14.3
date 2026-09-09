@@ -47,7 +47,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private const string DefaultHostUsername = "Player 1";
         private const string DefaultClientUsername = "Player 2";
 
-        public static GameData Instance { get; private set; }
+        public static GameData Instance;
 
         [Networked] public ref PlayerData P1Data => ref MakeRef<PlayerData>();
         [Networked] public ref PlayerData P2Data => ref MakeRef<PlayerData>();
@@ -60,7 +60,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         // C# field would remain local to the host and reset on remote simulations.
         [Networked] public int CurrentRound { get; set; } = 1;
 
-        public float roundDuration = 300f;
+        public int roundDuration = 300;
 
         public override void Spawned()
         {

@@ -57,7 +57,7 @@
         "MinimumInputDelay": 0,
         "MinimumInputDelayUnit": 0,
         "ClientsCanAddInputDelayToLimitResims": false,
-        "ClientMaxResimsPerFrame": -1
+        "ClientMaxResimsPerFrame": 4
     },
     "Network": {
         "ConnectionTimeout": 10.0,

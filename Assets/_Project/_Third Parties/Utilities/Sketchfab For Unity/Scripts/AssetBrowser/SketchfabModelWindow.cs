@@ -5,12 +5,12 @@
 
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using System.IO;
-using SimpleJSON;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using SimpleJSON;
+using System.IO;
 
-namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts.AssetBrowser
+namespace Sketchfab
 {
 	public class SketchfabModelWindow : EditorWindow
 	{

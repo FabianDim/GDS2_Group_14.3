@@ -13,6 +13,10 @@ namespace _Experimenation.K.Multiplayer.Scripts
         [SerializeField] private NetworkRunner runnerPrefab;
         [SerializeField] private GameData gameDataPrefab;
 
+        [Space, Header("Performance")]
+        [Tooltip("Caps the frame rate. VSync is off in this project, so without a cap the build runs uncapped and frame times get noisy (client-side jitter). Match this to the Fusion tick rate (60) unless you have a reason not to.")]
+        [SerializeField, Min(0)] private int targetFrameRate = 60;
+
         [Space, SerializeField] private TextMeshProUGUI connectionText;
         [SerializeField] private TMP_InputField roomId;
         [SerializeField] private TextMeshProUGUI multiplayerLog;
@@ -24,6 +28,11 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private void Awake()
         {
+            // VSync is disabled in QualitySettings; without an explicit cap the
+            // build renders uncapped and the unstable frame times show up as
+            // client-side jitter. 0 = uncapped (leave the field at 0 to disable).
+            Application.targetFrameRate = targetFrameRate;
+
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
 

@@ -109,7 +109,6 @@ GameObject:
   - component: {fileID: 7019291245997809047}
   - component: {fileID: 4511256440228581316}
   - component: {fileID: 6831744488723809989}
-  - component: {fileID: 7873615759634879455}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -161,7 +160,6 @@ MonoBehaviour:
   - {fileID: 7019291245997809047}
   - {fileID: 4511256440228581316}
   - {fileID: 6831744488723809989}
-  - {fileID: 7873615759634879455}
   ForceRemoteRenderTimeframe: 0
 --- !u!54 &2931563241326778533
 Rigidbody:
@@ -383,35 +381,6 @@ MonoBehaviour:
   climbMask:
     serializedVersion: 2
     m_Bits: 257
-  climbDistance: 0.8
-  wallCheckHeight: 1
-  lowerCheckHeight: 0.35
-  wallCheckRadius: 0.15
-  climbSpeed: 5
-  climbSideSpeed: 2.5
-  wallPullSpeed: 1
-  climbHeightMultiplier: 5
-  topOutForwardSpeed: 3
-  wallInFront: 0
-  lowerWallInFront: 0
-  climbLocked: 0
-  climbDistanceUsed: 0
---- !u!114 &7873615759634879455
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3680376527914010129}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dafc8f5141ae0134c92784f934597953, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.TestConsole
-  orientation: {fileID: 5108438730762093802}
-  climbMask:
-    serializedVersion: 2
-    m_Bits: 0
   climbDistance: 0.8
   wallCheckHeight: 1
   lowerCheckHeight: 0.35
