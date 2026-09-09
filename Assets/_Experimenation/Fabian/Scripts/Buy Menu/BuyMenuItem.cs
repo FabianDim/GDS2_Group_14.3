@@ -13,7 +13,7 @@ public class BuyMenuItem : MonoBehaviour
     public void Setup(Ability ability)
     {
         if (abilityImage != null)
-            abilityImage.sprite = ability.abilityImage;
+            abilityImage.sprite = ability.abilitySprite;
 
         foreach (TMP_Text item in abilityName)
         {
