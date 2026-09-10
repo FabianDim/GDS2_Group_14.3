@@ -1,3 +1,5 @@
+using System;
+using _Experimenation.Fabian.Scripts.Abilites;
 using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
@@ -23,13 +25,29 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float airMultiplier = 0.55f;
 
         [Header("Sprinting")]
+        [Networked]
+        private float NetworkedSprintSpeed { get; set; }
+
+        private bool dashBoostActive;
+
+        private TickTimer SpeedBoostTimer { get; set; }
+
+        public float sprintSpeed => NetworkedSprintSpeed;
         [SerializeField] private float walkSpeed = 10f;
-        [SerializeField] private float sprintSpeed = 15f;
+        [SerializeField] private float defaultSprintSpeed = 15f;
         [SerializeField] private float crouchSpeed = 5f;
         [SerializeField] private float acceleration = 12f;
 
         [Header("Jumping")]
-        public float jumpForce = 7f;
+        [Networked]
+        private TickTimer JumpBoostTimer { get; set; }
+
+        [Networked]
+        private float NetworkedJumpForce { get; set; }
+
+        private bool jumpBoostActive;
+
+        public float jumpForce => NetworkedJumpForce;
         [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         [Header("Gravity")]
@@ -69,10 +87,11 @@ namespace _Experimenation.Fraser.Scripts
         private Slide _slide;
         private WallRun _wallRun;
         private Climb _climb;
+        private float defaultJumpForce = 7f;
 
         public override void Spawned()
         {
-            if(!HasStateAuthority) return;
+            if (!HasStateAuthority) return;
 
             _kcc =
                 GetComponent<SimpleKCC>();
@@ -205,8 +224,9 @@ namespace _Experimenation.Fraser.Scripts
                 movementVelocity,
                 jumpImpulse
             );
-            
+
             PreviousButtons = input.Buttons;
+            PowerupsDeactivate();
         }
 
         private void GroundMovement(
@@ -341,7 +361,7 @@ namespace _Experimenation.Fraser.Scripts
             float force
         )
         {
-            
+
             _horizontalVelocity +=
                 direction.normalized *
                 force;
@@ -349,7 +369,7 @@ namespace _Experimenation.Fraser.Scripts
 
         public void ClearMovementVelocity()
         {
-            
+
             _horizontalVelocity =
                 Vector3.zero;
         }
@@ -358,12 +378,60 @@ namespace _Experimenation.Fraser.Scripts
             float gravity
         )
         {
-            
+
             if (_kcc != null)
             {
                 _kcc.SetGravity(
                     gravity
                 );
+            }
+        }
+
+        internal void ApplyJumpBoost(float boostMultiplayer, float abilityDuration, float maxJumpForce)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            NetworkedJumpForce = Mathf.Min(
+                maxJumpForce,
+                defaultJumpForce * boostMultiplayer
+            );
+            jumpBoostActive = true;
+            JumpBoostTimer = TickTimer.CreateFromSeconds(
+                Runner,
+                abilityDuration
+            );
+        }
+
+        internal void ApplyDashBoost(float boostMultiplier, float boostDuration)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            NetworkedSprintSpeed = Mathf.Min(
+                maxMoveSpeed,
+                defaultSprintSpeed * boostMultiplier
+            );
+
+            dashBoostActive = true;
+
+            SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
+        }
+
+        public void PowerupsDeactivate()
+        {
+            if (!dashBoostActive || !jumpBoostActive)
+            {
+                return;
+            }
+
+            if (SpeedBoostTimer.Expired(Runner))
+            {
+                NetworkedSprintSpeed = defaultSprintSpeed;
+            }
+            if (JumpBoostTimer.Expired(Runner))
+            {
+                NetworkedJumpForce = defaultJumpForce;
             }
         }
     }

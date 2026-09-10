@@ -1,13 +1,14 @@
+using Fusion;
 using UnityEngine;
 
-public class ThrowGrenade : MonoBehaviour
+public class ThrowGrenade : NetworkBehaviour
 {
     [SerializeField] private GameObject grenadePrefab;
     [SerializeField] private Transform throwPosition;
     [SerializeField] private Vector3 throwDirection = new Vector3(0, 1, 0);
     [SerializeField] private float maxForce = 10f;
 
-    private KeyCode throwKey = KeyCode.Mouse0;
+    private readonly KeyCode throwKey = KeyCode.Mouse0;
     private Camera mainCamera;
     private GameObject grenadeObject;
 
@@ -16,11 +17,10 @@ public class ThrowGrenade : MonoBehaviour
         mainCamera = Camera.main;
     }
 
-    private void Update()
+    public override void FixedUpdateNetwork()
     {
         if (grenadeObject != null)
         {
-            // Keep the grenade locked to the throw position while holding
             if (throwPosition != null)
             {
                 grenadeObject.transform.position = throwPosition.position;
@@ -36,21 +36,19 @@ public class ThrowGrenade : MonoBehaviour
 
     public void SpawnGrenade()
     {
+        if (!HasStateAuthority)
+            return;
+
         if (grenadePrefab == null)
         {
             Debug.LogError("ThrowGrenade: 'grenadePrefab' is missing in Inspector!");
             return;
         }
-
-        // Prevent spawning multiple active grenades at once
         if (grenadeObject != null) return;
 
         Transform spawnPoint = throwPosition != null ? throwPosition : transform;
-
-        // Instantiate at exact throw position
         grenadeObject = Instantiate(grenadePrefab, spawnPoint.position, spawnPoint.rotation);
 
-        // Disable physics temporarily so it doesn't drop to the ground
         if (grenadeObject.TryGetComponent<Rigidbody>(out var rb))
         {
             rb.isKinematic = true;
@@ -61,7 +59,6 @@ public class ThrowGrenade : MonoBehaviour
     {
         if (mainCamera == null) mainCamera = Camera.main;
 
-        // Re-enable physics before applying force
         if (grenade.TryGetComponent<Rigidbody>(out var rb))
         {
             rb.isKinematic = false;

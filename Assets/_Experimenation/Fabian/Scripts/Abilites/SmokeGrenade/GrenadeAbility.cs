@@ -5,9 +5,9 @@ namespace _Experimenation.Fabian.Scripts.Abilites
 {
     public class GrenadeAbility : AbilityEffect
     {
-        public override void ApplyEffect(Player runner)
+        public override void ApplyEffect(Player target)
         {
-            if (!runner.TryGetComponent<ThrowGrenade>(out var grenade))
+            if (!target.TryGetComponent<ThrowGrenade>(out var grenade))
             {
                 grenade = UnityEngine.Object.FindAnyObjectByType<ThrowGrenade>();
 

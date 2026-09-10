@@ -1,54 +1,69 @@
-using NUnit.Framework;
+using Fusion;
 using UnityEngine;
 
-public class SmokeExplosion : MonoBehaviour
+public class SmokeExplosion : NetworkBehaviour
 {
-    [Header("SmokeExplosionPrefab")]
+    [Header("Smoke Explosion")]
     [SerializeField] private GameObject smokeExplosionEffectPrefab;
     [SerializeField] private Vector3 particleOffset = new Vector3(0, 1, 0);
+
     [Header("Smoke Settings")]
     [SerializeField] private float smokeExplosionDelay = 3f;
-    [SerializeField] private float smokeExplosionForce = 700f;
-    [SerializeField] private float explosionRadius = 5f;
-    [SerializeField] private bool testExplosion = false;
 
     private float countDown;
-    private bool hasExploded = false;
-    private bool isArmed = false;
+    private bool hasExploded;
+    private bool isArmed;
 
-    private void Start()
+    public override void Spawned()
     {
         countDown = smokeExplosionDelay;
     }
 
-    private void Update()
+    public override void FixedUpdateNetwork()
     {
-        if (testExplosion == true)
-        {
-            CreateSmokeExplosion();
-            hasExploded = true;
-        }
+        if (!HasStateAuthority)
+            return;
 
-        if (!hasExploded && isArmed)
+        if (!isArmed || hasExploded)
+            return;
+
+        countDown -= Runner.DeltaTime;
+
+        if (countDown <= 0f)
         {
-            countDown -= Time.deltaTime;
-            if (countDown <= 0f)
-            {
-                CreateSmokeExplosion();
-                hasExploded = true;
-            }
+            Explode();
         }
     }
+
     public void ArmGrenade()
     {
+        if (!HasStateAuthority)
+            return;
+
         isArmed = true;
     }
-    private void CreateSmokeExplosion()
+
+    private void Explode()
     {
-        GameObject smoke = GameObject.Instantiate(smokeExplosionEffectPrefab, transform.position + particleOffset, Quaternion.identity);
+        if (hasExploded)
+            return;
+
+        hasExploded = true;
+
+        PlaySmokeExplosionRpc();
+
+        Runner.Despawn(Object);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void PlaySmokeExplosionRpc()
+    {
+        GameObject smoke = Instantiate(
+            smokeExplosionEffectPrefab,
+            transform.position + particleOffset,
+            Quaternion.identity
+        );
 
         Destroy(smoke, 10f);
-
-        Destroy(gameObject);
     }
 }
