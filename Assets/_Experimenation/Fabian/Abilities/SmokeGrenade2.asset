@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3e69b8f7e444ec9960dcc5c3e54336, type: 3}
   m_Name: SmokeGrenade2
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.Ability
-  abilityName: 
-  abilitySprite: {fileID: 0}
+  abilityName: Smoke
+  abilitySprite: {fileID: 21300000, guid: 3126d32d69eb392488e96fc585a0790b, type: 3}
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
   abilityType: 0
   abilityScope: 0
   abilityDescription: 
   effects: []
-  AbilityPrice: 0
+  AbilityPrice: 100
   references:
     version: 2
     RefIds: []

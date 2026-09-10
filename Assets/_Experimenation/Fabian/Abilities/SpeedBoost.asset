@@ -13,15 +13,19 @@ MonoBehaviour:
   m_Name: SpeedBoost
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Abilities.Scripts.Ability
   abilityName: Temporary Speed Boost
+  abilitySprite: {fileID: 21300000, guid: 3126d32d69eb392488e96fc585a0790b, type: 3}
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
   abilityType: 0
   abilityScope: 0
   abilityDescription: 
   effects:
   - rid: 4304078334819303506
+  AbilityPrice: 0
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 4304078334819303506
       type: {class: DashPowerup, ns: _Experimenation.K.Abilities.Scripts, asm: Assembly-CSharp}
       data:
