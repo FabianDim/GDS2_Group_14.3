@@ -3,11 +3,12 @@
  * License: https://github.com/sketchfab/UnityGLTF/blob/master/LICENSE
  */
 #if UNITY_EDITOR
-using System.Collections.Specialized;
-using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
+using System.Collections.Specialized;
 
-namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts.AssetBrowser
+namespace Sketchfab
 {
 	public class SketchfabBrowser : EditorWindow
 	{

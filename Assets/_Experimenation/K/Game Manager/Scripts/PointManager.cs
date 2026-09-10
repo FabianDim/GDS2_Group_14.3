@@ -9,12 +9,25 @@ namespace _Experimenation.K.Game_Manager.Scripts
     {
         private TextMeshProUGUI _pointText;
         private int _points;
-        private readonly GameData _gameData = GameData.Instance;
+        private GameData _gameData;
+
+        // Resolved lazily: Awake can run before GameData.Spawned() assigns the
+        // singleton, so a field initializer would cache a null reference.
+        private GameData ResolveGameData()
+        {
+            if (_gameData == null)
+                _gameData = GameData.Instance;
+            return _gameData;
+        }
 
         private void Awake()
         {
             _pointText = GetComponentInChildren<TextMeshProUGUI>();
-            _points = HasStateAuthority ? _gameData.P1Data.Points : _gameData.P2Data.Points;
+
+            var gameData = ResolveGameData();
+            if (gameData != null)
+                _points = HasStateAuthority ? gameData.P1Data.Points : gameData.P2Data.Points;
+
             _pointText.SetText("Points: " + _points);
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
         }
@@ -29,9 +42,12 @@ namespace _Experimenation.K.Game_Manager.Scripts
             if (!ev.CollectedBy.HasInputAuthority) return;
             _points += ev.Points;
             _pointText.SetText("Points: " + _points);
-            
-            if(HasStateAuthority) _gameData.P1Data.Points = _points;
-            else _gameData.P2Data.Points = _points;
+
+            var gameData = ResolveGameData();
+            if (gameData == null) return;
+
+            if(HasStateAuthority) gameData.P1Data.Points = _points;
+            else gameData.P2Data.Points = _points;
         }
     }
 }

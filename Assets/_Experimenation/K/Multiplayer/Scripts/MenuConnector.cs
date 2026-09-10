@@ -11,7 +11,13 @@ namespace _Experimenation.K.Multiplayer.Scripts
     public class MenuConnector : MonoRunnerCallbacks
     {
         [SerializeField] private NetworkRunner runnerPrefab;
-        [SerializeField] private TextMeshProUGUI connectionText;
+        [SerializeField] private GameData gameDataPrefab;
+
+        [Space, Header("Performance")]
+        [Tooltip("Caps the frame rate. VSync is off in this project, so without a cap the build runs uncapped and frame times get noisy (client-side jitter). Match this to the Fusion tick rate (60) unless you have a reason not to.")]
+        [SerializeField, Min(0)] private int targetFrameRate = 60;
+
+        [Space, SerializeField] private TextMeshProUGUI connectionText;
         [SerializeField] private TMP_InputField roomId;
         [SerializeField] private TextMeshProUGUI multiplayerLog;
         [SerializeField] private TextMeshProUGUI username;
@@ -22,6 +28,11 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private void Awake()
         {
+            // VSync is disabled in QualitySettings; without an explicit cap the
+            // build renders uncapped and the unstable frame times show up as
+            // client-side jitter. 0 = uncapped (leave the field at 0 to disable).
+            Application.targetFrameRate = targetFrameRate;
+
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
 
@@ -76,20 +87,6 @@ namespace _Experimenation.K.Multiplayer.Scripts
             RemoveRunnerCallbacks(runner);
         }
 
-        public override void OnSceneLoadDone(NetworkRunner runner)
-        {
-            if (GameData.Instance == null)
-            {
-                Debug.LogError("GameData was not spawned before the gameplay scene finished loading.");
-                return;
-            }
-
-            var defaultUsername = runner.IsSceneAuthority ? "Player1" : "Player2";
-            var localUsername = string.IsNullOrWhiteSpace(username.text) ? defaultUsername : username.text;
-            username.text = localUsername;
-            GameData.Instance.SetUsernameRpc(localUsername);
-        }
-
         private void OnDestroy()
         {
             RemoveRunnerCallbacks(_networkRunner);
@@ -106,13 +103,11 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         public override void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
+            runner.Spawn(gameDataPrefab).SetUsername(username.text);
+
             // Only the scene authority (the host, in Host Mode) decides when
             // the match is ready to transition.
-            var defaultUsername = runner.IsSceneAuthority ? "Player1" : "Player2";
-            if (string.IsNullOrWhiteSpace(username.text))
-                username.text = defaultUsername;
-
-            if (_gameStarted) return;
+            if (_gameStarted || !runner.IsServer) return;
             if (runner.ActivePlayers.Count() < 2)
             {
                 connectionText.SetText("Waiting for the other player");

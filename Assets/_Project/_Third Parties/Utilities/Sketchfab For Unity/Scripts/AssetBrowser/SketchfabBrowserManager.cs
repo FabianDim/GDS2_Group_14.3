@@ -5,13 +5,13 @@
 
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using SimpleJSON;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using SimpleJSON;
 using UnityEngine.Networking;
+using System.Collections.Specialized;
 
-namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts.AssetBrowser
+namespace Sketchfab
 {
 	public enum SORT_BY
 	{
@@ -95,6 +95,14 @@ namespace _Project._Third_Parties.Utilities.Sketchfab_For_Unity.Scripts.AssetBro
 
 			hasAnimation = node["animationCount"].AsInt > 0 ? "Yes" : "No";
 			licenseJson = node["license"].AsObject;
+
+			// "My models" results don't have any license as they are "private download"
+			// for the author.
+			if(licenseJson.ToString() == "{}")
+			{
+				isModelAvailable = archiveSize > 0;
+				return;
+			}
 
 			formattedLicenseRequirements = licenseJson["requirements"];
 

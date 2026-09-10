@@ -12,6 +12,7 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
         [SerializeField] private float spawnInterval = 5f;
         [SerializeField] private NetworkPrefabRef tokenPrefab;
         [SerializeField] private int tokensPerSpawn = 5;
+        [SerializeField, Min(1)] private int maxLiveTokens = 30;
 
         [Space, Header("Spawn Placement")]
         [SerializeField] private float spawnDistance = 10f;
@@ -61,6 +62,10 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
         {
             for (var i = 0; i < tokensPerSpawn; i++)
             {
+                // Stop spawning once the live token population cap is reached.
+                if (Token.LiveTokens >= maxLiveTokens)
+                    return;
+
                 if (!TryGetSpawnPoint(out var spawnPosition, out var spawnRotation))
                     continue;
 

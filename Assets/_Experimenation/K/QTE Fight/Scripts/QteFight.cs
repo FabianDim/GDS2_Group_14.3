@@ -93,6 +93,13 @@ namespace _Experimenation.K.QTE_Fight.Scripts
         private NetworkButtons _chaserPreviousButtons;
         private NetworkButtons _runnerPreviousButtons;
 
+        // Prompt identity controls when the text is rebuilt. Comparing these
+        // fields avoids per-frame string allocation and TMP re-layout.
+        private bool _promptVisible;
+        private QtePhase _promptPhase;
+        private int _promptKeyIndex = -1;
+        private bool _promptIsGamepad;
+
         [Networked] private float MeterValue { get; set; }
         [Networked] private int CurrentKeyIndex { get; set; }
         [Networked] private QtePhase Phase { get; set; }
@@ -168,26 +175,53 @@ namespace _Experimenation.K.QTE_Fight.Scripts
             if (_keyPrompt == null)
                 return;
 
+            var isGamepad = Gamepad.current != null;
+
             switch (Phase)
             {
                 case QtePhase.Mash:
-                    ShowPrompt($"Mash {GetMashLabel()}!");
+                    UpdatePromptText(QtePhase.Mash, -1, isGamepad);
                     break;
 
                 case QtePhase.Catch:
-                    ShowPrompt($"Press {GetKeyLabel(CurrentKeyIndex)}!");
+                    UpdatePromptText(QtePhase.Catch, CurrentKeyIndex, isGamepad);
                     break;
 
                 default:
-                    _keyPrompt.gameObject.SetActive(false);
+                    HidePrompt();
                     break;
             }
         }
 
-        private void ShowPrompt(string text)
+        private void UpdatePromptText(QtePhase phase, int keyIndex, bool isGamepad)
         {
+            if (_promptVisible &&
+                _promptPhase == phase &&
+                _promptKeyIndex == keyIndex &&
+                _promptIsGamepad == isGamepad)
+                return;
+
+            _promptPhase = phase;
+            _promptKeyIndex = keyIndex;
+            _promptIsGamepad = isGamepad;
+            _promptVisible = true;
+
+            // The string is built only when the prompt identity changes.
+            var text = phase == QtePhase.Catch
+                ? $"Press {GetKeyLabel(keyIndex)}!"
+                : $"Mash {(isGamepad ? mashGamepadLabel : mashKeyboardLabel)}!";
+
             _keyPrompt.gameObject.SetActive(true);
             _keyPrompt.SetText(text);
+        }
+
+        private void HidePrompt()
+        {
+            if (!_promptVisible)
+                return;
+
+            _promptVisible = false;
+            _keyPrompt.gameObject.SetActive(false);
         }
 
         /// <summary>Distributed round end. Only State Authority can finish the round.</summary>

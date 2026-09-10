@@ -16,8 +16,16 @@ namespace _Experimenation.K.Game_Manager.Scripts
         [SerializeField] private float duration = 5f;
         private TickTimer _timer;
         private bool _sceneLoadTriggered;
-        
-        private readonly GameData _gameData = GameData.Instance;
+        private GameData _gameData;
+
+        // Resolved lazily: this component can initialize before GameData.Spawned()
+        // assigns the singleton, so a field initializer would cache a null reference.
+        private GameData ResolveGameData()
+        {
+            if (_gameData == null)
+                _gameData = GameData.Instance;
+            return _gameData;
+        }
 
         public override void Spawned()
         {
@@ -45,18 +53,26 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 return;
 
             _sceneLoadTriggered = true;
-            if(_gameData.currentRound >= _gameData.numberOfRounds)
+            var gameData = ResolveGameData();
+            if (gameData == null)
+            {
+                // GameData not available yet - keep the timer armed and retry next tick.
+                _sceneLoadTriggered = false;
+                return;
+            }
+
+            if(gameData.CurrentRound >= gameData.numberOfRounds)
                 RPC_GameOver();
             else
             {
-                _gameData.currentRound++;
+                gameData.CurrentRound++;
                 Runner.LoadScene(SceneRef.FromIndex(1));
             }
         }
 
         private void OnRoundOver(RoundOverEvent ev)
         {
-            _gameData.UpdateScore(ev.RunnerWins);
+            ResolveGameData()?.UpdateScore(ev.RunnerWins);
             _timer = TickTimer.CreateFromSeconds(Runner, duration);
             RPC_ShowScreen(ev.RunnerWins);
         }
