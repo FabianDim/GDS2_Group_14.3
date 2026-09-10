@@ -15,7 +15,7 @@ namespace _Project.Abilities.Scripts
     public class Ability : ScriptableObject
     {
         public string abilityName;
-        public Sprite abilityImage;
+        [SerializeField] public Sprite abilitySprite;
         public Color abilityColor;
         public AbilityType abilityType;
         public AbilityScope abilityScope;
