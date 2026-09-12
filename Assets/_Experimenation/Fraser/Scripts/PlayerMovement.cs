@@ -428,10 +428,12 @@ namespace _Experimenation.Fraser.Scripts
             if (SpeedBoostTimer.Expired(Runner))
             {
                 NetworkedSprintSpeed = defaultSprintSpeed;
+                dashBoostActive = false;
             }
             if (JumpBoostTimer.Expired(Runner))
             {
                 NetworkedJumpForce = defaultJumpForce;
+                jumpBoostActive = false;
             }
         }
     }
