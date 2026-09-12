@@ -1,57 +1,57 @@
+using System.Linq;
+using _Experimenation.K.Multiplayer.Scripts;
 using _Project.Abilities.Scripts;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BuyMenuItem : MonoBehaviour, IPointerClickHandler
+namespace _Experimenation.Fabian.Scripts.Buy_Menu
 {
-    [SerializeField] private Image abilityImage;
-    [SerializeField] private TMP_Text[] abilityName;
-    [SerializeField] private TMP_Text[] description;
-    [SerializeField] private TMP_Text price;
-    [SerializeField] private TMP_Text KeyBind;
-    private Ability _ability;
-
-    private void Awake()
+    public class BuyMenuItem : MonoBehaviour
     {
-        if (abilityImage == null)
-            abilityImage = GetComponentInChildren<Image>();
-    }
+        [SerializeField] private Image abilityImage;
+        [SerializeField] private TMP_Text[] abilityName;
+        [SerializeField] private TMP_Text[] description;
+        [SerializeField] private TMP_Text price;
+        [SerializeField] private TMP_Text keyBind;
+        private Ability _ability;
 
-    public void Setup(Ability ability)
-    {
-        if (!ability)
-            return;
-        _ability = ability;
-        if (abilityImage == null)
-            abilityImage = GetComponentInChildren<Image>();
-
-        if (abilityImage != null)
-            abilityImage.sprite = ability.abilitySprite;
-        else
+        private void Awake()
         {
-            Debug.LogWarning("abilityImage is null – no Image component found on this BuyMenuItem.");
+            if (abilityImage == null)
+                abilityImage = GetComponentInChildren<Image>();
         }
 
-        foreach (TMP_Text item in abilityName)
+        public void Setup(Ability ability)
         {
-            item.SetText(ability.abilityName);
+            if (!ability)
+                return;
+            _ability = ability;
+            if (abilityImage == null)
+                abilityImage = GetComponentInChildren<Image>();
+
+            if (abilityImage != null)
+                abilityImage.sprite = ability.abilitySprite;
+            else
+            {
+                Debug.LogWarning("abilityImage is null – no Image component found on this BuyMenuItem.");
+            }
+
+            foreach (TMP_Text item in abilityName)
+            {
+                item.SetText(ability.abilityName);
+            }
+            foreach (TMP_Text item in description)
+            {
+                item.SetText(ability.abilityDescription);
+            }
+            price.SetText($"{ability.abilityPrice}");
         }
-        foreach (TMP_Text item in description)
+
+        public void BuyItem()
         {
-            item.SetText(ability.abilityDescription);
+            foreach(var effect in _ability.effects)
+                effect.ApplyEffect(FindObjectsByType<Player>().First(p => p.HasInputAuthority));
         }
-        price.SetText($"{ability.AbilityPrice}");
-    }
-
-    public void OnAbilityBuyClickHandler()
-    {
-        Debug.Log($"Ability buy menu item was clicked: {_ability.abilityName}");
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        OnAbilityBuyClickHandler();
     }
 }

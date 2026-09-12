@@ -34,7 +34,9 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 
         private IEnumerator ShowTimeLeft()
         {
-            for (var i = GameData.Instance.roundDuration * 0.25; i > 0; i--)
+            Debug.LogError($"From BuyMenuGeneration.cs: Round duration is {GameData.Instance.roundDuration}");
+            Debug.LogError($"From BuyMenuGeneration.cs: Buy Phase duration is {GameData.Instance.roundDuration * 0.25}");
+            for (var i = GameData.Instance.roundDuration * 0.25; i > -1; i--)
             {
                 timeLeftText.SetText($"Time until Start: {(int)i}");
                 yield return _1S;
@@ -77,8 +79,6 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 
                 card.Setup(ability);
 
-                PositionCard(card, i);
-
             }
         }
 
@@ -86,48 +86,6 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
         {
             foreach (Transform child in content)
                 Destroy(child.gameObject);
-        }
-
-        [SerializeField] private int columnWidthModifier = 2;
-
-        [SerializeField] private int columnHeightModifier = 4;
-        [SerializeField] private Vector2 cardPivot = new Vector2(-1.5f, 1.2f);
-        private void PositionCard(BuyMenuItem card, int index)
-        {
-            if (content == null || card == null)
-            {
-                return;
-            }
-            RectTransform cardRect = card.GetComponent<RectTransform>();
-            if (cardRect == null)
-            {
-                Debug.LogError("BuyMenuItem must be attached to a UI object with a RectTransform.");
-                return;
-            }
-            int columns = 3;
-            int column = index % columns;
-
-            float cardWidth = cardRect.rect.width;
-            float cardHeight = cardRect.rect.height;
-            float contentWidth = content.rect.width;
-            float columnWidth = (cardWidth / columns) / columnWidthModifier;
-
-            float x = -contentWidth / 2f
-                      + columnWidth * column
-                      + columnWidth / 2f;
-
-            float row = Mathf.CeilToInt(index / columns);
-
-            float y = -(cardHeight * row) / columnHeightModifier;
-
-
-
-
-            cardRect.anchorMin = new Vector2(0f, 1f);
-            cardRect.anchorMax = new Vector2(0f, 1f);
-
-            cardRect.pivot = cardPivot;
-            cardRect.anchoredPosition = new Vector2(x, y);
         }
     }
 

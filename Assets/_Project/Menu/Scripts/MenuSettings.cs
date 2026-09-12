@@ -6,7 +6,7 @@ namespace _Project.Menu.Scripts
     public class MenuSettings : ScriptableObject
     {
         public float mouseSensitivity = 5f;
-        public float gamepadSensitivity = 45f;
+        public float gamepadSensitivity = 200f;
         
         public void SetMouseSensitivity(float sensitivity) => mouseSensitivity = sensitivity;
         public void SetGamepadSensitivity(float sensitivity) => gamepadSensitivity = sensitivity;
