@@ -91,27 +91,23 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void Spawned()
         {
-            if (!HasStateAuthority) return;
-
-            _kcc =
-                GetComponent<SimpleKCC>();
-
-            _slide =
-                GetComponent<Slide>();
-
-            _wallRun =
-                GetComponent<WallRun>();
-
-            _climb =
-                GetComponent<Climb>();
+            _kcc = GetComponent<SimpleKCC>();
+            _slide = GetComponent<Slide>();
+            _wallRun = GetComponent<WallRun>();
+            _climb = GetComponent<Climb>();
 
             moveSpeed = walkSpeed;
 
-            _kcc.SetGravity(
-                NormalGravity
-            );
-        }
+            _kcc.SetGravity(NormalGravity);
 
+            if (HasStateAuthority)
+            {
+                NetworkedSprintSpeed = defaultSprintSpeed;
+                NetworkedJumpForce = defaultJumpForce;
+                SpeedBoostMultiplier = 1f;
+            }
+        }
+        
         public override void FixedUpdateNetwork()
         {
             if (_kcc == null || !GetInput(out GameplayInput input)) return;

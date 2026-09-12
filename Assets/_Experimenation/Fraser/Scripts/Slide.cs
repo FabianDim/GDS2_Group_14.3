@@ -65,7 +65,7 @@ namespace _Experimenation.Fraser.Scripts
                 }
             }
 
-            if (!input.Buttons.WasPressed(PreviousButtons, InputButton.CrouchHeld))
+            if (!input.Buttons.IsSet(InputButton.CrouchHeld))
             {
                 StopSlide();
                 TryStopCrouch();
