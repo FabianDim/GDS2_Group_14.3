@@ -1,4 +1,6 @@
-﻿using _Project.Menu.Scripts;
+﻿using _Experimenation.K.Event_Bus;
+using _Experimenation.K.Event_Bus.Events;
+using _Project.Menu.Scripts;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
 using UnityEngine;
@@ -61,7 +63,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         public override void Spawned()
         {
             if (!HasInputAuthority) return;
-            Runner.GetComponent<NetworkEvents>()?.OnInput.AddListener(OnInput);
+            EnableInput();
 
             EnableAction(moveAction);
             EnableAction(jumpAction);
@@ -77,11 +79,13 @@ namespace _Experimenation.K.Multiplayer.Scripts
             EnableAction(catchDownAction);
             EnableAction(catchLeftAction);
             EnableAction(catchRightAction);
+            
+            EventBus.Subscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            Runner.GetComponent<NetworkEvents>()?.OnInput.RemoveListener(OnInput);
+            DisableInput();
 
             DisableAction(moveAction);
             DisableAction(jumpAction);
@@ -97,6 +101,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
             DisableAction(catchDownAction);
             DisableAction(catchLeftAction);
             DisableAction(catchRightAction);
+            
+            EventBus.Unsubscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
         }
 
         private static void EnableAction(InputActionReference actionReference)
@@ -108,6 +114,11 @@ namespace _Experimenation.K.Multiplayer.Scripts
         {
             actionReference?.action?.Disable();
         }
+        
+        private void EnableInput() =>
+            Runner.GetComponent<NetworkEvents>()?.OnInput.AddListener(OnInput);
+        private void DisableInput() =>
+            Runner.GetComponent<NetworkEvents>()?.OnInput.RemoveListener(OnInput);
 
         private void MapButton(InputButton button, InputActionReference mapping) =>
             _accumulatedInput.Buttons.Set(button, mapping.action.IsPressed());
@@ -122,10 +133,28 @@ namespace _Experimenation.K.Multiplayer.Scripts
             
             //Move and Look
             _accumulatedInput.MoveInput = moveAction?.action?.ReadValue<Vector2>() ?? default;
+
+            // Mouse and gamepad report look input in incompatible units:
+            //  - mouse: per-frame delta (pixels moved since last frame)
+            //  - gamepad: stick position (-1..1), i.e. a rotation RATE, not a delta
+            // Pick the sensitivity from the device that actually drove the action,
+            // not from "a gamepad is connected".
             var lookValue = lookAction.action.ReadValue<Vector2>();
-            var lookSensitivity = Gamepad.current != null ? 
-                    menuSettings.gamepadSensitivity : menuSettings.mouseSensitivity;
-            var lookRotationDelta = new Vector2(-lookValue.y, lookValue.x) * lookSensitivity / 60f;
+            var activeControl = lookAction.action.activeControl;
+            var isGamepad = activeControl is { device: Gamepad };
+
+            Vector2 lookRotationDelta;
+            if (isGamepad)
+            {
+                // gamepadSensitivity = degrees per second at full stick tilt.
+                var rotationRate = lookValue * menuSettings.gamepadSensitivity;
+                lookRotationDelta = new Vector2(-rotationRate.y, rotationRate.x) * Time.deltaTime;
+            }
+            else
+            {
+                // mouseSensitivity = per-frame pixel multiplier.
+                lookRotationDelta = new Vector2(-lookValue.y, lookValue.x) * menuSettings.mouseSensitivity / 60f;
+            }
             _lookRotationAccumulator.Accumulate(lookRotationDelta);
             
             //Movement Buttons
@@ -158,6 +187,12 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             // Fusion polls accumulated input. This callback can be executed multiple times in a row if there is a performance spike.
             input.Set(_accumulatedInput);
+        }
+        
+        private void OnBuyZoneEntered(BuyZoneEnteredEvent ev)
+        {
+            if(ev.Entered) DisableInput();
+            else EnableInput();
         }
     }
 }

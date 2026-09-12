@@ -1,4 +1,3 @@
-using System;
 using _Experimenation.Fraser.Scripts;
 using _Experimenation.K.Multiplayer.Scripts;
 using _Project.Abilities.Scripts;
@@ -10,8 +9,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
     public class DashPowerup : AbilityEffect
     {
         [Header("Settings")]
-        public float boostMultiplier = 4f;
-        public float boostDuration = 3f;
+        public float boostMultiplier = 0.25f;
         private PlayerMovement _playerMovement;
 
         public override void ApplyEffect(Player target)
@@ -24,7 +22,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
                 return;
             }
 
-            _playerMovement.ApplyDashBoost(boostMultiplier, boostDuration);
+            _playerMovement.ApplyDashBoost(boostMultiplier);
         }
     }
 }

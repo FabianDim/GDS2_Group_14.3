@@ -60,7 +60,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         // C# field would remain local to the host and reset on remote simulations.
         [Networked] public int CurrentRound { get; set; } = 1;
 
-        public int roundDuration = 300;
+        public int roundDuration = 120;
 
         public override void Spawned()
         {
@@ -236,10 +236,16 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private void InitializeDefaultData()
         {
             if (P1Data.Username.Length == 0)
+            {
                 P1Data.Username = DefaultHostUsername;
+                P1Data.Points = 100;
+            }
 
             if (P2Data.Username.Length == 0)
+            {
                 P2Data.Username = DefaultClientUsername;
+                P2Data.Points = 100;
+            }
         }
 
         private static bool IsValidRole(PlayerRole role)

@@ -90,7 +90,7 @@ namespace _Project.Abilities.Scripts
         private void OnAbilitySelected(AbilitySelectedEvent ev)
         {
             foreach(var effect in _abilityChoices[ev.SelectedAbility - 1].effects)
-                effect.ApplyEffect();
+                effect.ApplyEffect(ev.Player);
             _isShowingAbilities = false;
         }
         #endregion
