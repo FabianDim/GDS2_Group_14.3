@@ -10,8 +10,33 @@ namespace _Experimenation.Fraser.Scripts
         [Header("References")]
         [SerializeField] private Transform orientation;
 
-        [Header("Speeds")]
-        [SerializeField] private float moveSpeed = 10f;
+        [Header("Movement")]
+        [SerializeField] public float moveSpeed = 10f;
+        public float defaultMoveSpeed = 10f;
+        [SerializeField] public float maxMoveSpeed = 40f;
+
+        // Set by State Authority (e.g. the QTE Runner boost) and replicated so
+        // server simulation and client prediction stay in sync.
+        [Networked] public float SpeedBoostMultiplier { get; set; }
+
+        [SerializeField] private float movementMultiplier = 10f;
+        [SerializeField] private float defaultAirMultiplier = 0.55f;
+
+        [Header("Sprinting")]
+        [Networked] private float NetworkedSprintSpeed { get; set; }
+
+        [Networked] private float NetworkedAerialMultiplier { get; set; }
+        [Networked] private float NetworkedAgilityMultiplier { get; set; }
+
+        public float airMultiplier => NetworkedAerialMultiplier;
+
+        public float agilityMultiplier => NetworkedAgilityMultiplier;
+
+        private bool dashBoostActive;
+
+        private TickTimer SpeedBoostTimer { get; set; }
+
+        public float sprintSpeed => NetworkedSprintSpeed;
         [SerializeField] private float walkSpeed = 10f;
         [SerializeField] private float defaultSprintSpeed = 15f;
         [SerializeField] private float crouchSpeed = 5f;
@@ -71,7 +96,16 @@ namespace _Experimenation.Fraser.Scripts
             NetworkedJumpForce = DefaultJumpForce;
             NetworkedSprintSpeed = defaultSprintSpeed;
 
-            _kcc.SetGravity(NormalGravity);
+            moveSpeed = walkSpeed;
+
+            _kcc.SetGravity(
+                NormalGravity
+            );
+
+            NetworkedAerialMultiplier = defaultAirMultiplier;
+            NetworkedAgilityMultiplier = 1f;
+            NetworkedSprintSpeed = defaultSprintSpeed;
+            NetworkedJumpForce = defaultJumpForce;
         }
 
         public override void FixedUpdateNetwork()
@@ -237,15 +271,33 @@ NetworkedSprintSpeed = Mathf.Min(
 
 dashBoostActive = true;
 
-SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
-}
+            SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
+        }
+        internal void ApplyAerialControlBoost(float boostMultiplier)
+        {
+            if (!HasStateAuthority)
+                return;
 
-public void PowerupsDeactivate()
-{
-    if (!dashBoostActive || !jumpBoostActive)
-    {
-        return;
-    }
+            NetworkedAerialMultiplier = Mathf.Min(
+                defaultAirMultiplier * 2, //Not sure what air should stay around.
+                defaultAirMultiplier * boostMultiplier
+            );
+        }
+        internal void ApplyAgilityBoost(float boostMultiplier)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            NetworkedAgilityMultiplier = boostMultiplier;
+
+        }
+
+        public void PowerupsDeactivate()
+        {
+            if (!dashBoostActive && !jumpBoostActive)
+            {
+                return;
+            }
 
     if (SpeedBoostTimer.Expired(Runner))
     {
