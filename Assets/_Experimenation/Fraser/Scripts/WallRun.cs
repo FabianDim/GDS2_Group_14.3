@@ -18,6 +18,7 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float wallRunGravity = -2f;
         [SerializeField] private float wallRunJumpHorizontalForce = 7f;
         [SerializeField] private float wallRunJumpVerticalForce = 7f;
+        public float CameraTilt => Tilt;
         [SerializeField] private float wallJumpReattachDelay = 0.15f;
 
         [Header("Camera")]

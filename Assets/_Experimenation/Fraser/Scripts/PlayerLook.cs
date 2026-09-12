@@ -11,6 +11,7 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private Transform cam;
         [SerializeField] private Transform orientation;
 
+        private WallRun _wallRun;
         private SimpleKCC _kcc;
         private float _pitch;
         private float _yaw;
@@ -18,7 +19,10 @@ namespace _Experimenation.Fraser.Scripts
         public override void Spawned()
         {
             _kcc = GetComponent<SimpleKCC>();
+            _wallRun = GetComponent<WallRun>();
+
             if (!HasInputAuthority) return;
+
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
@@ -46,8 +50,14 @@ namespace _Experimenation.Fraser.Scripts
 
         private void RefreshCamera()
         {
-            var pitchRotation = _kcc.GetLookRotation(true, false);
-            cam.localRotation = Quaternion.Euler(pitchRotation);
+            var lookRotation = _kcc.GetLookRotation(true, false);
+            var tilt = _wallRun != null ? _wallRun.CameraTilt : 0f;
+
+            cam.localRotation = Quaternion.Euler(
+                lookRotation.x,
+                lookRotation.y,
+                tilt
+            );
         }
     }
 }
