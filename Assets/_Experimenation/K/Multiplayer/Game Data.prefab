@@ -48,6 +48,7 @@ MonoBehaviour:
   numberOfRounds: 2
   _CurrentRound: 1
   roundDuration: 120
+  abilityDatabase: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
 --- !u!114 &5041624593913706618
 MonoBehaviour:
   m_ObjectHideFlags: 0

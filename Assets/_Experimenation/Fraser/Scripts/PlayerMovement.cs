@@ -149,7 +149,8 @@ namespace _Experimenation.Fraser.Scripts
             if (moveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * Runner.DeltaTime);
+                _horizontalVelocity =
+                    Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * Runner.DeltaTime);
             }
             else
             {
@@ -162,7 +163,8 @@ namespace _Experimenation.Fraser.Scripts
             if (moveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity,
+                    movementMultiplier * airMultiplier * Runner.DeltaTime);
             }
 
             if (airDrag > 0f)
@@ -178,7 +180,8 @@ namespace _Experimenation.Fraser.Scripts
             if (wallMoveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = wallMoveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity,
+                    movementMultiplier * airMultiplier * Runner.DeltaTime);
             }
 
             _horizontalVelocity = _wallRun.GetWallRunVelocity(_horizontalVelocity);
@@ -230,33 +233,11 @@ namespace _Experimenation.Fraser.Scripts
             if (!HasStateAuthority)
                 return;
 
-NetworkedSprintSpeed = Mathf.Min(
-    maxMoveSpeed,
-    defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
-);
-
-dashBoostActive = true;
-
-SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
-}
-
-public void PowerupsDeactivate()
-{
-    if (!dashBoostActive || !jumpBoostActive)
-    {
-        return;
-    }
-
-    if (SpeedBoostTimer.Expired(Runner))
-    {
-        NetworkedSprintSpeed = defaultSprintSpeed;
-        dashBoostActive = false;
-    }
-    if (JumpBoostTimer.Expired(Runner))
-    {
-        NetworkedJumpForce = defaultJumpForce;
-        jumpBoostActive = false;
-    }
+            NetworkedSprintSpeed = Mathf.Min(
+                maxMoveSpeed,
+                defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
+            );
         }
+
     }
 }

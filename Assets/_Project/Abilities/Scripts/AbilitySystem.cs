@@ -30,6 +30,7 @@ namespace _Project.Abilities.Scripts
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);   
             EventBus.Subscribe<RoundOverEvent>(OnRoundOver);
             EventBus.Subscribe<AbilitySelectedEvent>(OnAbilitySelected);
+            EventBus.Subscribe<AbilityPurchasedEvent>(OnAbilityPurchased);
             
             GenerateRandomAbilitySet();
         }
@@ -41,6 +42,7 @@ namespace _Project.Abilities.Scripts
             EventBus.Unsubscribe<TokenCollectedEvent>(OnTokenCollected);
             EventBus.Unsubscribe<RoundOverEvent>(OnRoundOver);
             EventBus.Unsubscribe<AbilitySelectedEvent>(OnAbilitySelected);
+            EventBus.Unsubscribe<AbilityPurchasedEvent>(OnAbilityPurchased);
         }
 
         #region Utilities
@@ -89,9 +91,44 @@ namespace _Project.Abilities.Scripts
 
         private void OnAbilitySelected(AbilitySelectedEvent ev)
         {
-            foreach(var effect in _abilityChoices[ev.SelectedAbility - 1].effects)
-                effect.ApplyEffect(ev.Player);
+            if (ev.Player == null || ev.SelectedAbility < 1 ||
+                ev.SelectedAbility > _abilityChoices.Count)
+                return;
+
+            var ability = _abilityChoices[ev.SelectedAbility - 1];
+            if (ability?.effects == null)
+                return;
+
+            foreach (var effect in ability.effects)
+            {
+                if (effect != null)
+                    effect.ApplyEffect(ev.Player);
+            }
+
             _isShowingAbilities = false;
+        }
+
+        private void OnAbilityPurchased(AbilityPurchasedEvent ev)
+        {
+            if (!HasStateAuthority || !ev.Accepted || database == null ||
+                ev.Buyer == PlayerRef.None ||
+                ev.AbilityIndex < 0 || ev.AbilityIndex >= database.allAbilities.Count)
+                return;
+
+            var player = FindObjectsByType<Player>()
+                .FirstOrDefault(candidate => candidate != null &&
+                    candidate.Object != null &&
+                    candidate.Object.InputAuthority == ev.Buyer);
+            var ability = database.allAbilities[ev.AbilityIndex];
+
+            if (player == null || ability?.effects == null)
+                return;
+
+            foreach (var effect in ability.effects)
+            {
+                if (effect != null)
+                    effect.ApplyEffect(player);
+            }
         }
         #endregion
     }

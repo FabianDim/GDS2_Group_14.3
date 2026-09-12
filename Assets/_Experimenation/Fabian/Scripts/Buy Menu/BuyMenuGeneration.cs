@@ -34,8 +34,6 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 
         private IEnumerator ShowTimeLeft()
         {
-            Debug.LogError($"From BuyMenuGeneration.cs: Round duration is {GameData.Instance.roundDuration}");
-            Debug.LogError($"From BuyMenuGeneration.cs: Buy Phase duration is {GameData.Instance.roundDuration * 0.25}");
             for (var i = GameData.Instance.roundDuration * 0.25; i > -1; i--)
             {
                 timeLeftText.SetText($"Time until Start: {(int)i}");
@@ -65,20 +63,14 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 
             ClearExistingCards();
 
-
-
-
-
-            for (int i = 0; i < database.allAbilities.Count; i++)
+            for (var index = 0; index < database.allAbilities.Count; index++)
             {
-                Ability ability = database.allAbilities[i];
+                var ability = database.allAbilities[index];
                 if (ability == null)
                     continue;
-                BuyMenuItem card =
-                    Instantiate(abilityCardPrefab, content);
 
-                card.Setup(ability);
-
+                var card = Instantiate(abilityCardPrefab, content);
+                card.Setup(ability, index);
             }
         }
 

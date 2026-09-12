@@ -25,15 +25,23 @@ namespace _Experimenation.K.Game_Manager.Scripts
         {
             if (!HasStateAuthority) return;
             var collector = other.GetComponentInParent<Player>();
-            if(collector)
-            {
-                RPC_GetCollected(collector, tokenValue);
-                Runner.Despawn(obj);
-            }
+            if (collector == null || collector.Object == null)
+                return;
+
+            var collectorRef = collector.Object.InputAuthority;
+            GameData.Instance?.ChangePoints(collectorRef, tokenValue);
+            RPC_GetCollected(collector, tokenValue);
+            Runner.Despawn(obj);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
-        private void RPC_GetCollected(Player collector, int tokenValue) =>
-            EventBus.Raise(new TokenCollectedEvent(tokenValue, collector, collector.Object.InputAuthority));
+        private void RPC_GetCollected(Player collector, int tokenValue)
+        {
+            if (collector == null || collector.Object == null)
+                return;
+
+            EventBus.Raise(
+                new TokenCollectedEvent(tokenValue, collector, collector.Object.InputAuthority));
+        }
     }
 }

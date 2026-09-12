@@ -1,4 +1,6 @@
-﻿using _Experimenation.K.Game_Manager.Scripts;
+﻿using _Experimenation.K.Event_Bus;
+using _Experimenation.K.Event_Bus.Events;
+using _Experimenation.K.Game_Manager.Scripts;
 using Fusion;
 using UnityEngine;
 
@@ -10,11 +12,21 @@ namespace _Experimenation.Fabian.Scripts.PhaseController
         [SerializeField] private GameObject buyPhaseItems;
         [SerializeField] private ParticleSystem buyPhaseEndsPS;
         [SerializeField] private GameObject runPhaseItems;
+
+        [OnChangedRender(nameof(OnRunPhaseChanged))]
+        [Networked] private NetworkBool IsRunPhase { get; set; }
+
         private TickTimer _timer;
+        private bool _timerInitialized;
 
         public override void Spawned()
         {
-            if(!HasStateAuthority) return;
+            ApplyPhaseVisuals();
+
+            if (!HasStateAuthority)
+                return;
+
+            IsRunPhase = false;
             StartCoroutine(InitTimerWhenGameDataReady());
         }
 
@@ -27,23 +39,43 @@ namespace _Experimenation.Fabian.Scripts.PhaseController
                 yield return null;
 
             _timer = TickTimer.CreateFromSeconds(Runner, GameData.Instance.roundDuration * 0.25f);
+            _timerInitialized = true;
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority || !_timer.Expired(Runner)) return;
+            if (!HasStateAuthority || !_timerInitialized || !_timer.Expired(Runner))
+                return;
 
-            _timer = TickTimer.None; // fire the phase transition exactly once
-            RPC_StartRunPhase();
+            _timer = TickTimer.None;
+            _timerInitialized = false;
+            IsRunPhase = true;
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
-        private void RPC_StartRunPhase()
+        private void OnRunPhaseChanged()
         {
-            runPhaseItems.SetActive(true);
-            buyPhaseEndsPS.Play();
-            buyPhaseItems.SetActive(false);
-            enabled = false;
+            ApplyPhaseVisuals();
+            EventBus.Raise(new RunPhaseStartsEvent());
+        }
+
+        private void ApplyPhaseVisuals()
+        {
+            var isRunPhase = IsRunPhase;
+
+            if (runPhaseItems != null)
+                runPhaseItems.SetActive(isRunPhase);
+            else
+                Debug.LogError("PhaseManager: Run Phase UI reference is not assigned.", this);
+
+            if (buyPhaseItems != null)
+                buyPhaseItems.SetActive(!isRunPhase);
+            else
+                Debug.LogError("PhaseManager: Buy Phase UI reference is not assigned.", this);
+
+            if (isRunPhase && buyPhaseEndsPS != null)
+                buyPhaseEndsPS.Play();
+            else if (isRunPhase)
+                Debug.LogError("PhaseManager: buy phase ending particle reference is not assigned.", this);
         }
     }
 }

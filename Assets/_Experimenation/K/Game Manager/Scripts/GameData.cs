@@ -1,5 +1,8 @@
 using System;
+using _Experimenation.K.Event_Bus;
+using _Experimenation.K.Event_Bus.Events;
 using _Experimenation.K.Multiplayer.Scripts;
+using _Project.Abilities.Scripts;
 using Fusion;
 using UnityEngine;
 
@@ -61,6 +64,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
         [Networked] public int CurrentRound { get; set; } = 1;
 
         public int roundDuration = 120;
+
+        [SerializeField] private AbilityDatabase abilityDatabase;
 
         public override void Spawned()
         {
@@ -236,22 +241,95 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private void InitializeDefaultData()
         {
             if (P1Data.Username.Length == 0)
-            {
                 P1Data.Username = DefaultHostUsername;
-                P1Data.Points = 100;
-            }
 
             if (P2Data.Username.Length == 0)
-            {
                 P2Data.Username = DefaultClientUsername;
-                P2Data.Points = 100;
+
+            P1Data.Points = 100;
+            P2Data.Points = 100;
+        }
+
+        public void RequestPurchase(int abilityIndex)
+        {
+            var runner = Runner;
+            if (runner == null || Object == null || !runner.IsRunning || runner.IsShutdown)
+                return;
+
+            if (HasStateAuthority)
+                TryPurchase(runner.LocalPlayer, abilityIndex);
+            else
+                RPC_RequestPurchase(abilityIndex);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        private void RPC_RequestPurchase(int abilityIndex, RpcInfo info = default)
+        {
+            if (!HasStateAuthority || info.Source == PlayerRef.None)
+                return;
+
+            TryPurchase(info.Source, abilityIndex);
+        }
+
+        private void TryPurchase(PlayerRef buyer, int abilityIndex)
+        {
+            if (!HasStateAuthority || !buyer.IsValid)
+                return;
+
+            var accepted = abilityDatabase != null &&
+                abilityIndex >= 0 &&
+                abilityIndex < abilityDatabase.allAbilities.Count;
+
+            var ability = accepted ? abilityDatabase.allAbilities[abilityIndex] : null;
+            accepted = ability != null && TrySpendPoints(buyer, ability.abilityPrice);
+            RPC_PurchaseResult(buyer, abilityIndex, accepted);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
+        private void RPC_PurchaseResult(PlayerRef buyer, int abilityIndex, bool accepted)
+        {
+            EventBus.Raise(new AbilityPurchasedEvent(buyer, abilityIndex, accepted));
+        }
+
+        private bool TrySpendPoints(PlayerRef player, int amount)
+        {
+            if (!HasStateAuthority || !player.IsValid || amount <= 0)
+                return false;
+
+            if (player == Runner.LocalPlayer)
+            {
+                if (P1Data.Points < amount)
+                    return false;
+
+                P1Data.Points -= amount;
+                return true;
             }
+
+            if (P2Data.Points < amount)
+                return false;
+
+            P2Data.Points -= amount;
+            return true;
+        }
+
+        public void ChangePoints(PlayerRef collector, int points)
+        {
+            if (!HasStateAuthority || !collector.IsValid || points == 0)
+                return;
+
+            // This game has exactly two players: the state-authority player is P1
+            // and the other player is P2. Only the host mutates the networked data.
+            if (collector == Runner.LocalPlayer)
+                P1Data.Points += points;
+            else
+                P2Data.Points += points;
         }
 
         private static bool IsValidRole(PlayerRole role)
         {
             return role == PlayerRole.Runner || role == PlayerRole.Chaser;
         }
+
 
         private static string NormalizeUsername(string username, string fallback)
         {

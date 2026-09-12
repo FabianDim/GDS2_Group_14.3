@@ -23,11 +23,14 @@ namespace _Experimenation.K.Multiplayer.Scripts
         //Ability Selection
         Ability1, Ability2, Ability3,
         
-        //Test Console
-        StartRunPhase,
+        //Tools
+        Fire,
         
         //QTE Fight
         QteFight, CatchUp, CatchDown, CatchLeft, CatchRight,
+        
+        //Test Console
+        StartRunPhase,
     }
     
     public sealed class PlayerInput : NetworkBehaviour, IBeforeUpdate
@@ -50,8 +53,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
         [SerializeField] private InputActionReference ability2Action;
         [SerializeField] private InputActionReference ability3Action;
         
-        [Space, Header("Test Console")] 
-        [SerializeField] private InputActionReference startRunPhase;
+        [Space, Header("Tools")]
+        [SerializeField] private InputActionReference fireAction;
         
         [Space, Header("QTE Fight")]
         [SerializeField] private InputActionReference qteFightAction;
@@ -60,6 +63,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
         [SerializeField] private InputActionReference catchLeftAction;
         [SerializeField] private InputActionReference catchRightAction;
 
+        [Space, Header("Test Console")] 
+        [SerializeField] private InputActionReference startRunPhase;
         public override void Spawned()
         {
             if (!HasInputAuthority) return;
@@ -73,6 +78,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
             EnableAction(ability1Action);
             EnableAction(ability2Action);
             EnableAction(ability3Action);
+            EnableAction(fireAction);
             EnableAction(startRunPhase);
             EnableAction(qteFightAction);
             EnableAction(catchUpAction);
@@ -95,6 +101,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
             DisableAction(ability1Action);
             DisableAction(ability2Action);
             DisableAction(ability3Action);
+            DisableAction(fireAction);
             DisableAction(startRunPhase);
             DisableAction(qteFightAction);
             DisableAction(catchUpAction);
@@ -168,8 +175,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
             MapButton(InputButton.Ability2, ability2Action);
             MapButton(InputButton.Ability3, ability3Action);
             
-            //Test Console
-            MapButton(InputButton.StartRunPhase, startRunPhase);
+            //Tools
+            MapButton(InputButton.Fire, fireAction);
             
             //QTE Fight
             MapButton(InputButton.QteFight, qteFightAction);
@@ -177,6 +184,9 @@ namespace _Experimenation.K.Multiplayer.Scripts
             MapButton(InputButton.CatchDown, catchDownAction);
             MapButton(InputButton.CatchLeft, catchLeftAction);
             MapButton(InputButton.CatchRight, catchRightAction);
+            
+            //Test Console
+            MapButton(InputButton.StartRunPhase, startRunPhase);
         }
 
         private void OnInput(NetworkRunner runner, NetworkInput input)

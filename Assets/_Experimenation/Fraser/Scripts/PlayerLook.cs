@@ -21,9 +21,7 @@ namespace _Experimenation.Fraser.Scripts
         {
             _kcc = GetComponent<SimpleKCC>();
             if (!HasInputAuthority) return;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            
+            LockCursor(true);
             EventBus.Subscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
         }
 
@@ -59,8 +57,17 @@ namespace _Experimenation.Fraser.Scripts
             var pitchRotation = _kcc.GetLookRotation(true, false);
             cam.localRotation = Quaternion.Euler(pitchRotation);
         }
+
+        private static void LockCursor(bool locked)
+        {
+            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !locked;
+        }
         
-        private void OnBuyZoneEntered(BuyZoneEnteredEvent ev) => 
+        private void OnBuyZoneEntered(BuyZoneEnteredEvent ev)
+        {
             cam.gameObject.SetActive(!ev.Entered);
+            LockCursor(!ev.Entered);
+        }
     }
 }
