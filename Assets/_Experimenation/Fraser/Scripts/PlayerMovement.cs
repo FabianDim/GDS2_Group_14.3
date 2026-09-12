@@ -22,11 +22,17 @@ namespace _Experimenation.Fraser.Scripts
         [Networked] public float SpeedBoostMultiplier { get; set; }
 
         [SerializeField] private float movementMultiplier = 10f;
-        [SerializeField] private float airMultiplier = 0.55f;
+        [SerializeField] private float defaultAirMultiplier = 0.55f;
 
         [Header("Sprinting")]
-        [Networked]
-        private float NetworkedSprintSpeed { get; set; }
+        [Networked] private float NetworkedSprintSpeed { get; set; }
+
+        [Networked] private float NetworkedAerialMultiplier { get; set; }
+        [Networked] private float NetworkedAgilityMultiplier { get; set; }
+
+        public float airMultiplier => NetworkedAerialMultiplier;
+
+        public float agilityMultiplier => NetworkedAgilityMultiplier;
 
         private bool dashBoostActive;
 
@@ -110,6 +116,11 @@ namespace _Experimenation.Fraser.Scripts
             _kcc.SetGravity(
                 NormalGravity
             );
+
+            NetworkedAerialMultiplier = defaultAirMultiplier;
+            NetworkedAgilityMultiplier = 1f;
+            NetworkedSprintSpeed = defaultSprintSpeed;
+            NetworkedJumpForce = defaultJumpForce;
         }
 
         public override void FixedUpdateNetwork()
@@ -313,8 +324,8 @@ namespace _Experimenation.Fraser.Scripts
                     Vector3.Lerp(
                         _horizontalVelocity,
                         targetVelocity,
-                        movementMultiplier *
-                        airMultiplier *
+                        agilityMultiplier *
+                        defaultAirMultiplier *
                         Runner.DeltaTime
                     );
             }
@@ -417,10 +428,28 @@ namespace _Experimenation.Fraser.Scripts
 
             SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
         }
+        internal void ApplyAerialControlBoost(float boostMultiplier)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            NetworkedAerialMultiplier = Mathf.Min(
+                defaultAirMultiplier * 2, //Not sure what air should stay around.
+                defaultAirMultiplier * boostMultiplier
+            );
+        }
+        internal void ApplyAgilityBoost(float boostMultiplier)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            NetworkedAgilityMultiplier = boostMultiplier;
+
+        }
 
         public void PowerupsDeactivate()
         {
-            if (!dashBoostActive || !jumpBoostActive)
+            if (!dashBoostActive && !jumpBoostActive)
             {
                 return;
             }
