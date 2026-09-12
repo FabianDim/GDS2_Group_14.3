@@ -108,6 +108,14 @@ namespace _Experimenation.Fraser.Scripts
             NetworkedJumpForce = defaultJumpForce;
         }
 
+            if (HasStateAuthority)
+            {
+                NetworkedSprintSpeed = defaultSprintSpeed;
+                NetworkedJumpForce = defaultJumpForce;
+                SpeedBoostMultiplier = 1f;
+            }
+        }
+        
         public override void FixedUpdateNetwork()
         {
             if (_kcc == null || !GetInput(out GameplayInput input))
