@@ -1,4 +1,4 @@
-using _Experimenation.K.Game_Manager.Scripts;
+﻿using _Experimenation.K.Game_Manager.Scripts;
 using Fusion;
 using UnityEngine;
 
@@ -15,12 +15,25 @@ namespace _Experimenation.Fabian.Scripts.PhaseController
         public override void Spawned()
         {
             if(!HasStateAuthority) return;
+            StartCoroutine(InitTimerWhenGameDataReady());
+        }
+
+        // GameData.Instance is assigned in GameData.Spawned(), which may run
+        // after this component's Spawned() - wait for it instead of NRE-ing
+        // and leaving _timer at its default (never expires).
+        private System.Collections.IEnumerator InitTimerWhenGameDataReady()
+        {
+            while (GameData.Instance == null)
+                yield return null;
+
             _timer = TickTimer.CreateFromSeconds(Runner, GameData.Instance.roundDuration * 0.25f);
         }
 
         public override void FixedUpdateNetwork()
         {
             if (!HasStateAuthority || !_timer.Expired(Runner)) return;
+
+            _timer = TickTimer.None; // fire the phase transition exactly once
             RPC_StartRunPhase();
         }
 

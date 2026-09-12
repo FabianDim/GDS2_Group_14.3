@@ -65,7 +65,9 @@ namespace _Experimenation.K.Multiplayer.Scripts
                 selectedAbility = 3;
             
             if(selectedAbility != 0) 
-                EventBus.Raise(new AbilitySelectedEvent(selectedAbility));
+                EventBus.Raise(
+                    new AbilitySelectedEvent(selectedAbility, Object.GetComponent<Player>())
+                );
             
             PreviousButtons = input.Buttons;
         }

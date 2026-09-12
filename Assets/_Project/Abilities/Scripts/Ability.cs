@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using _Experimenation.K.Multiplayer.Scripts;
 using SerializeReferenceEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace _Project.Abilities.Scripts
 {
@@ -21,7 +20,7 @@ namespace _Project.Abilities.Scripts
         public AbilityScope abilityScope;
         public string abilityDescription;
         [SerializeReference, SR] public List<AbilityEffect> effects;
-        public int AbilityPrice;
+        public int abilityPrice;
 
 
         public void OnEnable()
@@ -36,17 +35,9 @@ namespace _Project.Abilities.Scripts
     }
 
     [Serializable]
-    public class AbilityEffect
+    public abstract class AbilityEffect
     {
-        public virtual void ApplyEffect()
-        {
-
-        }
-
-        public virtual void ApplyEffect(Player target)
-        {
-
-        }
+        public abstract void ApplyEffect(Player target);
 
         protected IEnumerator EndEffect(Action callback, float delay = 3f)
         {
@@ -54,87 +45,4 @@ namespace _Project.Abilities.Scripts
             callback?.Invoke();
         }
     }
-
-    #region Ability Effects
-    [Serializable]
-    public class Ability1 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability1 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability2 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability2 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability3 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability3 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability4 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability4 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability5 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability5 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability6 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability6 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability7 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability7 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability8 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability8 Activated");
-        }
-    }
-
-    [Serializable]
-    public class Ability9 : AbilityEffect
-    {
-        public override void ApplyEffect()
-        {
-            Debug.Log("Ability9 Activated");
-        }
-    }
-    #endregion
 }

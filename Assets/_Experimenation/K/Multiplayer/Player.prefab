@@ -281,14 +281,13 @@ MonoBehaviour:
   moveSpeed: 10
   defaultMoveSpeed: 10
   maxMoveSpeed: 40
-  _SpeedBoostMultiplier: 0
+  _SpeedBoostMultiplier: 1
   movementMultiplier: 10
   airMultiplier: 0.3
   walkSpeed: 10
-  sprintSpeed: 20
+  defaultSprintSpeed: 15
   crouchSpeed: 5
   acceleration: 12
-  jumpForce: 7
   gravityMultiplier: 1.8
   groundDrag: 6
   airDrag: 0

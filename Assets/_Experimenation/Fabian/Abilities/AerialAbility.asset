@@ -10,18 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f3e69b8f7e444ec9960dcc5c3e54336, type: 3}
-  m_Name: Ability 6
+  m_Name: AerialAbility
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.Ability
-  abilityName: Ability 6
-  abilityColor: {r: 0, g: 0, b: 1, a: 1}
-  abilityType: 1
-  abilityScope: 1
-  abilityDescription: TECH 6
+  abilityName: Aerial Ability
+  abilitySprite: {fileID: 0}
+  abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
+  abilityType: 0
+  abilityScope: 0
+  abilityDescription: Permanent aerial agility
   effects:
-  - rid: 4879116493947666662
+  - rid: 7367326317905969240
+  AbilityPrice: 0
   references:
     version: 2
     RefIds:
-    - rid: 4879116493947666662
-      type: {class: Ability6, ns: _Project.Abilities.Scripts, asm: Assembly-CSharp}
-      data: 
+    - rid: 7367326317905969240
+      type: {class: AerialControlPowerup, ns: _Experimenation.Fabian.Scripts.Abilites, asm: Assembly-CSharp}
+      data:
+        AirBoostMultiplier: 1.25

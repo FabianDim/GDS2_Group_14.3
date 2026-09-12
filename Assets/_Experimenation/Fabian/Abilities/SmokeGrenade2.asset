@@ -18,8 +18,11 @@ MonoBehaviour:
   abilityType: 0
   abilityScope: 0
   abilityDescription: 
-  effects: []
+  effects:
+  - rid: -2
   AbilityPrice: 100
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }

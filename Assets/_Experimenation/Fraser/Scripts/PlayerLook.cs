@@ -1,3 +1,5 @@
+using _Experimenation.K.Event_Bus;
+using _Experimenation.K.Event_Bus.Events;
 using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
@@ -25,6 +27,14 @@ namespace _Experimenation.Fraser.Scripts
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            
+            EventBus.Subscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (!HasInputAuthority) return;
+            EventBus.Unsubscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
         }
 
         public override void FixedUpdateNetwork()
@@ -59,5 +69,8 @@ namespace _Experimenation.Fraser.Scripts
                 tilt
             );
         }
+        
+        private void OnBuyZoneEntered(BuyZoneEnteredEvent ev) => 
+            cam.gameObject.SetActive(!ev.Entered);
     }
 }

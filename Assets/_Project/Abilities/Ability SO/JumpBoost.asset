@@ -13,21 +13,19 @@ MonoBehaviour:
   m_Name: JumpBoost
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.Ability
   abilityName: Jump Boost Ability
-  abilityImage: {fileID: 0}
+  abilitySprite: {fileID: 0}
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
   abilityType: 0
   abilityScope: 0
   abilityDescription: 
   effects:
   - rid: 4879116493947666666
-  AbilityPrice: 1234
-  image: {fileID: 0}
+  abilityPrice: 75
   references:
     version: 2
     RefIds:
     - rid: 4879116493947666666
       type: {class: JumpBoostAbility, ns: _Experimenation.Fabian.Scripts.Abilites, asm: Assembly-CSharp}
       data:
-        abilityDuration: 20
         boostMultiplayer: 2
         maxJumpForce: 0
