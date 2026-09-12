@@ -230,7 +230,33 @@ namespace _Experimenation.Fraser.Scripts
             if (!HasStateAuthority)
                 return;
 
-            NetworkedSprintSpeed = Mathf.Min(maxMoveSpeed, defaultSprintSpeed + defaultSprintSpeed * boostMultiplier);
+NetworkedSprintSpeed = Mathf.Min(
+    maxMoveSpeed,
+    defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
+);
+
+dashBoostActive = true;
+
+SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
+}
+
+public void PowerupsDeactivate()
+{
+    if (!dashBoostActive || !jumpBoostActive)
+    {
+        return;
+    }
+
+    if (SpeedBoostTimer.Expired(Runner))
+    {
+        NetworkedSprintSpeed = defaultSprintSpeed;
+        dashBoostActive = false;
+    }
+    if (JumpBoostTimer.Expired(Runner))
+    {
+        NetworkedJumpForce = defaultJumpForce;
+        jumpBoostActive = false;
+    }
         }
     }
 }
