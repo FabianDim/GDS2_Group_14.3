@@ -17,9 +17,6 @@ namespace _Experimenation.Fraser.Scripts
 
         // Set by State Authority (e.g. the QTE Runner boost) and replicated so
         // server simulation and client prediction stay in sync.
-        [Networked] public float SpeedBoostMultiplier { get; set; }
-
-        [SerializeField] private float movementMultiplier = 10f;
         [SerializeField] private float defaultAirMultiplier = 0.55f;
 
         [Header("Sprinting")]
@@ -28,24 +25,17 @@ namespace _Experimenation.Fraser.Scripts
         [Networked] private float NetworkedAerialMultiplier { get; set; }
         [Networked] private float NetworkedAgilityMultiplier { get; set; }
 
-        public float airMultiplier => NetworkedAerialMultiplier;
+        private float AirMultiplier => NetworkedAerialMultiplier;
 
-        public float agilityMultiplier => NetworkedAgilityMultiplier;
-
-        private bool dashBoostActive;
-
-        private TickTimer SpeedBoostTimer { get; set; }
-
-        public float sprintSpeed => NetworkedSprintSpeed;
+        public float AgilityMultiplier => NetworkedAgilityMultiplier;
+        
         [SerializeField] private float walkSpeed = 10f;
         [SerializeField] private float defaultSprintSpeed = 15f;
         [SerializeField] private float crouchSpeed = 5f;
-        [SerializeField] private float maxMoveSpeed = 40f;
         [SerializeField] private float acceleration = 12f;
 
         [Header("Responsiveness & Drag")]
         [SerializeField] private float movementMultiplier = 10f;
-        [SerializeField] private float airMultiplier = 0.55f;
         [SerializeField] private float groundDrag = 6f;
         [SerializeField] private float airDrag;
         [SerializeField] private float slideDrag = 1f;
@@ -59,7 +49,6 @@ namespace _Experimenation.Fraser.Scripts
 
         // Networked so powerup boosts replicate; initialized to defaults in
         // Spawned() because [Networked] properties start at 0.
-        [Networked] private float NetworkedSprintSpeed { get; set; }
         [Networked] private float NetworkedJumpForce { get; set; }
         [Networked] private NetworkButtons PreviousButtons { get; set; }
 
@@ -105,7 +94,7 @@ namespace _Experimenation.Fraser.Scripts
             NetworkedAerialMultiplier = defaultAirMultiplier;
             NetworkedAgilityMultiplier = 1f;
             NetworkedSprintSpeed = defaultSprintSpeed;
-            NetworkedJumpForce = defaultJumpForce;
+            NetworkedJumpForce = DefaultJumpForce;
         }
 
             if (HasStateAuthority)
@@ -204,7 +193,7 @@ namespace _Experimenation.Fraser.Scripts
             if (moveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * AirMultiplier * Runner.DeltaTime);
             }
 
             if (airDrag > 0f)
@@ -220,7 +209,7 @@ namespace _Experimenation.Fraser.Scripts
             if (wallMoveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = wallMoveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * AirMultiplier * Runner.DeltaTime);
             }
 
             _horizontalVelocity = _wallRun.GetWallRunVelocity(_horizontalVelocity);
@@ -272,14 +261,11 @@ namespace _Experimenation.Fraser.Scripts
             if (!HasStateAuthority)
                 return;
 
-NetworkedSprintSpeed = Mathf.Min(
-    maxMoveSpeed,
-    defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
-);
-
-dashBoostActive = true;
-
-            SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
+            NetworkedSprintSpeed = Mathf.Min(
+                maxMoveSpeed,
+                defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
+            );
+            
         }
         internal void ApplyAerialControlBoost(float boostMultiplier)
         {
@@ -288,35 +274,17 @@ dashBoostActive = true;
 
             NetworkedAerialMultiplier = Mathf.Min(
                 defaultAirMultiplier * 2, //Not sure what air should stay around.
-                defaultAirMultiplier * boostMultiplier
+                defaultAirMultiplier + defaultAirMultiplier * boostMultiplier
             );
         }
+        
         internal void ApplyAgilityBoost(float boostMultiplier)
         {
             if (!HasStateAuthority)
                 return;
 
-            NetworkedAgilityMultiplier = boostMultiplier;
+            NetworkedAgilityMultiplier += NetworkedAgilityMultiplier * boostMultiplier;
 
-        }
-
-        public void PowerupsDeactivate()
-        {
-            if (!dashBoostActive && !jumpBoostActive)
-            {
-                return;
-            }
-
-    if (SpeedBoostTimer.Expired(Runner))
-    {
-        NetworkedSprintSpeed = defaultSprintSpeed;
-        dashBoostActive = false;
-    }
-    if (JumpBoostTimer.Expired(Runner))
-    {
-        NetworkedJumpForce = defaultJumpForce;
-        jumpBoostActive = false;
-    }
         }
     }
 }

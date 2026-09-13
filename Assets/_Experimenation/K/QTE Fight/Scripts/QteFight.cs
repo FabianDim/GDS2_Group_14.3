@@ -90,8 +90,8 @@ namespace _Experimenation.K.QTE_Fight.Scripts
         // get within (r1 + r2) of each other - a raw 0.1m check is unreachable.
         private float _contactDistance;
 
-        private NetworkButtons _chaserPreviousButtons;
-        private NetworkButtons _runnerPreviousButtons;
+        [Networked] private NetworkButtons ChaserPreviousButtons { get; set; }
+        [Networked] private NetworkButtons RunnerPreviousButtons { get; set; }
 
         // Prompt identity controls when the text is rebuilt. Comparing these
         // fields avoids per-frame string allocation and TMP re-layout.
@@ -418,11 +418,19 @@ namespace _Experimenation.K.QTE_Fight.Scripts
 
         private void HandleMashInput()
         {
-            if (PlayerPressed(_chaserPlayer, ref _chaserPreviousButtons, InputButton.QteFight))
+            if (PlayerPressed(_chaserPlayer, ChaserPreviousButtons, InputButton.QteFight,
+                    out var chaserButtons))
+            {
+                ChaserPreviousButtons = chaserButtons;
                 MeterValue = Mathf.Clamp01(MeterValue - qteStrength);
+            }
 
-            if (PlayerPressed(_runnerPlayer, ref _runnerPreviousButtons, InputButton.QteFight))
+            if (PlayerPressed(_runnerPlayer, RunnerPreviousButtons, InputButton.QteFight,
+                    out var runnerButtons))
+            {
+                RunnerPreviousButtons = runnerButtons;
                 MeterValue = Mathf.Clamp01(MeterValue + qteStrength);
+            }
         }
 
         private void HandleCatchKeyInput()
@@ -431,18 +439,28 @@ namespace _Experimenation.K.QTE_Fight.Scripts
                 return;
 
             var requiredButton = CatchButtons[CurrentKeyIndex];
-            if (PlayerPressed(_chaserPlayer, ref _chaserPreviousButtons, requiredButton))
+            if (PlayerPressed(_chaserPlayer, ChaserPreviousButtons, requiredButton,
+                    out var currentButtons))
+            {
+                ChaserPreviousButtons = currentButtons;
                 EndRound(false);
+            }
         }
 
-        private bool PlayerPressed(PlayerRef player, ref NetworkButtons previousButtons, InputButton button)
+        private bool PlayerPressed(
+            PlayerRef player,
+            NetworkButtons previousButtons,
+            InputButton button,
+            out NetworkButtons currentButtons)
         {
             if (!Runner.TryGetInputForPlayer(player, out GameplayInput input))
+            {
+                currentButtons = previousButtons;
                 return false;
+            }
 
-            var wasPressed = input.Buttons.WasPressed(previousButtons, button);
-            previousButtons = input.Buttons;
-            return wasPressed;
+            currentButtons = input.Buttons;
+            return input.Buttons.WasPressed(previousButtons, button);
         }
 
         private bool TimerExpired(TickTimer timer)

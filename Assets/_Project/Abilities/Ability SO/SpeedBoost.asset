@@ -17,7 +17,7 @@ MonoBehaviour:
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
   abilityType: 0
   abilityScope: 0
-  abilityDescription: 
+  abilityDescription: Increase your sprinting speed
   effects:
   - rid: 4879116493947666667
   abilityPrice: 75
@@ -27,4 +27,4 @@ MonoBehaviour:
     - rid: 4879116493947666667
       type: {class: DashPowerup, ns: _Experimenation.Fabian.Scripts.Abilites, asm: Assembly-CSharp}
       data:
-        boostMultiplier: 4
+        boostMultiplier: 0.25

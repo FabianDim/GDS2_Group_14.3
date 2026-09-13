@@ -148,7 +148,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2058597340825049626}
   - component: {fileID: 2587475144630807776}
-  - component: {fileID: 3918485323478605506}
   - component: {fileID: 6353239738675445074}
   m_Layer: 5
   m_Name: Ability Selection
@@ -204,19 +203,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &3918485323478605506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 475349711318425100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57cbefeb050f41978e650efb79bc57d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilitySystem
-  database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
 --- !u!114 &6353239738675445074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2170,6 +2156,8 @@ GameObject:
   - component: {fileID: 6442138911610842659}
   - component: {fileID: 4595422584672547983}
   - component: {fileID: 6894551653928419215}
+  - component: {fileID: 901234567890123456}
+  - component: {fileID: 901234567890123457}
   m_Layer: 5
   m_Name: Game Manager
   m_TagString: Untagged
@@ -2295,6 +2283,8 @@ MonoBehaviour:
   buyPhaseItems: {fileID: 0}
   buyPhaseEndsPS: {fileID: 0}
   runPhaseItems: {fileID: 6184000093662703899}
+  _IsRunPhase:
+    RawValue: 0
 --- !u!114 &6894551653928419215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2315,13 +2305,40 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6442138911610842659}
   - {fileID: 4595422584672547983}
+  - {fileID: 901234567890123456}
+  - {fileID: 901234567890123457}
   - {fileID: 7743648350992339341}
-  - {fileID: 3918485323478605506}
   - {fileID: 4945055755121267571}
   - {fileID: 4051007208382943394}
   - {fileID: 9059136126790985489}
   - {fileID: 1645422499148897473}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &901234567890123456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5890195215599673364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d7a4c1e6f6b4f9c8f3a5e2d1c0b7a6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.BuyPhaseAbilitySystem
+  database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
+--- !u!114 &901234567890123457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5890195215599673364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57cbefeb050f41978e650efb79bc57d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.RunPhaseAbilitySystem
+  database: {fileID: 11400000, guid: f134a8aedbeab274990fac6077eae103, type: 2}
 --- !u!1 &5986051136074763612
 GameObject:
   m_ObjectHideFlags: 0

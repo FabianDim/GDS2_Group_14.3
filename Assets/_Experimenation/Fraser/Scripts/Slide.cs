@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _Experimenation.Fraser.Scripts
 {
-    public class Slide : NetworkBehaviour
+    public class Slide : NetworkBehaviour, IGameplayInputConsumer
     {
         [Header("References")]
         [SerializeField] private Transform orientation;
@@ -16,7 +16,6 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float crouchHeight = 1f;
         [SerializeField] private float crouchCameraHeight = 0.4f;
         [SerializeField] private float cameraCrouchSpeed = 15f;
-        [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         [Header("Sliding")]
         [SerializeField] private float slideForce = 6f;
@@ -46,23 +45,17 @@ namespace _Experimenation.Fraser.Scripts
             _kcc.SetHeight(standingHeight);
         }
 
-        public override void FixedUpdateNetwork()
+        public void ProcessInput(GameplayInput input, NetworkButtons previousButtons)
         {
-            if (_kcc == null ||
-                _playerMovement == null ||
-                !GetInput(out GameplayInput input))
-            {
+            if (_kcc == null || _playerMovement == null)
                 return;
-            }
 
-            if (input.Buttons.WasPressed(PreviousButtons, InputButton.Crouch))
+            if (input.Buttons.WasPressed(previousButtons, InputButton.Crouch))
             {
                 StartCrouch();
 
                 if (CanSlide())
-                {
                     StartSlide();
-                }
             }
 
             if (!input.Buttons.IsSet(InputButton.CrouchHeld))
