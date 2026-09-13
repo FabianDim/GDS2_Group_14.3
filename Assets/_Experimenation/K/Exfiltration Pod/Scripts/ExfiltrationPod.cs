@@ -50,10 +50,12 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
             if (!HasStateAuthority)
                 return;
 
-            _remainingPoints = Mathf.Max(0, pointTarget);
+            _remainingPoints = pointTarget;
             NetworkPosition = transform.position;
 
             EventBus.Subscribe<AllPlayersSpawnedEvent>(OnAllPlayersSpawned);
+            // The pod unlocks through either of two authoritative conditions:
+            // the Runner earns the token target, or the Run Phase timer expires.
             EventBus.Subscribe<TimeRunsOutEvent>(OnTimeRunsOut);
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
             _subscribed = true;
@@ -186,14 +188,21 @@ namespace _Experimenation.K.Exfiltration_Pod.Scripts
 
         private void OnTimeRunsOut(TimeRunsOutEvent ev)
         {
+            // Timeout is the second unlock condition. It does not represent a
+            // round win; the pod becomes available so the Runner can extract.
             UnlockPod();
         }
 
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
-            if (IsUnlocked)
+            if (ev == null || IsUnlocked || ev.CollectedBy == null ||
+                ev.CollectedBy.Role != PlayerRole.Runner)
+            {
                 return;
+            }
 
+            // This threshold tracks only points earned by the Runner during this
+            // round; the Runner's starting GameData points are unrelated.
             _remainingPoints -= Mathf.Max(0, ev.Points);
             if (_remainingPoints <= 0)
                 UnlockPod();

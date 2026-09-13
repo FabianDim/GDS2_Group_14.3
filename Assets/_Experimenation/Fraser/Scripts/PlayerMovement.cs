@@ -25,15 +25,10 @@ namespace _Experimenation.Fraser.Scripts
         [Networked] private float NetworkedAerialMultiplier { get; set; }
         [Networked] private float NetworkedAgilityMultiplier { get; set; }
 
-        public float airMultiplier => NetworkedAerialMultiplier;
+        private float AirMultiplier => NetworkedAerialMultiplier;
 
-        public float agilityMultiplier => NetworkedAgilityMultiplier;
-
-        private bool dashBoostActive;
-
-        private TickTimer SpeedBoostTimer { get; set; }
-
-        public float sprintSpeed => NetworkedSprintSpeed;
+        public float AgilityMultiplier => NetworkedAgilityMultiplier;
+        
         [SerializeField] private float walkSpeed = 10f;
         [SerializeField] private float defaultSprintSpeed = 15f;
         [SerializeField] private float crouchSpeed = 5f;
@@ -190,7 +185,7 @@ namespace _Experimenation.Fraser.Scripts
             if (moveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * AirMultiplier * Runner.DeltaTime);
             }
 
             if (airDrag > 0f)
@@ -206,7 +201,7 @@ namespace _Experimenation.Fraser.Scripts
             if (wallMoveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = wallMoveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * AirMultiplier * Runner.DeltaTime);
             }
 
             _horizontalVelocity = _wallRun.GetWallRunVelocity(_horizontalVelocity);
@@ -262,8 +257,7 @@ namespace _Experimenation.Fraser.Scripts
                 maxMoveSpeed,
                 defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
             );
-
-            dashBoostActive = true;
+            
         }
         internal void ApplyAerialControlBoost(float boostMultiplier)
         {
@@ -272,15 +266,16 @@ namespace _Experimenation.Fraser.Scripts
 
             NetworkedAerialMultiplier = Mathf.Min(
                 defaultAirMultiplier * 2, //Not sure what air should stay around.
-                defaultAirMultiplier * boostMultiplier
+                defaultAirMultiplier + defaultAirMultiplier * boostMultiplier
             );
         }
+        
         internal void ApplyAgilityBoost(float boostMultiplier)
         {
             if (!HasStateAuthority)
                 return;
 
-            NetworkedAgilityMultiplier = boostMultiplier;
+            NetworkedAgilityMultiplier += NetworkedAgilityMultiplier * boostMultiplier;
 
         }
     }
