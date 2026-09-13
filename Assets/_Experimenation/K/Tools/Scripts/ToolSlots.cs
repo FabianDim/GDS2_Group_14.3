@@ -89,27 +89,28 @@ namespace _Experimenation.K.Tools.Scripts
             if (!IsLocalOwner(inputOwner) || !IsRunPhase())
                 return false;
 
-            var consumed = false;
+            var isToolSelectHeld = input.Buttons.IsSet(InputButton.ToolSelect);
+            if (_isSelecting != isToolSelectHeld)
+                SetSelecting(isToolSelectHeld);
 
-            if (WasPressed(input, previousButtons, InputButton.ToolSelect))
-            {
-                SetSelecting(!_isSelecting);
-                consumed = true;
-            }
+            // Keep the tool-selection input consumed for the entire hold, but do
+            // not treat it as a toggle. Releasing the button immediately exits
+            // selection mode on this network tick.
 
             var selectedSlot = GetSelectedSlot(input, previousButtons);
             if (selectedSlot < 0)
-                return consumed;
+                return isToolSelectHeld;
 
-            // Ability buttons are shared with Run Phase ability selection. Only
-            // consume one when this player actually owns a tool in that slot.
-            if (!_isSelecting && !HasLocalTool(selectedSlot))
-                return consumed;
+            if (_isSelecting)
+            {
+                // While the selection button is held, an ability button chooses
+                // and activates the corresponding tool slot.
+                return !RequestToolActivation(selectedSlot);
+            }
 
-            if (!RequestToolActivation(selectedSlot))
-                return consumed;
+            if (!HasLocalTool(selectedSlot) || !RequestToolActivation(selectedSlot))
+                return isToolSelectHeld;
 
-            SetSelecting(false);
             return true;
         }
 

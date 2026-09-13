@@ -56,6 +56,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
                 selectedAbility = 2;
             else if (input.Buttons.WasPressed(previousButtons, InputButton.Ability3))
                 selectedAbility = 3;
+            else if (input.Buttons.WasPressed(previousButtons, InputButton.Ability4))
+                selectedAbility = 4;
 
             if (selectedAbility != 0)
             {
