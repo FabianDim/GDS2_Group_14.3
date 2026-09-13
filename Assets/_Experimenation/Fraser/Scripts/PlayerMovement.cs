@@ -1,51 +1,34 @@
-﻿using _Experimenation.K.Multiplayer.Scripts;
+using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
 using UnityEngine;
 
 namespace _Experimenation.Fraser.Scripts
 {
-    public class PlayerMovement : NetworkBehaviour
+    /// <summary>
+    /// Networked player movement. State Authority owns the replicated movement
+    /// modifiers, while every peer runs the same input-driven movement pipeline.
+    /// </summary>
+    [RequireComponent(typeof(SimpleKCC))]
+    public class PlayerMovement : NetworkBehaviour, IGameplayInputConsumer
     {
+        private const float DefaultJumpForce = 7f;
+
         [Header("References")]
         [SerializeField] private Transform orientation;
 
         [Header("Movement")]
         [SerializeField] public float moveSpeed = 10f;
-        public float defaultMoveSpeed = 10f;
+        public float defaultMoveSpeed = 10f; // Kept for existing prefab compatibility.
         [SerializeField] public float maxMoveSpeed = 40f;
-
-        // Set by State Authority (e.g. the QTE Runner boost) and replicated so
-        // server simulation and client prediction stay in sync.
-        [Networked] public float SpeedBoostMultiplier { get; set; }
-
-        [SerializeField] private float movementMultiplier = 10f;
-        [SerializeField] private float defaultAirMultiplier = 0.55f;
-
-        [Header("Sprinting")]
-        [Networked] private float NetworkedSprintSpeed { get; set; }
-
-        [Networked] private float NetworkedAerialMultiplier { get; set; }
-        [Networked] private float NetworkedAgilityMultiplier { get; set; }
-
-        public float airMultiplier => NetworkedAerialMultiplier;
-
-        public float agilityMultiplier => NetworkedAgilityMultiplier;
-
-        private bool dashBoostActive;
-
-        private TickTimer SpeedBoostTimer { get; set; }
-
-        public float sprintSpeed => NetworkedSprintSpeed;
         [SerializeField] private float walkSpeed = 10f;
         [SerializeField] private float defaultSprintSpeed = 15f;
         [SerializeField] private float crouchSpeed = 5f;
-        [SerializeField] private float maxMoveSpeed = 40f;
         [SerializeField] private float acceleration = 12f;
 
-        [Header("Responsiveness & Drag")]
+        [Header("Acceleration and Drag")]
         [SerializeField] private float movementMultiplier = 10f;
-        [SerializeField] private float airMultiplier = 0.55f;
+        [SerializeField] private float defaultAirMultiplier = 0.55f;
         [SerializeField] private float groundDrag = 6f;
         [SerializeField] private float airDrag;
         [SerializeField] private float slideDrag = 1f;
@@ -53,17 +36,12 @@ namespace _Experimenation.Fraser.Scripts
         [Header("Gravity")]
         [SerializeField] private float gravityMultiplier = 1.8f;
 
-        // Set by State Authority (e.g. the QTE Runner boost) and replicated so
-        // server simulation and client prediction stay in sync.
+        // These values are replicated because abilities can modify them at runtime.
         [Networked] public float SpeedBoostMultiplier { get; set; }
-
-        // Networked so powerup boosts replicate; initialized to defaults in
-        // Spawned() because [Networked] properties start at 0.
         [Networked] private float NetworkedSprintSpeed { get; set; }
+        [Networked] private float NetworkedAerialMultiplier { get; set; }
+        [Networked] private float NetworkedAgilityMultiplier { get; set; }
         [Networked] private float NetworkedJumpForce { get; set; }
-        [Networked] private NetworkButtons PreviousButtons { get; set; }
-
-        private const float DefaultJumpForce = 7f;
 
         private Vector3 _horizontalVelocity;
         private SimpleKCC _kcc;
@@ -79,84 +57,113 @@ namespace _Experimenation.Fraser.Scripts
 
         public float HorizontalSpeed => _horizontalVelocity.magnitude;
         public float NormalGravity => Physics.gravity.y * gravityMultiplier;
-        private float JumpForce => NetworkedJumpForce;
-        private float SprintSpeed => NetworkedSprintSpeed;
+        public float AgilityMultiplier => NetworkedAgilityMultiplier > 0f
+            ? NetworkedAgilityMultiplier
+            : 1f;
+
+        private float AirMultiplier => NetworkedAerialMultiplier > 0f
+            ? NetworkedAerialMultiplier
+            : defaultAirMultiplier;
+
+        private float JumpForce => NetworkedJumpForce > 0f
+            ? NetworkedJumpForce
+            : DefaultJumpForce;
+
+        private float SprintSpeed => NetworkedSprintSpeed > 0f
+            ? NetworkedSprintSpeed
+            : defaultSprintSpeed;
 
         public override void Spawned()
         {
-            if (!HasStateAuthority) return;
+            CacheMovementComponents();
 
+            if (_kcc == null)
+            {
+                Debug.LogError("PlayerMovement requires a SimpleKCC component.", this);
+                return;
+            }
+
+            moveSpeed = walkSpeed;
+            _kcc.SetGravity(NormalGravity);
+
+            if (!HasStateAuthority)
+                return;
+
+            // Networked properties start at zero. Initialize their baseline values
+            // before abilities or sprint/jump input can use them.
+            NetworkedSprintSpeed = defaultSprintSpeed;
+            NetworkedAerialMultiplier = defaultAirMultiplier;
+            NetworkedAgilityMultiplier = 1f;
+            NetworkedJumpForce = DefaultJumpForce;
+        }
+
+        public void ProcessInput(GameplayInput input, NetworkButtons previousButtons)
+        {
+            if (_kcc == null)
+                return;
+
+            IsGrounded = _kcc.IsGrounded;
+            UpdateMovementStates(input);
+            ControlSpeed(input);
+
+            var moveDirection = GetMoveDirection(input.MoveInput);
+            var movementVelocity = GetMovementVelocity(input, moveDirection);
+            var jumpImpulse = HandleJump(input, previousButtons, ref movementVelocity);
+
+            _kcc.Move(movementVelocity, jumpImpulse);
+        }
+
+        private void CacheMovementComponents()
+        {
             _kcc = GetComponent<SimpleKCC>();
             _slide = GetComponent<Slide>();
             _wallRun = GetComponent<WallRun>();
             _climb = GetComponent<Climb>();
-
-            // Initialize networked values to their design defaults, otherwise
-            // jump applies zero impulse and sprint lerps moveSpeed down to zero.
-            NetworkedJumpForce = DefaultJumpForce;
-            NetworkedSprintSpeed = defaultSprintSpeed;
-
-            moveSpeed = walkSpeed;
-
-            _kcc.SetGravity(
-                NormalGravity
-            );
-
-            NetworkedAerialMultiplier = defaultAirMultiplier;
-            NetworkedAgilityMultiplier = 1f;
-            NetworkedSprintSpeed = defaultSprintSpeed;
-            NetworkedJumpForce = defaultJumpForce;
         }
 
-        public override void FixedUpdateNetwork()
+        private void UpdateMovementStates(GameplayInput input)
         {
-            if (_kcc == null || !GetInput(out GameplayInput input))
-                return;
-
-            IsGrounded = _kcc.IsGrounded;
-
             _climb?.UpdateClimbState(input);
             _wallRun?.UpdateWallRunState();
+        }
 
-            ControlSpeed(input);
-
-            Vector3 moveDirection = GetMoveDirection(input.MoveInput);
-
-            Vector3 movementVelocity;
+        private Vector3 GetMovementVelocity(GameplayInput input, Vector3 moveDirection)
+        {
             if (IsClimbing && _climb != null)
-            {
-                movementVelocity = _climb.GetClimbVelocity(input);
-            }
+                return _climb.GetClimbVelocity(input);
+
+            if (IsWallRunning && _wallRun != null)
+                WallRunMovement(moveDirection);
+            else if (IsSliding)
+                SlideMovement();
+            else if (IsGrounded)
+                GroundMovement(moveDirection);
             else
-            {
-                if (IsWallRunning && _wallRun != null) WallRunMovement(moveDirection);
-                else if (IsSliding) SlideMovement();
-                else if (IsGrounded) GroundMovement(moveDirection);
-                else AirMovement(moveDirection);
+                AirMovement(moveDirection);
 
-                movementVelocity = _horizontalVelocity;
-            }
-
-            float jumpImpulse = HandleJump(input, ref movementVelocity);
-
-            _kcc.Move(movementVelocity, jumpImpulse);
-
-            PreviousButtons = input.Buttons;
+            return _horizontalVelocity;
         }
 
         private Vector3 GetMoveDirection(Vector2 movementInput)
         {
-            var direction = orientation.forward * movementInput.y + orientation.right * movementInput.x;
-            direction.y = 0f;
-            if (direction.sqrMagnitude > 1f)
-                direction.Normalize();
+            if (orientation == null)
+                return Vector3.zero;
 
-            return direction;
+            var direction = orientation.forward * movementInput.y +
+                            orientation.right * movementInput.x;
+            direction.y = 0f;
+
+            return direction.sqrMagnitude > 1f
+                ? direction.normalized
+                : direction;
         }
 
-        private float HandleJump(GameplayInput input, ref Vector3 movementVelocity)
+        private float HandleJump(
+            GameplayInput input,
+            NetworkButtons previousButtons,
+            ref Vector3 movementVelocity)
         {
-            if (!input.Buttons.WasPressed(PreviousButtons, InputButton.Jump))
+            if (!input.Buttons.WasPressed(previousButtons, InputButton.Jump))
                 return 0f;
 
             if (IsWallRunning && _wallRun != null)
@@ -167,52 +174,52 @@ namespace _Experimenation.Fraser.Scripts
                 return _wallRun.WallJumpVerticalForce;
             }
 
-            if (IsGrounded)
-            {
-                if (IsSliding && _slide != null)
-                    _slide.StopSlideFromJump();
+            if (!IsGrounded)
+                return 0f;
 
-                return JumpForce;
-            }
+            if (IsSliding && _slide != null)
+                _slide.StopSlideFromJump();
 
-            return 0f;
+            return JumpForce;
         }
 
         private void GroundMovement(Vector3 moveDirection)
         {
-            if (moveDirection.sqrMagnitude > 0.01f)
+            if (HasMovementInput(moveDirection))
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = LerpVelocity(
+                    targetVelocity,
+                    movementMultiplier);
+                return;
             }
-            else
-            {
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, Vector3.zero, groundDrag * Runner.DeltaTime);
-            }
+
+            _horizontalVelocity = LerpVelocity(Vector3.zero, groundDrag);
         }
 
         private void AirMovement(Vector3 moveDirection)
         {
-            if (moveDirection.sqrMagnitude > 0.01f)
+            if (HasMovementInput(moveDirection))
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = LerpVelocity(
+                    targetVelocity,
+                    movementMultiplier * AirMultiplier);
             }
 
             if (airDrag > 0f)
-            {
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, Vector3.zero, airDrag * Runner.DeltaTime);
-            }
+                _horizontalVelocity = LerpVelocity(Vector3.zero, airDrag);
         }
 
         private void WallRunMovement(Vector3 moveDirection)
         {
             var wallMoveDirection = _wallRun.GetWallRunDirection(moveDirection);
-
-            if (wallMoveDirection.sqrMagnitude > 0.01f)
+            if (HasMovementInput(wallMoveDirection))
             {
                 var targetVelocity = wallMoveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = LerpVelocity(
+                    targetVelocity,
+                    movementMultiplier * AirMultiplier);
             }
 
             _horizontalVelocity = _wallRun.GetWallRunVelocity(_horizontalVelocity);
@@ -220,20 +227,43 @@ namespace _Experimenation.Fraser.Scripts
 
         private void SlideMovement()
         {
-            _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, Vector3.zero, slideDrag * Runner.DeltaTime);
+            _horizontalVelocity = LerpVelocity(Vector3.zero, slideDrag);
+        }
+
+        private Vector3 LerpVelocity(Vector3 targetVelocity, float response)
+        {
+            return Vector3.Lerp(
+                _horizontalVelocity,
+                targetVelocity,
+                response * Runner.DeltaTime);
+        }
+
+        private static bool HasMovementInput(Vector3 direction)
+        {
+            return direction.sqrMagnitude > 0.01f;
         }
 
         private void ControlSpeed(GameplayInput input)
         {
-            float speedMultiplier = Mathf.Max(1f, SpeedBoostMultiplier);
-            float targetSpeed = IsGrounded switch
-            {
-                true when IsCrouching && !IsSliding => crouchSpeed * speedMultiplier,
-                true when input.Buttons.IsSet(InputButton.SprintHeld) => SprintSpeed * speedMultiplier,
-                _ => walkSpeed * speedMultiplier
-            };
+            var speedMultiplier = Mathf.Max(1f, SpeedBoostMultiplier);
+            var targetSpeed = GetTargetSpeed(input) * speedMultiplier;
+            moveSpeed = Mathf.Lerp(
+                moveSpeed,
+                targetSpeed,
+                acceleration * Runner.DeltaTime);
+        }
 
-            moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, acceleration * Runner.DeltaTime);
+        private float GetTargetSpeed(GameplayInput input)
+        {
+            if (!IsGrounded)
+                return walkSpeed;
+
+            if (IsCrouching && !IsSliding)
+                return crouchSpeed;
+
+            return input.Buttons.IsSet(InputButton.SprintHeld)
+                ? SprintSpeed
+                : walkSpeed;
         }
 
         public void AddSlideImpulse(Vector3 direction, float force)
@@ -256,7 +286,9 @@ namespace _Experimenation.Fraser.Scripts
             if (!HasStateAuthority)
                 return;
 
-            NetworkedJumpForce = Mathf.Min(maxJumpForce, DefaultJumpForce + DefaultJumpForce * boostMultiplier);
+            NetworkedJumpForce = Mathf.Min(
+                maxJumpForce,
+                DefaultJumpForce + DefaultJumpForce * boostMultiplier);
         }
 
         internal void ApplyDashBoost(float boostMultiplier)
@@ -264,51 +296,27 @@ namespace _Experimenation.Fraser.Scripts
             if (!HasStateAuthority)
                 return;
 
-NetworkedSprintSpeed = Mathf.Min(
-    maxMoveSpeed,
-    defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
-);
-
-dashBoostActive = true;
-
-            SpeedBoostTimer = TickTimer.CreateFromSeconds(Runner, boostDuration);
+            NetworkedSprintSpeed = Mathf.Min(
+                maxMoveSpeed,
+                defaultSprintSpeed + defaultSprintSpeed * boostMultiplier);
         }
+
         internal void ApplyAerialControlBoost(float boostMultiplier)
         {
             if (!HasStateAuthority)
                 return;
 
             NetworkedAerialMultiplier = Mathf.Min(
-                defaultAirMultiplier * 2, //Not sure what air should stay around.
-                defaultAirMultiplier * boostMultiplier
-            );
+                defaultAirMultiplier * 2f,
+                defaultAirMultiplier + defaultAirMultiplier * boostMultiplier);
         }
+
         internal void ApplyAgilityBoost(float boostMultiplier)
         {
             if (!HasStateAuthority)
                 return;
 
-            NetworkedAgilityMultiplier = boostMultiplier;
-
-        }
-
-        public void PowerupsDeactivate()
-        {
-            if (!dashBoostActive && !jumpBoostActive)
-            {
-                return;
-            }
-
-    if (SpeedBoostTimer.Expired(Runner))
-    {
-        NetworkedSprintSpeed = defaultSprintSpeed;
-        dashBoostActive = false;
-    }
-    if (JumpBoostTimer.Expired(Runner))
-    {
-        NetworkedJumpForce = defaultJumpForce;
-        jumpBoostActive = false;
-    }
+            NetworkedAgilityMultiplier += NetworkedAgilityMultiplier * boostMultiplier;
         }
     }
 }

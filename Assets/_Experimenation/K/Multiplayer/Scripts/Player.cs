@@ -7,11 +7,10 @@ namespace _Experimenation.K.Multiplayer.Scripts
 {
     public enum PlayerRole {Runner = 1, Chaser = 2}
     
-    public class Player : NetworkBehaviour
+    public class Player : NetworkBehaviour, IGameplayInputConsumer
     {
         [OnChangedRender(nameof(OnRoleChanged))]
         [Networked] public PlayerRole Role { get; set; }
-        [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         public override void Spawned()
         {
@@ -48,28 +47,21 @@ namespace _Experimenation.K.Multiplayer.Scripts
                 Role == PlayerRole.Runner ? Color.cyan : Color.red;
         }
         
-        public override void FixedUpdateNetwork()
+        public void ProcessInput(GameplayInput input, NetworkButtons previousButtons)
         {
-            HandleAbilitySelection();
+            var selectedAbility = 0;
+            if (input.Buttons.WasPressed(previousButtons, InputButton.Ability1))
+                selectedAbility = 1;
+            else if (input.Buttons.WasPressed(previousButtons, InputButton.Ability2))
+                selectedAbility = 2;
+            else if (input.Buttons.WasPressed(previousButtons, InputButton.Ability3))
+                selectedAbility = 3;
+
+            if (selectedAbility != 0)
+            {
+                EventBus.Raise(new AbilitySelectedEvent(selectedAbility, this));
+            }
         }
 
-        private void HandleAbilitySelection()
-        {   
-            if(!GetInput(out GameplayInput input)) return;
-            var selectedAbility = 0;
-            if(input.Buttons.WasPressed(PreviousButtons, InputButton.Ability1)) 
-                selectedAbility = 1;
-            else if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability2)) 
-                selectedAbility = 2;
-            else if (input.Buttons.WasPressed(PreviousButtons, InputButton.Ability3)) 
-                selectedAbility = 3;
-            
-            if(selectedAbility != 0) 
-                EventBus.Raise(
-                    new AbilitySelectedEvent(selectedAbility, Object.GetComponent<Player>())
-                );
-            
-            PreviousButtons = input.Buttons;
-        }
     }
 }

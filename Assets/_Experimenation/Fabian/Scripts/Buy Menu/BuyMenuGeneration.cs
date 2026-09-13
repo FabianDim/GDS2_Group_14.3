@@ -24,19 +24,37 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 
         private IEnumerator Start()
         {
-            yield return new WaitUntil(() => GameData.Instance);
-            var spawnLocation = GameData.Instance.HasStateAuthority ? p1BuyMenuLocation : p2BuyMenuLocation;
+            yield return new WaitUntil(() => GameData.Instance != null);
+
+            var gameData = GameData.Instance;
+            if (gameData == null || !gameData.Runner.IsRunning)
+                yield break;
+
+            var spawnLocation = gameData.HasStateAuthority
+                ? p1BuyMenuLocation
+                : p2BuyMenuLocation;
+
+            if (spawnLocation == null)
+            {
+                Debug.LogError("BuyMenuGeneration: local buy-menu location is not assigned.", this);
+                yield break;
+            }
+
             transform.SetPositionAndRotation(spawnLocation.position, spawnLocation.rotation);
-            
             GenerateAbilityCards();
             StartCoroutine(ShowTimeLeft());
         }
 
         private IEnumerator ShowTimeLeft()
         {
+            while (GameData.Instance == null)
+                yield return null;
+
             for (var i = GameData.Instance.roundDuration * 0.25; i > -1; i--)
             {
-                timeLeftText.SetText($"Time until Start: {(int)i}");
+                if (timeLeftText != null)
+                    timeLeftText.SetText($"Time until Start: {(int)i}");
+
                 yield return _1S;
             }
         }

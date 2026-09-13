@@ -14,7 +14,7 @@ namespace _Experimenation.Fabian.Scripts.PhaseController
         [SerializeField] private GameObject runPhaseItems;
 
         [OnChangedRender(nameof(OnRunPhaseChanged))]
-        [Networked] private NetworkBool IsRunPhase { get; set; }
+        [Networked] public NetworkBool IsRunPhase { get; private set; }
 
         private TickTimer _timer;
         private bool _timerInitialized;

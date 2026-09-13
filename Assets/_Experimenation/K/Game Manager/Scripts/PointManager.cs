@@ -18,6 +18,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         {
             _pointText = GetComponentInChildren<TextMeshProUGUI>();
             EventBus.Subscribe<TokenCollectedEvent>(OnTokenCollected);
+            EventBus.Subscribe<AbilityPurchasedEvent>(OnAbilityPurchased);
             _subscribed = true;
             _initialization = StartCoroutine(InitializeWhenReady());
         }
@@ -25,10 +26,16 @@ namespace _Experimenation.K.Game_Manager.Scripts
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             if (_initialization != null)
+            {
                 StopCoroutine(_initialization);
+                _initialization = null;
+            }
 
-            if (!_subscribed) return;
+            if (!_subscribed)
+                return;
+
             EventBus.Unsubscribe<TokenCollectedEvent>(OnTokenCollected);
+            EventBus.Unsubscribe<AbilityPurchasedEvent>(OnAbilityPurchased);
             _subscribed = false;
         }
 
@@ -38,8 +45,20 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 yield return null;
 
             _gameData = GameData.Instance;
-            SetDisplayedPoints(GetLocalPlayerPoints());
+            RefreshDisplayedPoints();
             _initialization = null;
+        }
+
+        private void Update()
+        {
+            // GameData is authoritative. Reconcile this local display from the
+            // replicated value so purchases and token rewards are both reflected.
+            if (_gameData == null || Runner == null || !Runner.IsRunning)
+                return;
+
+            var networkedPoints = GetLocalPlayerPoints();
+            if (networkedPoints != _points)
+                SetDisplayedPoints(networkedPoints);
         }
 
         private int GetLocalPlayerPoints()
@@ -56,10 +75,23 @@ namespace _Experimenation.K.Game_Manager.Scripts
             if (Runner == null || ev.Collector != Runner.LocalPlayer)
                 return;
 
-            // The host has already applied the authoritative value before sending
-            // the event. On the client, the event provides immediate UI feedback;
-            // replicated GameData remains the source of truth after initialization.
-            SetDisplayedPoints(_points + ev.Points);
+            RefreshDisplayedPoints();
+        }
+
+        private void OnAbilityPurchased(AbilityPurchasedEvent ev)
+        {
+            if (!ev.Accepted || Runner == null || ev.Buyer != Runner.LocalPlayer)
+                return;
+
+            // The purchase result is only a notification. GameData has already
+            // deducted the price on State Authority; read that replicated value.
+            RefreshDisplayedPoints();
+        }
+
+        private void RefreshDisplayedPoints()
+        {
+            if (_gameData != null)
+                SetDisplayedPoints(GetLocalPlayerPoints());
         }
 
         private void SetDisplayedPoints(int points)

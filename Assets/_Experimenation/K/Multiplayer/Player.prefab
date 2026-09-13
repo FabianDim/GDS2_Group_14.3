@@ -259,12 +259,15 @@ MonoBehaviour:
   ability1Action: {fileID: 6351299234884927223, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   ability2Action: {fileID: 5724174579971124104, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   ability3Action: {fileID: 4170820193278323613, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  startRunPhase: {fileID: -8233780872175136204, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  ability4Action: {fileID: 4897001816188478617, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  toolSelectAction: {fileID: 8297335116981374593, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  fireAction: {fileID: 845963707718532814, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   qteFightAction: {fileID: 7659840476263111996, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   catchUpAction: {fileID: 667586304176544533, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   catchDownAction: {fileID: -654362234646396781, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   catchLeftAction: {fileID: 5172619980748720269, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   catchRightAction: {fileID: -3350918037111773671, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  startRunPhase: {fileID: -8233780872175136204, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!114 &3241989403578629798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,17 +284,17 @@ MonoBehaviour:
   moveSpeed: 10
   defaultMoveSpeed: 10
   maxMoveSpeed: 40
-  _SpeedBoostMultiplier: 1
-  movementMultiplier: 10
-  airMultiplier: 0.3
   walkSpeed: 10
   defaultSprintSpeed: 15
   crouchSpeed: 5
   acceleration: 12
-  gravityMultiplier: 1.8
+  movementMultiplier: 10
+  defaultAirMultiplier: 0.55
   groundDrag: 6
   airDrag: 0
   slideDrag: 1
+  gravityMultiplier: 1.8
+  _SpeedBoostMultiplier: 1
 --- !u!114 &6813173082918899735
 MonoBehaviour:
   m_ObjectHideFlags: 0

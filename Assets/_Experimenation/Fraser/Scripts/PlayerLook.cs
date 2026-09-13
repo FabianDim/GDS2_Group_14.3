@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace _Experimenation.Fraser.Scripts
 {
-    public class PlayerLook : NetworkBehaviour
+    public class PlayerLook : NetworkBehaviour, IGameplayInputConsumer
     {
         [Header("References")]
         [SerializeField] private Transform cam;
@@ -31,26 +31,17 @@ namespace _Experimenation.Fraser.Scripts
             EventBus.Unsubscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
         }
 
-        public override void FixedUpdateNetwork()
+        public void ProcessInput(GameplayInput input, NetworkButtons previousButtons)
         {
-            // Look input stays ungated: in host mode the host simulates every
-            // player's look rotation, including remote players.
-            if (GetInput(out GameplayInput input))
-                ProcessInput(input);
-
-            // RefreshCamera was removed here - it only matters for the local
-            // player and already runs in LateUpdate (input-authority gated),
-            // so per-tick camera work for remote players is skipped.
+            _kcc?.AddLookRotation(input.LookRotationDelta);
         }
+
 
         private void LateUpdate()
         {
             if (!HasInputAuthority) return;
             RefreshCamera();
         }
-
-        private void ProcessInput(GameplayInput input) =>
-            _kcc.AddLookRotation(input.LookRotationDelta);
 
         private void RefreshCamera()
         {
