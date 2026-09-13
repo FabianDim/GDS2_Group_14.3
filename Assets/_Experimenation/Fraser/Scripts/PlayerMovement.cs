@@ -95,14 +95,11 @@ namespace _Experimenation.Fraser.Scripts
             NetworkedAgilityMultiplier = 1f;
             NetworkedSprintSpeed = defaultSprintSpeed;
             NetworkedJumpForce = DefaultJumpForce;
-        }
 
-            if (HasStateAuthority)
-            {
-                NetworkedSprintSpeed = defaultSprintSpeed;
-                NetworkedJumpForce = defaultJumpForce;
-                SpeedBoostMultiplier = 1f;
-            }
+            if (!HasStateAuthority) return;
+            NetworkedSprintSpeed = defaultSprintSpeed;
+            NetworkedJumpForce = DefaultJumpForce;
+            SpeedBoostMultiplier = 1f;
         }
         
         public override void FixedUpdateNetwork()
