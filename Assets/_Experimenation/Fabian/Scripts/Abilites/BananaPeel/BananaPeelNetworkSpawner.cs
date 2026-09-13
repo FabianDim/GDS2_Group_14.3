@@ -24,6 +24,7 @@ public class BananaPeelNetworkSpawner : NetworkBehaviour
             return;
 
         hasTestSpawned = true;
+        Debug.Log("spawning the banana.");
         SpawnTheBanana(transform.position);
     }
 
