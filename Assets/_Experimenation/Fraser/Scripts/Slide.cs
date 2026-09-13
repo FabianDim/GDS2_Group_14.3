@@ -64,12 +64,17 @@ namespace _Experimenation.Fraser.Scripts
                 TryStopCrouch();
             }
 
-            if (!IsSliding)
-                return;
+            if (IsSliding)
+            {
+                _slideTimer -= Runner.DeltaTime;
 
-            _slideTimer -= Runner.DeltaTime;
-            if (_slideTimer <= 0f)
-                StopSlide();
+                if (_slideTimer <= 0f)
+                {
+                    StopSlide();
+                }
+            }
+
+            PreviousButtons = input.Buttons;
         }
 
         private void LateUpdate()

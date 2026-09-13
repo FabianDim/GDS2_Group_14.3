@@ -66,6 +66,9 @@ namespace _Experimenation.Fraser.Scripts
 
             CheckWall();
 
+            var climbHeld =
+                playerInput.Buttons.IsSet(InputButton.Jump);
+
             if (IsClimbing)
             {
                 TrackClimbDistance();
@@ -76,10 +79,7 @@ namespace _Experimenation.Fraser.Scripts
                     return;
                 }
 
-                var movingForward =
-                    playerInput.MoveInput.y > 0.1f;
-
-                if (movingForward &&
+                if (climbHeld &&
                     (wallInFront || lowerWallInFront))
                 {
                     return;
@@ -90,10 +90,11 @@ namespace _Experimenation.Fraser.Scripts
             }
 
             var canStartClimb =
+                !_playerMovement.IsGrounded &&
+                climbHeld &&
                 !climbLocked &&
                 !_playerMovement.IsCrouching &&
                 !_playerMovement.IsSliding &&
-                playerInput.MoveInput.y > 0.1f &&
                 wallInFront;
 
             if (canStartClimb)
