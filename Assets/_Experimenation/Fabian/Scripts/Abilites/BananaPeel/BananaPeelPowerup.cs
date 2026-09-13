@@ -12,7 +12,6 @@ namespace _Experimenation.Fabian.Scripts.Abilites
 
         private PlayerMovement _playerMovement;
 
-
         public override void ApplyEffect(Player target)
         {
             _playerMovement = target != null ? target.GetComponent<PlayerMovement>() : null;
