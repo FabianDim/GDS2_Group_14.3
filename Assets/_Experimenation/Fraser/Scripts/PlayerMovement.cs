@@ -51,6 +51,8 @@ namespace _Experimenation.Fraser.Scripts
         // Set by State Authority (e.g. the QTE Runner boost) and replicated so
         // server simulation and client prediction stay in sync.
         [Networked] public float SpeedBoostMultiplier { get; set; }
+        [Networked] private float SpeedHindranceMultiplier { get; set; }
+        private TickTimer SpeedHindranceTimer { get; set; }
 
         // Networked so powerup boosts replicate; initialized to defaults in
         // Spawned() because [Networked] properties start at 0.
@@ -98,6 +100,7 @@ namespace _Experimenation.Fraser.Scripts
 
             NetworkedAerialMultiplier = defaultAirMultiplier;
             NetworkedAgilityMultiplier = 1f;
+            SpeedHindranceMultiplier = 1f;
             NetworkedSprintSpeed = defaultSprintSpeed;
             NetworkedJumpForce = DefaultJumpForce;
         }
@@ -106,6 +109,9 @@ namespace _Experimenation.Fraser.Scripts
         {
             if (_kcc == null || !GetInput(out GameplayInput input))
                 return;
+
+            if (HasStateAuthority && SpeedHindranceTimer.Expired(Runner))
+                SpeedHindranceMultiplier = 1f;
 
             IsGrounded = _kcc.IsGrounded;
 
@@ -219,7 +225,7 @@ namespace _Experimenation.Fraser.Scripts
 
         private void ControlSpeed(GameplayInput input)
         {
-            float speedMultiplier = Mathf.Max(1f, SpeedBoostMultiplier);
+            float speedMultiplier = Mathf.Max(1f, SpeedBoostMultiplier) * SpeedHindranceMultiplier;
             float targetSpeed = IsGrounded switch
             {
                 true when IsCrouching && !IsSliding => crouchSpeed * speedMultiplier,
@@ -282,6 +288,15 @@ namespace _Experimenation.Fraser.Scripts
 
             NetworkedAgilityMultiplier = boostMultiplier;
 
+        }
+
+        public void ApplySpeedHindrance(float multiplier, float duration)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            SpeedHindranceMultiplier = Mathf.Clamp01(multiplier);
+            SpeedHindranceTimer = TickTimer.CreateFromSeconds(Runner, duration);
         }
     }
 }
