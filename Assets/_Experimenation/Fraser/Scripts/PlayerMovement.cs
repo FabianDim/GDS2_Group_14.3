@@ -73,30 +73,19 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void Spawned()
         {
-            if (!HasStateAuthority) return;
-
             _kcc = GetComponent<SimpleKCC>();
             _slide = GetComponent<Slide>();
             _wallRun = GetComponent<WallRun>();
             _climb = GetComponent<Climb>();
 
-            // Initialize networked values to their design defaults, otherwise
-            // jump applies zero impulse and sprint lerps moveSpeed down to zero.
-            NetworkedJumpForce = DefaultJumpForce;
-            NetworkedSprintSpeed = defaultSprintSpeed;
-
             moveSpeed = walkSpeed;
+            _kcc.SetGravity(NormalGravity);
 
-            _kcc.SetGravity(
-                NormalGravity
-            );
+            if (!HasStateAuthority)
+                return;
 
             NetworkedAerialMultiplier = defaultAirMultiplier;
             NetworkedAgilityMultiplier = 1f;
-            NetworkedSprintSpeed = defaultSprintSpeed;
-            NetworkedJumpForce = DefaultJumpForce;
-
-            if (!HasStateAuthority) return;
             NetworkedSprintSpeed = defaultSprintSpeed;
             NetworkedJumpForce = DefaultJumpForce;
             SpeedBoostMultiplier = 1f;
