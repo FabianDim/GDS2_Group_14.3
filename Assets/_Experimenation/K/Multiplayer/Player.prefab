@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4166142261398819695
 Transform:
   m_ObjectHideFlags: 0
@@ -48,7 +48,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 615194197035301064}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 7019291245997809047}
   - component: {fileID: 4511256440228581316}
   - component: {fileID: 6831744488723809989}
+  - component: {fileID: -6989268588473754792}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -162,6 +163,7 @@ MonoBehaviour:
   - {fileID: 7019291245997809047}
   - {fileID: 4511256440228581316}
   - {fileID: 6831744488723809989}
+  - {fileID: -6989268588473754792}
   ForceRemoteRenderTimeframe: 0
 --- !u!54 &2931563241326778533
 Rigidbody:
@@ -398,6 +400,24 @@ MonoBehaviour:
   lowerWallInFront: 0
   climbLocked: 0
   climbDistanceUsed: 0
+--- !u!114 &-6989268588473754792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3680376527914010129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa2110296be3a1445a03e74b545cd35f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.Fraser.Scripts.PlayerAnimation
+  playerMovement: {fileID: 3241989403578629798}
+  thirdPersonAnimator: {fileID: 4502385004652882098}
+  thirdPersonVisual: {fileID: 7492360408693642603}
+  walkingSpeed: 10
+  sprintingSpeed: 15
+  animatorDampTime: 0.1
 --- !u!1 &6582706624164020743
 GameObject:
   m_ObjectHideFlags: 0
@@ -717,6 +737,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
+--- !u!95 &4502385004652882098 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
+  m_PrefabInstance: {fileID: 8003242778364597539}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7537763099204170440 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
