@@ -14,7 +14,6 @@ namespace _Project.Abilities.Scripts
         [SerializeField] private AbilityDatabase database;
         private AbilityUIManager _abilityUIManager;
         private List<Ability> _randomAbilitySet = new();
-        private const int AbilityChoiceCount = 3;
         private List<Ability> _abilityChoices = new();
         private bool _isShowingAbilities;
         private bool _newSet;
@@ -70,11 +69,18 @@ namespace _Project.Abilities.Scripts
                 ev.CollectedBy.Role != PlayerRole.Chaser) 
                 return;
 
-            _isShowingAbilities = true;
-            _abilityChoices = _randomAbilitySet.GetRange(AbilityIndex, AbilityChoiceCount);
-            AbilityIndex += AbilityChoiceCount;
-            if (AbilityIndex + AbilityChoiceCount >= _randomAbilitySet.Count) 
+            if (_randomAbilitySet.Count == 0 || _abilityUIManager.ChoiceCapacity == 0)
+                return;
+
+            if (AbilityIndex >= _randomAbilitySet.Count)
                 AbilityIndex = 0;
+
+            var count = Mathf.Min(_abilityUIManager.ChoiceCapacity, _randomAbilitySet.Count - AbilityIndex);
+            _abilityChoices = _randomAbilitySet.GetRange(AbilityIndex, count);
+            AbilityIndex += count;
+            if (AbilityIndex >= _randomAbilitySet.Count)
+                AbilityIndex = 0;
+            _isShowingAbilities = true;
             
             var choiceIndices =
                 _abilityChoices.Select(ability => database.allAbilities.IndexOf(ability)).ToArray();
@@ -83,6 +89,7 @@ namespace _Project.Abilities.Scripts
 
         private void OnRoundOver(RoundOverEvent ev)
         {
+            _isShowingAbilities = false;
             AbilityIndex = 0;
             if (_newSet)
                 GenerateRandomAbilitySet();
