@@ -64,13 +64,13 @@ namespace _Experimenation.Fraser.Scripts
                 TryStopCrouch();
             }
 
-            if (!IsSliding) return;
+            if (!IsSliding)
+                return;
+
             _slideTimer -= Runner.DeltaTime;
 
             if (_slideTimer <= 0f)
-            {
                 StopSlide();
-            }
         }
 
         private void LateUpdate()
@@ -81,9 +81,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StartCrouch()
         {
             if (IsCrouching)
-            {
                 return;
-            }
 
             IsCrouching = true;
             _playerMovement.IsCrouching = true;
@@ -94,14 +92,10 @@ namespace _Experimenation.Fraser.Scripts
         private void TryStopCrouch()
         {
             if (!IsCrouching)
-            {
                 return;
-            }
 
             if (!CanStand())
-            {
                 return;
-            }
 
             IsCrouching = false;
             _playerMovement.IsCrouching = false;
@@ -112,9 +106,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StartSlide()
         {
             if (IsSliding)
-            {
                 return;
-            }
 
             IsSliding = true;
             _playerMovement.IsSliding = true;
@@ -133,9 +125,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StopSlide()
         {
             if (!IsSliding)
-            {
                 return;
-            }
 
             IsSliding = false;
             _playerMovement.IsSliding = false;
@@ -174,8 +164,8 @@ namespace _Experimenation.Fraser.Scripts
 
         private void UpdateCameraHeight()
         {
-
-            var targetHeight = IsCrouching ? crouchCameraHeight : _standingCameraHeight;
+            var targetHeight =
+                IsCrouching ? crouchCameraHeight : _standingCameraHeight;
 
             var cameraLocalPosition =
                 cameraPosition.localPosition;

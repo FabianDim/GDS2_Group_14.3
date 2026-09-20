@@ -458,7 +458,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6866348630828994275}
-  - component: {fileID: 7991416147956686548}
   m_Layer: 0
   m_Name: Third Person Visual
   m_TagString: Untagged
@@ -482,28 +481,6 @@ Transform:
   - {fileID: 7537763099204170440}
   m_Father: {fileID: 292306296938088141}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &7991416147956686548
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7492360408693642603}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8628232329967541783
 GameObject:
   m_ObjectHideFlags: 0
@@ -730,6 +707,10 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: acf9a984931007d4286b4dae294e7741, type: 2}
     - target: {fileID: 5866666021909216657, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
       propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
+      propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

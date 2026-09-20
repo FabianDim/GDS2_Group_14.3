@@ -13,13 +13,18 @@ namespace _Experimenation.Fraser.Scripts
         [Header("Movement Speeds")]
         [SerializeField] private float walkingSpeed = 10f;
         [SerializeField] private float sprintingSpeed = 15f;
+        [SerializeField] private float crouchWalkingSpeed = 5f;
         [SerializeField] private float animatorDampTime = 0.1f;
 
-        [Networked]
-        private float NetworkedAnimationSpeed { get; set; }
+        [Networked] private float NetworkedAnimationSpeed { get; set; }
+        [Networked] private float NetworkedCrouchSpeed { get; set; }
+        [Networked] private NetworkBool NetworkedIsSliding { get; set; }
+        [Networked] private NetworkBool NetworkedIsCrouching { get; set; }
 
-        private static readonly int SpeedHash =
-            Animator.StringToHash("Speed");
+        private static readonly int SpeedHash = Animator.StringToHash("Speed");
+        private static readonly int CrouchSpeedHash = Animator.StringToHash("CrouchSpeed");
+        private static readonly int IsSlidingHash = Animator.StringToHash("IsSliding");
+        private static readonly int IsCrouchingHash = Animator.StringToHash("IsCrouching");
 
         public override void Spawned()
         {
@@ -35,10 +40,16 @@ namespace _Experimenation.Fraser.Scripts
             if (!HasStateAuthority || playerMovement == null)
                 return;
 
+            float horizontalSpeed = playerMovement.HorizontalSpeed;
+
             NetworkedAnimationSpeed =
-                ConvertSpeedToAnimatorValue(
-                    playerMovement.HorizontalSpeed
-                );
+                ConvertSpeedToAnimatorValue(horizontalSpeed);
+
+            NetworkedCrouchSpeed =
+                ConvertCrouchSpeedToAnimatorValue(horizontalSpeed);
+
+            NetworkedIsSliding = playerMovement.IsSliding;
+            NetworkedIsCrouching = playerMovement.IsCrouching;
         }
 
         public override void Render()
@@ -47,14 +58,22 @@ namespace _Experimenation.Fraser.Scripts
                 return;
 
             float animationSpeed = NetworkedAnimationSpeed;
+            float crouchSpeed = NetworkedCrouchSpeed;
+            bool isSliding = NetworkedIsSliding;
+            bool isCrouching = NetworkedIsCrouching;
 
-            if (HasInputAuthority &&
-                playerMovement != null)
+            if (HasInputAuthority && playerMovement != null)
             {
+                float horizontalSpeed = playerMovement.HorizontalSpeed;
+
                 animationSpeed =
-                    ConvertSpeedToAnimatorValue(
-                        playerMovement.HorizontalSpeed
-                    );
+                    ConvertSpeedToAnimatorValue(horizontalSpeed);
+
+                crouchSpeed =
+                    ConvertCrouchSpeedToAnimatorValue(horizontalSpeed);
+
+                isSliding = playerMovement.IsSliding;
+                isCrouching = playerMovement.IsCrouching;
             }
 
             thirdPersonAnimator.SetFloat(
@@ -63,10 +82,19 @@ namespace _Experimenation.Fraser.Scripts
                 animatorDampTime,
                 Time.deltaTime
             );
+
+            thirdPersonAnimator.SetFloat(
+                CrouchSpeedHash,
+                crouchSpeed,
+                animatorDampTime,
+                Time.deltaTime
+            );
+
+            thirdPersonAnimator.SetBool(IsSlidingHash, isSliding);
+            thirdPersonAnimator.SetBool(IsCrouchingHash, isCrouching);
         }
 
-        private float ConvertSpeedToAnimatorValue(
-            float horizontalSpeed)
+        private float ConvertSpeedToAnimatorValue(float horizontalSpeed)
         {
             if (horizontalSpeed <= walkingSpeed)
             {
@@ -85,6 +113,15 @@ namespace _Experimenation.Fraser.Scripts
                     sprintingSpeed,
                     horizontalSpeed
                 )
+            );
+        }
+
+        private float ConvertCrouchSpeedToAnimatorValue(float horizontalSpeed)
+        {
+            return Mathf.InverseLerp(
+                0f,
+                crouchWalkingSpeed,
+                horizontalSpeed
             );
         }
     }
