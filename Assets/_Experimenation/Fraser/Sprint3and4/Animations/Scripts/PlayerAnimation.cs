@@ -20,16 +20,29 @@ namespace _Experimenation.Fraser.Scripts
         [Networked] private float NetworkedCrouchSpeed { get; set; }
         [Networked] private NetworkBool NetworkedIsSliding { get; set; }
         [Networked] private NetworkBool NetworkedIsCrouching { get; set; }
+        [Networked] private NetworkBool NetworkedIsAirborne { get; set; }
+        [Networked] private NetworkBool NetworkedJumpAnimationActive { get; set; }
+        [Networked] private NetworkBool NetworkedIsClimbing { get; set; }
 
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
         private static readonly int CrouchSpeedHash = Animator.StringToHash("CrouchSpeed");
         private static readonly int IsSlidingHash = Animator.StringToHash("IsSliding");
         private static readonly int IsCrouchingHash = Animator.StringToHash("IsCrouching");
+        private static readonly int IsAirborneHash = Animator.StringToHash("IsAirborne");
+        private static readonly int JumpAnimationActiveHash =
+            Animator.StringToHash("JumpAnimationActive");
+        private static readonly int IsClimbingHash = Animator.StringToHash("IsClimbing");
+        private static readonly int JumpHash = Animator.StringToHash("Jump");
+
+        private int _lastJumpSequence;
 
         public override void Spawned()
         {
             if (playerMovement == null)
                 playerMovement = GetComponent<PlayerMovement>();
+
+            if (playerMovement != null)
+                _lastJumpSequence = playerMovement.JumpSequence;
 
             if (thirdPersonVisual != null)
                 thirdPersonVisual.SetActive(!HasInputAuthority);
@@ -50,6 +63,9 @@ namespace _Experimenation.Fraser.Scripts
 
             NetworkedIsSliding = playerMovement.IsSliding;
             NetworkedIsCrouching = playerMovement.IsCrouching;
+            NetworkedIsAirborne = !playerMovement.IsGrounded;
+            NetworkedJumpAnimationActive = playerMovement.JumpAnimationActive;
+            NetworkedIsClimbing = playerMovement.IsClimbing;
         }
 
         public override void Render()
@@ -61,6 +77,9 @@ namespace _Experimenation.Fraser.Scripts
             float crouchSpeed = NetworkedCrouchSpeed;
             bool isSliding = NetworkedIsSliding;
             bool isCrouching = NetworkedIsCrouching;
+            bool isAirborne = NetworkedIsAirborne;
+            bool jumpAnimationActive = NetworkedJumpAnimationActive;
+            bool isClimbing = NetworkedIsClimbing;
 
             if (HasInputAuthority && playerMovement != null)
             {
@@ -74,6 +93,9 @@ namespace _Experimenation.Fraser.Scripts
 
                 isSliding = playerMovement.IsSliding;
                 isCrouching = playerMovement.IsCrouching;
+                isAirborne = !playerMovement.IsGrounded;
+                jumpAnimationActive = playerMovement.JumpAnimationActive;
+                isClimbing = playerMovement.IsClimbing;
             }
 
             thirdPersonAnimator.SetFloat(
@@ -92,6 +114,19 @@ namespace _Experimenation.Fraser.Scripts
 
             thirdPersonAnimator.SetBool(IsSlidingHash, isSliding);
             thirdPersonAnimator.SetBool(IsCrouchingHash, isCrouching);
+            thirdPersonAnimator.SetBool(IsAirborneHash, isAirborne);
+            thirdPersonAnimator.SetBool(
+                JumpAnimationActiveHash,
+                jumpAnimationActive
+            );
+            thirdPersonAnimator.SetBool(IsClimbingHash, isClimbing);
+
+            if (playerMovement != null &&
+                playerMovement.JumpSequence != _lastJumpSequence)
+            {
+                _lastJumpSequence = playerMovement.JumpSequence;
+                thirdPersonAnimator.SetTrigger(JumpHash);
+            }
         }
 
         private float ConvertSpeedToAnimatorValue(float horizontalSpeed)

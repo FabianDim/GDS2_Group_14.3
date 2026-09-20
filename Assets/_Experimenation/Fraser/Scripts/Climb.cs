@@ -15,6 +15,8 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float wallCheckHeight = 1f;
         [SerializeField] private float lowerCheckHeight = 0.35f;
         [SerializeField] private float wallCheckRadius = 0.15f;
+        [SerializeField] private float wallLossGraceSeconds = 0.12f;
+        [Networked] private TickTimer WallLossGrace { get; set; }
 
         [Header("Climbing")]
         [SerializeField] private float climbSpeed = 5f;
@@ -79,11 +81,23 @@ namespace _Experimenation.Fraser.Scripts
                     return;
                 }
 
-                if (climbHeld &&
-                    (wallInFront || lowerWallInFront))
+                if (!climbHeld)
                 {
+                    StopClimb();
                     return;
                 }
+
+                if (wallInFront || lowerWallInFront)
+                {
+                    WallLossGrace = TickTimer.CreateFromSeconds(
+                        Runner,
+                        wallLossGraceSeconds
+                    );
+                    return;
+                }
+
+                if (!WallLossGrace.ExpiredOrNotRunning(Runner))
+                    return;
 
                 StopClimb();
                 return;
@@ -159,6 +173,11 @@ namespace _Experimenation.Fraser.Scripts
             IsClimbing = true;
             _playerMovement.IsClimbing = true;
 
+            WallLossGrace = TickTimer.CreateFromSeconds(
+                Runner,
+                wallLossGraceSeconds
+            );
+
             _previousClimbHeight =
                 transform.position.y;
 
@@ -180,6 +199,7 @@ namespace _Experimenation.Fraser.Scripts
 
             IsClimbing = false;
             _playerMovement.IsClimbing = false;
+            WallLossGrace = TickTimer.None;
 
             _playerMovement.SetGravity(
                 _playerMovement.NormalGravity
@@ -192,7 +212,7 @@ namespace _Experimenation.Fraser.Scripts
 
             IsClimbing = false;
             _playerMovement.IsClimbing = false;
-
+            WallLossGrace = TickTimer.None;
             _playerMovement.ClearMovementVelocity();
 
             _playerMovement.SetGravity(
