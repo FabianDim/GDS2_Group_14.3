@@ -15,8 +15,6 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float wallCheckHeight = 1f;
         [SerializeField] private float lowerCheckHeight = 0.35f;
         [SerializeField] private float wallCheckRadius = 0.15f;
-        [SerializeField] private float wallLossGraceSeconds = 0.12f;
-        [Networked] private TickTimer WallLossGrace { get; set; }
 
         [Header("Climbing")]
         [SerializeField] private float climbSpeed = 5f;
@@ -58,7 +56,8 @@ namespace _Experimenation.Fraser.Scripts
 
         public void UpdateClimbState(GameplayInput playerInput)
         {
-            if (!_playerMovement) return;
+            if (!_playerMovement)
+                return;
 
             if (_playerMovement.IsGrounded)
             {
@@ -68,7 +67,7 @@ namespace _Experimenation.Fraser.Scripts
 
             CheckWall();
 
-            var climbHeld =
+            bool climbHeld =
                 playerInput.Buttons.IsSet(InputButton.Jump);
 
             if (IsClimbing)
@@ -81,29 +80,17 @@ namespace _Experimenation.Fraser.Scripts
                     return;
                 }
 
-                if (!climbHeld)
+                if (climbHeld &&
+                    (wallInFront || lowerWallInFront))
                 {
-                    StopClimb();
                     return;
                 }
-
-                if (wallInFront || lowerWallInFront)
-                {
-                    WallLossGrace = TickTimer.CreateFromSeconds(
-                        Runner,
-                        wallLossGraceSeconds
-                    );
-                    return;
-                }
-
-                if (!WallLossGrace.ExpiredOrNotRunning(Runner))
-                    return;
 
                 StopClimb();
                 return;
             }
 
-            var canStartClimb =
+            bool canStartClimb =
                 !_playerMovement.IsGrounded &&
                 climbHeld &&
                 !climbLocked &&
@@ -122,11 +109,11 @@ namespace _Experimenation.Fraser.Scripts
             var physicsScene =
                 Runner.GetPhysicsScene();
 
-            var centrePosition =
+            Vector3 centrePosition =
                 transform.position +
                 Vector3.up * wallCheckHeight;
 
-            var lowerPosition =
+            Vector3 lowerPosition =
                 transform.position +
                 Vector3.up * lowerCheckHeight;
 
@@ -166,17 +153,10 @@ namespace _Experimenation.Fraser.Scripts
         private void StartClimb()
         {
             if (IsClimbing)
-            {
                 return;
-            }
 
             IsClimbing = true;
             _playerMovement.IsClimbing = true;
-
-            WallLossGrace = TickTimer.CreateFromSeconds(
-                Runner,
-                wallLossGraceSeconds
-            );
 
             _previousClimbHeight =
                 transform.position.y;
@@ -193,13 +173,10 @@ namespace _Experimenation.Fraser.Scripts
         private void StopClimb()
         {
             if (!IsClimbing)
-            {
                 return;
-            }
 
             IsClimbing = false;
             _playerMovement.IsClimbing = false;
-            WallLossGrace = TickTimer.None;
 
             _playerMovement.SetGravity(
                 _playerMovement.NormalGravity
@@ -212,7 +189,7 @@ namespace _Experimenation.Fraser.Scripts
 
             IsClimbing = false;
             _playerMovement.IsClimbing = false;
-            WallLossGrace = TickTimer.None;
+
             _playerMovement.ClearMovementVelocity();
 
             _playerMovement.SetGravity(
@@ -222,7 +199,7 @@ namespace _Experimenation.Fraser.Scripts
 
         private void TrackClimbDistance()
         {
-            var heightDifference =
+            float heightDifference =
                 transform.position.y -
                 _previousClimbHeight;
 
@@ -236,11 +213,14 @@ namespace _Experimenation.Fraser.Scripts
                 transform.position.y;
         }
 
-        public Vector3 GetClimbVelocity(GameplayInput playerInput)
+        public Vector3 GetClimbVelocity(
+            GameplayInput playerInput
+        )
         {
-            var currentWallHit = wallInFront ? _wallHit : _lowerWallHit;
+            RaycastHit currentWallHit =
+                wallInFront ? _wallHit : _lowerWallHit;
 
-            var wallSideDirection =
+            Vector3 wallSideDirection =
                 Vector3.Cross(
                     Vector3.up,
                     currentWallHit.normal
@@ -255,15 +235,15 @@ namespace _Experimenation.Fraser.Scripts
                     -wallSideDirection;
             }
 
-            var sideVelocity =
+            Vector3 sideVelocity =
                 wallSideDirection *
                 playerInput.MoveInput.x *
                 climbSideSpeed;
 
-            var climbVelocity =
+            Vector3 climbVelocity =
                 Vector3.up * climbSpeed;
 
-            var wallVelocity =
+            Vector3 wallVelocity =
                 -currentWallHit.normal *
                 wallPullSpeed;
 
