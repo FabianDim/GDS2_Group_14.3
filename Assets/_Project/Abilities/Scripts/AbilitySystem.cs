@@ -65,8 +65,7 @@ namespace _Project.Abilities.Scripts
         #region Event Bus Handlers
         private void OnTokenCollected(TokenCollectedEvent ev)
         {
-            if (_isShowingAbilities || 
-                ev.CollectedBy.Role != PlayerRole.Chaser) 
+            if (_isShowingAbilities) 
                 return;
 
             if (_randomAbilitySet.Count == 0 || _abilityUIManager.ChoiceCapacity == 0)

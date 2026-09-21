@@ -8,7 +8,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
     public class AgilityPowerup : AbilityEffect
     {
         private PlayerMovement _playerMovement;
-        public float AgilityBoostMultiplier = 2f;
+        public float AgilityBoostMultiplier = 0.25f;
         public override void ApplyEffect(Player target)
         {
             _playerMovement = target != null
