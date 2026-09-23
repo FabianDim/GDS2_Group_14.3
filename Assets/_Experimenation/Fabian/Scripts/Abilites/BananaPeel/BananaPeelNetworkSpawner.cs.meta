@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: bf717c37939b93c4aaea19c0394b0082
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - bananaPeelPrefab: {fileID: 8714437318731189684, guid: 74e070f7c6b9fa548a829d922e657d0b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
