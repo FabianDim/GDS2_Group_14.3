@@ -24,6 +24,7 @@ namespace _Project.Abilities.Scripts
         private List<Ability> _randomAbilitySet = new();
         private List<Ability> _abilityChoices = new();
         private bool _isShowingAbilities;
+        private PlayerRef _choiceOwner;
         private bool _newSet;
 
         [Networked] private int AbilityIndex { get; set; }
@@ -86,12 +87,21 @@ namespace _Project.Abilities.Scripts
 
             var chaserAbilityPool = database.allAbilities
                 .Where(ability => 
-                    ability && ability.abilityScope == AbilityScope.Chaser && 
+                    ability &&
+                    (ability.abilityScope == AbilityScope.General ||
+                     ability.abilityScope == AbilityScope.Chaser) &&
                     ability.abilityType != AbilityType.Tool)
                 .ToList();
 
+            if (chaserAbilityPool.Count == 0)
+            {
+                _randomAbilitySet.Clear();
+                Debug.LogWarning("RunPhaseAbilitySystem: no General or Chaser non-tool abilities are available.", this);
+                return;
+            }
+
             var extraIndex = 0;
-            while (chaserAbilityPool.Count % 3 != 0)
+            while (chaserAbilityPool.Count % AbilityChoiceCount != 0)
                 chaserAbilityPool.Add(chaserAbilityPool[extraIndex++]);
                 
             _randomAbilitySet = ListUtility.Shuffle(chaserAbilityPool);
@@ -101,6 +111,8 @@ namespace _Project.Abilities.Scripts
         {
             if (!IsRunPhase || _isShowingAbilities || ev == null ||
                 ev.CollectedBy == null || ev.CollectedBy.Role != PlayerRole.Chaser ||
+                ev.CollectedBy.Runner != Runner || ev.CollectedBy.Object == null ||
+                !ev.Collector.IsValid || ev.CollectedBy.Object.InputAuthority != ev.Collector ||
                 _randomAbilitySet.Count < AbilityChoiceCount)
             {
                 return;
@@ -110,6 +122,7 @@ namespace _Project.Abilities.Scripts
                 return;
 
             _isShowingAbilities = true;
+            _choiceOwner = ev.Collector;
             AbilityIndex += AbilityChoiceCount;
             if (AbilityIndex + AbilityChoiceCount > _randomAbilitySet.Count)
                 AbilityIndex = 0;
@@ -124,6 +137,7 @@ namespace _Project.Abilities.Scripts
         {
             AbilityIndex = 0;
             _isShowingAbilities = false;
+            _choiceOwner = PlayerRef.None;
             _abilityChoices.Clear();
 
             if (_newSet)
@@ -133,18 +147,20 @@ namespace _Project.Abilities.Scripts
 
         private void OnAbilitySelected(AbilitySelectedEvent ev)
         {
-            if (!IsRunPhase || ev == null || ev.Player == null ||
+            if (!IsRunPhase || !_isShowingAbilities || ev == null || ev.Player == null ||
                 ev.Player.Object == null || !ev.Player.HasStateAuthority ||
+                ev.Player.Runner != Runner || ev.Player.Object.InputAuthority != _choiceOwner ||
                 ev.Player.Role != PlayerRole.Chaser ||
                 ev.SelectedAbility < 1 || ev.SelectedAbility > _abilityChoices.Count)
             {
                 return;
             }
 
-            AbilityEffectApplier.ApplyAll(
-                _abilityChoices[ev.SelectedAbility - 1],
-                ev.Player);
+            var ability = _abilityChoices[ev.SelectedAbility - 1];
             _isShowingAbilities = false;
+            _choiceOwner = PlayerRef.None;
+            _abilityChoices.Clear();
+            AbilityEffectApplier.ApplyAll(ability, ev.Player);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]

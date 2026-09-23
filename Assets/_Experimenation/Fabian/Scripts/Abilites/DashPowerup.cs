@@ -18,7 +18,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
 
             if (_playerMovement == null)
             {
-                Debug.LogError("DashPowerup: No FirstPersonMovement found in scene.");
+                UnityEngine.Debug.LogError("DashPowerup: No FirstPersonMovement found in scene.");
                 return;
             }
 

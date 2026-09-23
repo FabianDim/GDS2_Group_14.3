@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
+using _Experimenation.K.Multiplayer.Scripts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -110,6 +111,13 @@ namespace _Project.Abilities.Scripts
         
         private void OnAbilitySelected(AbilitySelectedEvent ev)
         {
+            // The host also processes the remote player's inputs. Only a valid
+            // selection from the local Chaser should dismiss these cards.
+            if (ev == null || ev.Player == null || ev.Player.Object == null ||
+                !ev.Player.HasInputAuthority || ev.Player.Role != PlayerRole.Chaser ||
+                ev.SelectedAbility < 1 || ev.SelectedAbility > _abilities.Count)
+                return;
+
             ShowUI(false);
         }
     }

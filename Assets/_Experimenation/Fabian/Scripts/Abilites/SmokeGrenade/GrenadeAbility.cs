@@ -16,7 +16,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites.SmokeGrenade
             // grenade component.
             if (!target.TryGetComponent<ThrowGrenade>(out var grenade))
             {
-                Debug.LogWarning($"{target.name} has no ThrowGrenade component.", target);
+                UnityEngine.Debug.LogWarning($"{target.name} has no ThrowGrenade component.", target);
                 return;
             }
 

@@ -113025,8 +113025,32 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4595889938588091840, guid: 7e1a34257c222924a84d1c1e0c6e40e5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1866615895}
   m_SourcePrefab: {fileID: 100100000, guid: 7e1a34257c222924a84d1c1e0c6e40e5, type: 3}
+--- !u!1 &1866615894 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4595889938588091840, guid: 7e1a34257c222924a84d1c1e0c6e40e5, type: 3}
+  m_PrefabInstance: {fileID: 1866615893}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1866615895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866615894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1a67a15cbd5f03468362daecc99822f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.Fabian.Scripts.Debug.PlayerDebugOverlay
+  toggleKey: 284
+  offset: {x: 20, y: 20}
+  fontSize: 20
+  startVisible: 1
 --- !u!4 &1866652941 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4269365529672502, guid: d53d4d08ad7e9e549b78f75406b218c9, type: 3}

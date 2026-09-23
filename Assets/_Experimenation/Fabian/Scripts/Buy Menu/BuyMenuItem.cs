@@ -51,7 +51,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
                 abilityImage.sprite = ability.abilitySprite;
             else
             {
-                Debug.LogWarning("abilityImage is null – no Image component found on this BuyMenuItem.");
+                UnityEngine.Debug.LogWarning("abilityImage is null – no Image component found on this BuyMenuItem.");
             }
 
             if (abilityName != null)
@@ -84,14 +84,14 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             var gameData = GameData.Instance;
             if (gameData == null)
             {
-                Debug.LogWarning("Cannot purchase ability because GameData is not ready.", this);
+                UnityEngine.Debug.LogWarning("Cannot purchase ability because GameData is not ready.", this);
                 return;
             }
 
             var runner = gameData.Runner;
             if (runner == null || !runner.IsRunning || runner.IsShutdown)
             {
-                Debug.LogWarning("Cannot purchase ability because the network runner is not ready.", this);
+                UnityEngine.Debug.LogWarning("Cannot purchase ability because the network runner is not ready.", this);
                 return;
             }
 
@@ -105,7 +105,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             if (gameData == null || ev.Buyer != gameData.Runner.LocalPlayer ||
                 ev.AbilityIndex != _abilityIndex)
                 return;
-            
+
             if (!ev.Accepted)
                 return;
 

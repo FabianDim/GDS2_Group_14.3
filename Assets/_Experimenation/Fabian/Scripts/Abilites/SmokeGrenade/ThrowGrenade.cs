@@ -41,7 +41,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites.SmokeGrenade
 
             if (grenadePrefab == null)
             {
-                Debug.LogError("ThrowGrenade: 'grenadePrefab' is missing in Inspector!");
+                UnityEngine.Debug.LogError("ThrowGrenade: 'grenadePrefab' is missing in Inspector!");
                 return;
             }
             if (_grenadeObject != null) return;

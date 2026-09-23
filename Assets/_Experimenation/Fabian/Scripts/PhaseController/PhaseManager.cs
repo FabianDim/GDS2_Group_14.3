@@ -65,17 +65,17 @@ namespace _Experimenation.Fabian.Scripts.PhaseController
             if (runPhaseItems != null)
                 runPhaseItems.SetActive(isRunPhase);
             else
-                Debug.LogError("PhaseManager: Run Phase UI reference is not assigned.", this);
+                UnityEngine.Debug.LogError("PhaseManager: Run Phase UI reference is not assigned.", this);
 
             if (buyPhaseItems != null)
                 buyPhaseItems.SetActive(!isRunPhase);
             else
-                Debug.LogError("PhaseManager: Buy Phase UI reference is not assigned.", this);
+                UnityEngine.Debug.LogError("PhaseManager: Buy Phase UI reference is not assigned.", this);
 
             if (isRunPhase && buyPhaseEndsPS != null)
                 buyPhaseEndsPS.Play();
             else if (isRunPhase)
-                Debug.LogError("PhaseManager: buy phase ending particle reference is not assigned.", this);
+                UnityEngine.Debug.LogError("PhaseManager: buy phase ending particle reference is not assigned.", this);
         }
     }
 }

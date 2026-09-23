@@ -19,7 +19,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
         [Space, Header("Spawn Locations")]
         [SerializeField] private Transform p1BuyMenuLocation;
         [SerializeField] private Transform p2BuyMenuLocation;
-        
+
         private readonly WaitForSeconds _1S = new(1);
 
         private IEnumerator Start()
@@ -36,7 +36,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 
             if (spawnLocation == null)
             {
-                Debug.LogError("BuyMenuGeneration: local buy-menu location is not assigned.", this);
+                UnityEngine.Debug.LogError("BuyMenuGeneration: local buy-menu location is not assigned.", this);
                 yield break;
             }
 
@@ -63,19 +63,19 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
         {
             if (database == null)
             {
-                Debug.LogError("BuyMenuGeneration: AbilityDatabase is not assigned.");
+                UnityEngine.Debug.LogError("BuyMenuGeneration: AbilityDatabase is not assigned.");
                 return;
             }
 
             if (content == null)
             {
-                Debug.LogError("BuyMenuGeneration: Content transform is not assigned.");
+                UnityEngine.Debug.LogError("BuyMenuGeneration: Content transform is not assigned.");
                 return;
             }
 
             if (abilityCardPrefab == null)
             {
-                Debug.LogError("BuyMenuGeneration: Ability card prefab is not assigned.");
+                UnityEngine.Debug.LogError("BuyMenuGeneration: Ability card prefab is not assigned.");
                 return;
             }
 
