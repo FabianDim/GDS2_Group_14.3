@@ -106,7 +106,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
                 P1Data.Username = NormalizeUsername(_username, DefaultHostUsername);
         }
 
-        private static void TryDespawnDuplicate(NetworkRunner runner, NetworkObject networkObject)
+        public static void TryDespawnDuplicate(NetworkRunner runner, NetworkObject networkObject)
         {
             try
             {

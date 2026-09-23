@@ -15,8 +15,6 @@ namespace _Experimenation.Fraser.Scripts
         public float defaultMoveSpeed = 10f;
         [SerializeField] public float maxMoveSpeed = 40f;
 
-        // Set by State Authority (e.g. the QTE Runner boost) and replicated so
-        // server simulation and client prediction stay in sync.
         [SerializeField] private float defaultAirMultiplier = 0.55f;
 
         [Header("Sprinting")]
@@ -25,15 +23,10 @@ namespace _Experimenation.Fraser.Scripts
         [Networked] private float NetworkedAerialMultiplier { get; set; }
         [Networked] private float NetworkedAgilityMultiplier { get; set; }
 
-        public float airMultiplier => NetworkedAerialMultiplier;
+        private float AirMultiplier => NetworkedAerialMultiplier;
 
-        public float agilityMultiplier => NetworkedAgilityMultiplier;
+        public float AgilityMultiplier => NetworkedAgilityMultiplier;
 
-        private bool dashBoostActive;
-
-        private TickTimer SpeedBoostTimer { get; set; }
-
-        public float sprintSpeed => NetworkedSprintSpeed;
         [SerializeField] private float walkSpeed = 10f;
         [SerializeField] private float defaultSprintSpeed = 15f;
         [SerializeField] private float crouchSpeed = 5f;
@@ -48,16 +41,14 @@ namespace _Experimenation.Fraser.Scripts
         [Header("Gravity")]
         [SerializeField] private float gravityMultiplier = 1.8f;
 
-        // Set by State Authority (e.g. the QTE Runner boost) and replicated so
-        // server simulation and client prediction stay in sync.
         [Networked] public float SpeedBoostMultiplier { get; set; }
         [Networked] private float SpeedHindranceMultiplier { get; set; }
         private TickTimer SpeedHindranceTimer { get; set; }
 
-        // Networked so powerup boosts replicate; initialized to defaults in
-        // Spawned() because [Networked] properties start at 0.
         [Networked] private float NetworkedJumpForce { get; set; }
         [Networked] private NetworkButtons PreviousButtons { get; set; }
+        [Networked] public int JumpSequence { get; private set; }
+        [Networked] public NetworkBool JumpAnimationActive { get; private set; }
 
         private const float DefaultJumpForce = 7f;
 
@@ -80,29 +71,23 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void Spawned()
         {
-            if (!HasStateAuthority) return;
-
             _kcc = GetComponent<SimpleKCC>();
             _slide = GetComponent<Slide>();
             _wallRun = GetComponent<WallRun>();
             _climb = GetComponent<Climb>();
 
-            // Initialize networked values to their design defaults, otherwise
-            // jump applies zero impulse and sprint lerps moveSpeed down to zero.
-            NetworkedJumpForce = DefaultJumpForce;
-            NetworkedSprintSpeed = defaultSprintSpeed;
-
             moveSpeed = walkSpeed;
+            _kcc.SetGravity(NormalGravity);
 
-            _kcc.SetGravity(
-                NormalGravity
-            );
+            if (!HasStateAuthority)
+                return;
 
             NetworkedAerialMultiplier = defaultAirMultiplier;
             NetworkedAgilityMultiplier = 1f;
             SpeedHindranceMultiplier = 1f;
             NetworkedSprintSpeed = defaultSprintSpeed;
             NetworkedJumpForce = DefaultJumpForce;
+            SpeedBoostMultiplier = 1f;
         }
 
         public override void FixedUpdateNetwork()
@@ -114,6 +99,9 @@ namespace _Experimenation.Fraser.Scripts
                 SpeedHindranceMultiplier = 1f;
 
             IsGrounded = _kcc.IsGrounded;
+
+            if (IsGrounded)
+                JumpAnimationActive = false;
 
             _climb?.UpdateClimbState(input);
             _wallRun?.UpdateWallRunState();
@@ -141,6 +129,8 @@ namespace _Experimenation.Fraser.Scripts
 
             _kcc.Move(movementVelocity, jumpImpulse);
 
+            IsGrounded = jumpImpulse > 0f ? false : _kcc.IsGrounded;
+
             PreviousButtons = input.Buttons;
         }
 
@@ -164,6 +154,8 @@ namespace _Experimenation.Fraser.Scripts
                 _horizontalVelocity += _wallRun.GetWallJumpHorizontalImpulse();
                 movementVelocity = _horizontalVelocity;
                 _wallRun.StopWallRunFromJump();
+                JumpSequence++;
+                JumpAnimationActive = true;
                 return _wallRun.WallJumpVerticalForce;
             }
 
@@ -172,6 +164,8 @@ namespace _Experimenation.Fraser.Scripts
                 if (IsSliding && _slide != null)
                     _slide.StopSlideFromJump();
 
+                JumpSequence++;
+                JumpAnimationActive = true;
                 return JumpForce;
             }
 
@@ -183,11 +177,19 @@ namespace _Experimenation.Fraser.Scripts
             if (moveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(
+                    _horizontalVelocity,
+                    targetVelocity,
+                    movementMultiplier * Runner.DeltaTime
+                );
             }
             else
             {
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, Vector3.zero, groundDrag * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(
+                    _horizontalVelocity,
+                    Vector3.zero,
+                    groundDrag * Runner.DeltaTime
+                );
             }
         }
 
@@ -196,12 +198,20 @@ namespace _Experimenation.Fraser.Scripts
             if (moveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(
+                    _horizontalVelocity,
+                    targetVelocity,
+                    movementMultiplier * AirMultiplier * Runner.DeltaTime
+                );
             }
 
             if (airDrag > 0f)
             {
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, Vector3.zero, airDrag * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(
+                    _horizontalVelocity,
+                    Vector3.zero,
+                    airDrag * Runner.DeltaTime
+                );
             }
         }
 
@@ -212,15 +222,25 @@ namespace _Experimenation.Fraser.Scripts
             if (wallMoveDirection.sqrMagnitude > 0.01f)
             {
                 var targetVelocity = wallMoveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, targetVelocity, movementMultiplier * airMultiplier * Runner.DeltaTime);
+                _horizontalVelocity = Vector3.Lerp(
+                    _horizontalVelocity,
+                    targetVelocity,
+                    movementMultiplier * AirMultiplier * Runner.DeltaTime
+                );
             }
 
-            _horizontalVelocity = _wallRun.GetWallRunVelocity(_horizontalVelocity);
+            _horizontalVelocity = _wallRun.GetWallRunVelocity(
+                _horizontalVelocity
+            );
         }
 
         private void SlideMovement()
         {
-            _horizontalVelocity = Vector3.Lerp(_horizontalVelocity, Vector3.zero, slideDrag * Runner.DeltaTime);
+            _horizontalVelocity = Vector3.Lerp(
+                _horizontalVelocity,
+                Vector3.zero,
+                slideDrag * Runner.DeltaTime
+            );
         }
 
         private void ControlSpeed(GameplayInput input)
@@ -233,7 +253,11 @@ namespace _Experimenation.Fraser.Scripts
                 _ => walkSpeed * speedMultiplier
             };
 
-            moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, acceleration * Runner.DeltaTime);
+            moveSpeed = Mathf.Lerp(
+                moveSpeed,
+                targetSpeed,
+                acceleration * Runner.DeltaTime
+            );
         }
 
         public void AddSlideImpulse(Vector3 direction, float force)
@@ -251,12 +275,18 @@ namespace _Experimenation.Fraser.Scripts
             _kcc?.SetGravity(gravity);
         }
 
-        internal void ApplyJumpBoost(float boostMultiplier, float maxJumpForce)
+        internal void ApplyJumpBoost(
+            float boostMultiplier,
+            float maxJumpForce
+        )
         {
             if (!HasStateAuthority)
                 return;
 
-            NetworkedJumpForce = Mathf.Min(maxJumpForce, DefaultJumpForce + DefaultJumpForce * boostMultiplier);
+            NetworkedJumpForce = Mathf.Min(
+                maxJumpForce,
+                DefaultJumpForce + DefaultJumpForce * boostMultiplier
+            );
         }
 
         internal void ApplyDashBoost(float boostMultiplier)
@@ -268,26 +298,26 @@ namespace _Experimenation.Fraser.Scripts
                 maxMoveSpeed,
                 defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
             );
-
-            dashBoostActive = true;
         }
+
         internal void ApplyAerialControlBoost(float boostMultiplier)
         {
             if (!HasStateAuthority)
                 return;
 
             NetworkedAerialMultiplier = Mathf.Min(
-                defaultAirMultiplier * 2, //Not sure what air should stay around.
-                defaultAirMultiplier * boostMultiplier
+                defaultAirMultiplier * 2,
+                defaultAirMultiplier + defaultAirMultiplier * boostMultiplier
             );
         }
+
         internal void ApplyAgilityBoost(float boostMultiplier)
         {
             if (!HasStateAuthority)
                 return;
 
-            NetworkedAgilityMultiplier = boostMultiplier;
-
+            NetworkedAgilityMultiplier +=
+                NetworkedAgilityMultiplier * boostMultiplier;
         }
 
         public void ApplySpeedHindrance(float multiplier, float duration)

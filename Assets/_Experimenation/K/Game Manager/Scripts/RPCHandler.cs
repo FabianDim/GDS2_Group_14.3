@@ -2,7 +2,6 @@
 using _Experimenation.K.Event_Bus.Events;
 using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
-using UnityEngine;
 
 namespace _Experimenation.K.Game_Manager.Scripts
 {
@@ -21,12 +20,13 @@ namespace _Experimenation.K.Game_Manager.Scripts
             Runner.MakeDontDestroyOnLoad(gameObject);
         }
         
-        public void GetCollected(Collider other, int tokenValue, NetworkObject obj)
+        public void GetCollected(Player collector, int tokenValue, NetworkObject obj)
         {
-            if (!HasStateAuthority) return;
-            var collector = other.GetComponentInParent<Player>();
-            if (collector == null || collector.Object == null)
+            if (!HasStateAuthority || collector == null || collector.Object == null ||
+                obj == null)
+            {
                 return;
+            }
 
             var collectorRef = collector.Object.InputAuthority;
             GameData.Instance?.ChangePoints(collectorRef, tokenValue);

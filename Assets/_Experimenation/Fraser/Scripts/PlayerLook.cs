@@ -7,12 +7,13 @@ using UnityEngine;
 
 namespace _Experimenation.Fraser.Scripts
 {
-    public class PlayerLook : NetworkBehaviour
+    public class PlayerLook : NetworkBehaviour, IGameplayInputConsumer
     {
         [Header("References")]
         [SerializeField] private Transform cam;
         [SerializeField] private Transform orientation;
 
+        private WallRun _wallRun;
         private SimpleKCC _kcc;
         private float _pitch;
         private float _yaw;
@@ -20,6 +21,8 @@ namespace _Experimenation.Fraser.Scripts
         public override void Spawned()
         {
             _kcc = GetComponent<SimpleKCC>();
+            _wallRun = GetComponent<WallRun>();
+
             if (!HasInputAuthority) return;
             LockCursor(true);
             EventBus.Subscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
@@ -31,17 +34,11 @@ namespace _Experimenation.Fraser.Scripts
             EventBus.Unsubscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
         }
 
-        public override void FixedUpdateNetwork()
+        public void ProcessInput(GameplayInput input, NetworkButtons previousButtons)
         {
-            // Look input stays ungated: in host mode the host simulates every
-            // player's look rotation, including remote players.
-            if (GetInput(out GameplayInput input))
-                ProcessInput(input);
-
-            // RefreshCamera was removed here - it only matters for the local
-            // player and already runs in LateUpdate (input-authority gated),
-            // so per-tick camera work for remote players is skipped.
+            _kcc?.AddLookRotation(input.LookRotationDelta);
         }
+
 
         private void LateUpdate()
         {
@@ -49,13 +46,16 @@ namespace _Experimenation.Fraser.Scripts
             RefreshCamera();
         }
 
-        private void ProcessInput(GameplayInput input) =>
-            _kcc.AddLookRotation(input.LookRotationDelta);
-
         private void RefreshCamera()
         {
-            var pitchRotation = _kcc.GetLookRotation(true, false);
-            cam.localRotation = Quaternion.Euler(pitchRotation);
+            var lookRotation = _kcc.GetLookRotation(true, false);
+            var tilt = _wallRun != null ? _wallRun.CameraTilt : 0f;
+
+            cam.localRotation = Quaternion.Euler(
+                lookRotation.x,
+                lookRotation.y,
+                tilt
+            );
         }
 
         private static void LockCursor(bool locked)

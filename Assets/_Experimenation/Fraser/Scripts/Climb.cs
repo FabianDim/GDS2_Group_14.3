@@ -56,7 +56,8 @@ namespace _Experimenation.Fraser.Scripts
 
         public void UpdateClimbState(GameplayInput playerInput)
         {
-            if (!_playerMovement) return;
+            if (!_playerMovement)
+                return;
 
             if (_playerMovement.IsGrounded)
             {
@@ -65,6 +66,9 @@ namespace _Experimenation.Fraser.Scripts
             }
 
             CheckWall();
+
+            bool climbHeld =
+                playerInput.Buttons.IsSet(InputButton.Jump);
 
             if (IsClimbing)
             {
@@ -76,10 +80,7 @@ namespace _Experimenation.Fraser.Scripts
                     return;
                 }
 
-                var movingForward =
-                    playerInput.MoveInput.y > 0.1f;
-
-                if (movingForward &&
+                if (climbHeld &&
                     (wallInFront || lowerWallInFront))
                 {
                     return;
@@ -89,11 +90,12 @@ namespace _Experimenation.Fraser.Scripts
                 return;
             }
 
-            var canStartClimb =
+            bool canStartClimb =
+                !_playerMovement.IsGrounded &&
+                climbHeld &&
                 !climbLocked &&
                 !_playerMovement.IsCrouching &&
                 !_playerMovement.IsSliding &&
-                playerInput.MoveInput.y > 0.1f &&
                 wallInFront;
 
             if (canStartClimb)
@@ -107,11 +109,11 @@ namespace _Experimenation.Fraser.Scripts
             var physicsScene =
                 Runner.GetPhysicsScene();
 
-            var centrePosition =
+            Vector3 centrePosition =
                 transform.position +
                 Vector3.up * wallCheckHeight;
 
-            var lowerPosition =
+            Vector3 lowerPosition =
                 transform.position +
                 Vector3.up * lowerCheckHeight;
 
@@ -151,9 +153,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StartClimb()
         {
             if (IsClimbing)
-            {
                 return;
-            }
 
             IsClimbing = true;
             _playerMovement.IsClimbing = true;
@@ -173,9 +173,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StopClimb()
         {
             if (!IsClimbing)
-            {
                 return;
-            }
 
             IsClimbing = false;
             _playerMovement.IsClimbing = false;
@@ -201,7 +199,7 @@ namespace _Experimenation.Fraser.Scripts
 
         private void TrackClimbDistance()
         {
-            var heightDifference =
+            float heightDifference =
                 transform.position.y -
                 _previousClimbHeight;
 
@@ -215,11 +213,14 @@ namespace _Experimenation.Fraser.Scripts
                 transform.position.y;
         }
 
-        public Vector3 GetClimbVelocity(GameplayInput playerInput)
+        public Vector3 GetClimbVelocity(
+            GameplayInput playerInput
+        )
         {
-            var currentWallHit = wallInFront ? _wallHit : _lowerWallHit;
+            RaycastHit currentWallHit =
+                wallInFront ? _wallHit : _lowerWallHit;
 
-            var wallSideDirection =
+            Vector3 wallSideDirection =
                 Vector3.Cross(
                     Vector3.up,
                     currentWallHit.normal
@@ -234,15 +235,15 @@ namespace _Experimenation.Fraser.Scripts
                     -wallSideDirection;
             }
 
-            var sideVelocity =
+            Vector3 sideVelocity =
                 wallSideDirection *
                 playerInput.MoveInput.x *
                 climbSideSpeed;
 
-            var climbVelocity =
+            Vector3 climbVelocity =
                 Vector3.up * climbSpeed;
 
-            var wallVelocity =
+            Vector3 wallVelocity =
                 -currentWallHit.normal *
                 wallPullSpeed;
 

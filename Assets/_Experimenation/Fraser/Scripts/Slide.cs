@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _Experimenation.Fraser.Scripts
 {
-    public class Slide : NetworkBehaviour
+    public class Slide : NetworkBehaviour, IGameplayInputConsumer
     {
         [Header("References")]
         [SerializeField] private Transform orientation;
@@ -16,7 +16,6 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private float crouchHeight = 1f;
         [SerializeField] private float crouchCameraHeight = 0.4f;
         [SerializeField] private float cameraCrouchSpeed = 15f;
-        [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         [Header("Sliding")]
         [SerializeField] private float slideForce = 6f;
@@ -46,40 +45,32 @@ namespace _Experimenation.Fraser.Scripts
             _kcc.SetHeight(standingHeight);
         }
 
-        public override void FixedUpdateNetwork()
+        public void ProcessInput(GameplayInput input, NetworkButtons previousButtons)
         {
-            if (_kcc == null ||
-                _playerMovement == null ||
-                !GetInput(out GameplayInput input))
-            {
+            if (_kcc == null || _playerMovement == null)
                 return;
-            }
 
-            if (input.Buttons.WasPressed(PreviousButtons, InputButton.Crouch))
+            if (input.Buttons.WasPressed(previousButtons, InputButton.Crouch))
             {
                 StartCrouch();
 
                 if (CanSlide())
-                {
                     StartSlide();
-                }
             }
 
-            if (!input.Buttons.WasPressed(PreviousButtons, InputButton.CrouchHeld))
+            if (!input.Buttons.IsSet(InputButton.CrouchHeld))
             {
                 StopSlide();
                 TryStopCrouch();
             }
 
-            if (!IsSliding) return;
+            if (!IsSliding)
+                return;
+
             _slideTimer -= Runner.DeltaTime;
 
             if (_slideTimer <= 0f)
-            {
                 StopSlide();
-            }
-            
-            PreviousButtons = input.Buttons;
         }
 
         private void LateUpdate()
@@ -90,9 +81,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StartCrouch()
         {
             if (IsCrouching)
-            {
                 return;
-            }
 
             IsCrouching = true;
             _playerMovement.IsCrouching = true;
@@ -103,14 +92,10 @@ namespace _Experimenation.Fraser.Scripts
         private void TryStopCrouch()
         {
             if (!IsCrouching)
-            {
                 return;
-            }
 
             if (!CanStand())
-            {
                 return;
-            }
 
             IsCrouching = false;
             _playerMovement.IsCrouching = false;
@@ -121,9 +106,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StartSlide()
         {
             if (IsSliding)
-            {
                 return;
-            }
 
             IsSliding = true;
             _playerMovement.IsSliding = true;
@@ -142,9 +125,7 @@ namespace _Experimenation.Fraser.Scripts
         private void StopSlide()
         {
             if (!IsSliding)
-            {
                 return;
-            }
 
             IsSliding = false;
             _playerMovement.IsSliding = false;
@@ -183,8 +164,8 @@ namespace _Experimenation.Fraser.Scripts
 
         private void UpdateCameraHeight()
         {
-
-            var targetHeight = IsCrouching ? crouchCameraHeight : _standingCameraHeight;
+            var targetHeight =
+                IsCrouching ? crouchCameraHeight : _standingCameraHeight;
 
             var cameraLocalPosition =
                 cameraPosition.localPosition;

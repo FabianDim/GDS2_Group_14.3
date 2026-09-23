@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6748524616555936114}
   - component: {fileID: 5590567999832806496}
   - component: {fileID: 3165734596970860273}
+  - component: {fileID: 9056318472015649821}
   m_Layer: 0
   m_Name: Exfiltration Pod
   m_TagString: Untagged
@@ -50,6 +51,8 @@ MonoBehaviour:
   pointTarget: 10
   podAvailableTime: 30
   podUnavailableTime: 15
+  podVisual: {fileID: 0}
+  podTrigger: {fileID: 0}
 --- !u!65 &3165734596970860273
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -71,6 +74,26 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.350193, y: 8.278208, z: 5.1673164}
   m_Center: {x: -0.037834167, y: 2.048345, z: 8.1089325}
+--- !u!114 &9056318472015649821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6054745952688444280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 2976576785
+  SendPriority: 1
+  EnableInterpolation: 1
+  Flags: 262146
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 5590567999832806496}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1001 &3527374530618633553
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace _Project.Abilities.Scripts
 {
-    public enum AbilityType { Stats, Technique }
+    public enum AbilityType { Stats, Technique, Tool }
     public enum AbilityScope { General, Runner, Chaser }
 
     [CreateAssetMenu(fileName = "New Ability", menuName = "Abilities/New Ability")]

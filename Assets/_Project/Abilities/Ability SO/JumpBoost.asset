@@ -27,5 +27,5 @@ MonoBehaviour:
     - rid: 4879116493947666666
       type: {class: JumpBoostAbility, ns: _Experimenation.Fabian.Scripts.Abilites, asm: Assembly-CSharp}
       data:
-        boostMultiplayer: 2
-        maxJumpForce: 0
+        boostMultiplayer: 0.25
+        maxJumpForce: 100

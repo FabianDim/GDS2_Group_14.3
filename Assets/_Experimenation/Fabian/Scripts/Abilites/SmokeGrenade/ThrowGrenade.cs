@@ -4,38 +4,34 @@ using UnityEngine;
 
 namespace _Experimenation.Fabian.Scripts.Abilites.SmokeGrenade
 {
-    public class ThrowGrenade : NetworkBehaviour
+    public class ThrowGrenade : NetworkBehaviour, IGameplayInputConsumer
     {
         [SerializeField] private GameObject grenadePrefab;
         [SerializeField] private Transform throwPosition;
         [SerializeField] private Vector3 throwDirection = new Vector3(0, 1, 0);
         [SerializeField] private float maxForce = 10f;
 
-        [Networked] private NetworkButtons PreviousButtons { get; set; }
         private Camera _mainCamera;
         private GameObject _grenadeObject;
 
-        private void Start()
+        public override void Spawned()
         {
             _mainCamera = Camera.main;
         }
 
-        public override void FixedUpdateNetwork()
+        public void ProcessInput(GameplayInput input, NetworkButtons previousButtons)
         {
-            if (_grenadeObject == null || !GetInput(out GameplayInput input)) return;
-        
+            if (_grenadeObject == null)
+                return;
+
             if (throwPosition != null)
             {
                 _grenadeObject.transform.position = throwPosition.position;
                 _grenadeObject.transform.rotation = throwPosition.rotation;
             }
 
-            if (input.Buttons.WasPressed(PreviousButtons, InputButton.Fire))
-            {
+            if (input.Buttons.WasPressed(previousButtons, InputButton.Fire))
                 ThrowGrenadeFunc(maxForce, _grenadeObject);
-            }
-        
-            PreviousButtons = input.Buttons;
         }
 
         public void SpawnGrenade()

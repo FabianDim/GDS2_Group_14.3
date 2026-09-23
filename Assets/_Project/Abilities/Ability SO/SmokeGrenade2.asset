@@ -16,13 +16,14 @@ MonoBehaviour:
   abilitySprite: {fileID: 21300000, guid: 3126d32d69eb392488e96fc585a0790b, type: 3}
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
   abilityType: 0
-  abilityScope: 0
-  abilityDescription: 
+  abilityScope: 1
+  abilityDescription: Throw a smoke grenade to conceal yourself
   effects:
-  - rid: -2
-  AbilityPrice: 100
+  - rid: 9010019802128842975
+  abilityPrice: 100
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 9010019802128842975
+      type: {class: GrenadeAbility, ns: _Experimenation.Fabian.Scripts.Abilites.SmokeGrenade, asm: Assembly-CSharp}
+      data: 

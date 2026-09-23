@@ -1,6 +1,8 @@
+using System.Linq;
 using _Experimenation.K.Game_Manager.Scripts;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
+using _Experimenation.K.Multiplayer.Scripts;
 using _Project.Abilities.Scripts;
 using TMPro;
 using UnityEngine;
@@ -103,13 +105,14 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             if (gameData == null || ev.Buyer != gameData.Runner.LocalPlayer ||
                 ev.AbilityIndex != _abilityIndex)
                 return;
-
-            _purchaseRequested = false;
+            
             if (!ev.Accepted)
                 return;
 
             if (price != null)
+            {
                 price.SetText("Sold");
+            }
         }
     }
 }

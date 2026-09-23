@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.AbilityDatabase
   abilityFolderPath: Assets/_Project/Abilities/Ability SO
   allAbilities:
+  - {fileID: 11400000, guid: 6f3e0757193a3dc41a7ce08f1ef0c310, type: 2}
+  - {fileID: 11400000, guid: 99532fe07b5c63649a0a0da8a363cf18, type: 2}
   - {fileID: 11400000, guid: 7698c062dc41d71418690c543a3f5af2, type: 2}
+  - {fileID: 11400000, guid: b4c9df07c9a46d440bdc16836b83318b, type: 2}
   - {fileID: 11400000, guid: 2d0624f838d0d9b449e74c0d9161c3ba, type: 2}
   - {fileID: 11400000, guid: 1d3a5e23611e3cb40802925b2f27a4bc, type: 2}
   - {fileID: 11400000, guid: 6026c97132073b24299a3e7603056428, type: 2}

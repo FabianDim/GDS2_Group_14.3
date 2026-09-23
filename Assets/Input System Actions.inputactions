@@ -27,16 +27,6 @@
                     "priority": 0
                 },
                 {
-                    "name": "Tools",
-                    "type": "Value",
-                    "id": "6b444451-8a00-4d00-a97e-f47457f736a8",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true,
-                    "priority": 0
-                },
-                {
                     "name": "Crouch",
                     "type": "Button",
                     "id": "27c5f898-bc57-4ee1-8800-db469aca5fe3",
@@ -97,6 +87,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "Ability 4",
+                    "type": "Button",
+                    "id": "ca91788d-740e-419f-afe0-908f3712ee33",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "QTE Fight",
                     "type": "Button",
                     "id": "3c084a9f-713b-4aae-b338-9ed17a2ef80f",
@@ -150,6 +150,16 @@
                     "name": "Fire",
                     "type": "Button",
                     "id": "1699b529-81be-4aee-91c2-d7a6adab9ceb",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "Tool Select",
+                    "type": "Button",
+                    "id": "d2003c82-ddf2-4cf1-9980-51dafc01e79a",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -325,39 +335,6 @@
                 },
                 {
                     "name": "",
-                    "id": "c1f7a91b-d0fd-4a62-997e-7fb9b69bf235",
-                    "path": "<Gamepad>/rightStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Gamepad",
-                    "action": "Tools",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "8c8e490b-c610-4785-884f-f04217b23ca4",
-                    "path": "<Pointer>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse;Touch",
-                    "action": "Tools",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3e5f5442-8668-4b27-a940-df99bad7e831",
-                    "path": "<Joystick>/{Hatswitch}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick",
-                    "action": "Tools",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "f2e9ba44-c423-42a7-ad56-f20975884794",
                     "path": "<Keyboard>/leftShift",
                     "interactions": "",
@@ -512,6 +489,28 @@
                 },
                 {
                     "name": "",
+                    "id": "b96c37eb-5da8-4948-862d-a5e7feb2d72a",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Ability 4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fe6e35c5-201a-4173-b6d0-9d22173553dd",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Ability 4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "a8654ed7-fbab-4b75-acd5-c8aeb8cb809f",
                     "path": "<Keyboard>/j",
                     "interactions": "",
@@ -639,6 +638,28 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "80fb72bc-4fd9-4e38-8ec5-3b6295b68c54",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Tool Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c45181fc-d79c-46af-af0b-5156c3ba4385",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse;Gamepad",
+                    "action": "Tool Select",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

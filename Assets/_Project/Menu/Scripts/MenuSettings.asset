@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98962caa83c829946bbfc3a0ff3eb13b, type: 3}
   m_Name: MenuSettings
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Menu.Scripts.MenuSettings
-  mouseSensitivity: 5
-  gamepadSensitivity: 180
+  mouseSensitivity: 10
+  gamepadSensitivity: 200
