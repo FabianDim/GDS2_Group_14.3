@@ -26,6 +26,7 @@ namespace _Project.Abilities.Scripts
         [SerializeField] private Transform ui;
         private readonly List<AbilityUI> _abilities = new();
 
+        public int ChoiceCapacity => ui.childCount;
         private bool _initialized;
 
         private void Awake()
@@ -100,6 +101,11 @@ namespace _Project.Abilities.Scripts
 
             for (var i = 0; i < _abilities.Count; ++i)
             {
+                var hasAbility = i < abilities.Count;
+                _abilities[i].Background.gameObject.SetActive(hasAbility);
+                if (!hasAbility)
+                    continue;
+
                 _abilities[i].Background.color = abilities[i].abilityColor;
                 _abilities[i].Name.text = abilities[i].abilityName;
                 _abilities[i].Description.text = abilities[i].abilityDescription;
@@ -110,6 +116,10 @@ namespace _Project.Abilities.Scripts
         
         private void OnAbilitySelected(AbilitySelectedEvent ev)
         {
+            if (ev.SelectedAbility < 1 || ev.SelectedAbility > _abilities.Count ||
+                !_abilities[ev.SelectedAbility - 1].Background.gameObject.activeInHierarchy)
+                return;
+
             ShowUI(false);
         }
     }
