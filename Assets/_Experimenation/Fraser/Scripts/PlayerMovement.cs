@@ -41,6 +41,10 @@ namespace _Experimenation.Fraser.Scripts
         [Header("Gravity")]
         [SerializeField] private float gravityMultiplier = 1.8f;
 
+        [Header("Jump Forgiveness")]
+        [SerializeField] private float coyoteTime = 0.12f;
+        [SerializeField] private float jumpBufferTime = 0.10f;
+
         [Networked] public float SpeedBoostMultiplier { get; set; }
 
         [Networked] private float NetworkedJumpForce { get; set; }
@@ -56,6 +60,9 @@ namespace _Experimenation.Fraser.Scripts
         private WallRun _wallRun;
         private Climb _climb;
 
+        private float _coyoteTimer;
+        private float _jumpBufferTimer;
+
         public bool IsGrounded { get; private set; }
         public bool IsCrouching { get; set; }
         public bool IsSliding { get; set; }
@@ -63,7 +70,12 @@ namespace _Experimenation.Fraser.Scripts
         public bool IsClimbing { get; set; }
 
         public float HorizontalSpeed => _horizontalVelocity.magnitude;
+
+        public float VerticalSpeed =>
+            _kcc != null ? _kcc.RealVelocity.y : 0f;
+
         public float NormalGravity => Physics.gravity.y * gravityMultiplier;
+
         private float JumpForce => NetworkedJumpForce;
         private float SprintSpeed => NetworkedSprintSpeed;
 
@@ -94,6 +106,8 @@ namespace _Experimenation.Fraser.Scripts
 
             IsGrounded = _kcc.IsGrounded;
 
+            UpdateJumpTimers(input);
+
             if (IsGrounded)
                 JumpAnimationActive = false;
 
@@ -105,168 +119,311 @@ namespace _Experimenation.Fraser.Scripts
             Vector3 moveDirection = GetMoveDirection(input.MoveInput);
 
             Vector3 movementVelocity;
+
             if (IsClimbing && _climb != null)
             {
                 movementVelocity = _climb.GetClimbVelocity(input);
             }
             else
             {
-                if (IsWallRunning && _wallRun != null) WallRunMovement(moveDirection);
-                else if (IsSliding) SlideMovement();
-                else if (IsGrounded) GroundMovement(moveDirection);
-                else AirMovement(moveDirection);
+                if (IsWallRunning && _wallRun != null)
+                    WallRunMovement(moveDirection);
+                else if (IsSliding)
+                    SlideMovement();
+                else if (IsGrounded)
+                    GroundMovement(moveDirection);
+                else
+                    AirMovement(moveDirection);
 
                 movementVelocity = _horizontalVelocity;
             }
 
-            float jumpImpulse = HandleJump(input, ref movementVelocity);
+            float jumpImpulse =
+                HandleJump(input, ref movementVelocity);
 
             _kcc.Move(movementVelocity, jumpImpulse);
 
-            IsGrounded = jumpImpulse > 0f ? false : _kcc.IsGrounded;
+            IsGrounded =
+                jumpImpulse > 0f
+                    ? false
+                    : _kcc.IsGrounded;
 
             PreviousButtons = input.Buttons;
         }
 
-        private Vector3 GetMoveDirection(Vector2 movementInput)
+        private void UpdateJumpTimers(GameplayInput input)
         {
-            var direction = orientation.forward * movementInput.y + orientation.right * movementInput.x;
+            if (IsGrounded)
+                _coyoteTimer = coyoteTime;
+            else
+                _coyoteTimer -= Runner.DeltaTime;
+
+            if (input.Buttons.WasPressed(
+                    PreviousButtons,
+                    InputButton.Jump))
+            {
+                _jumpBufferTimer = jumpBufferTime;
+            }
+            else
+            {
+                _jumpBufferTimer -= Runner.DeltaTime;
+            }
+
+            _coyoteTimer = Mathf.Max(
+                _coyoteTimer,
+                0f
+            );
+
+            _jumpBufferTimer = Mathf.Max(
+                _jumpBufferTimer,
+                0f
+            );
+        }
+
+        private Vector3 GetMoveDirection(
+            Vector2 movementInput
+        )
+        {
+            var direction =
+                orientation.forward * movementInput.y +
+                orientation.right * movementInput.x;
+
             direction.y = 0f;
+
             if (direction.sqrMagnitude > 1f)
                 direction.Normalize();
 
             return direction;
         }
 
-        private float HandleJump(GameplayInput input, ref Vector3 movementVelocity)
+        private float HandleJump(
+            GameplayInput input,
+            ref Vector3 movementVelocity
+        )
         {
-            if (!input.Buttons.WasPressed(PreviousButtons, InputButton.Jump))
+            bool jumpRequested =
+                _jumpBufferTimer > 0f;
+
+            if (!jumpRequested)
                 return 0f;
 
             if (IsWallRunning && _wallRun != null)
             {
-                _horizontalVelocity += _wallRun.GetWallJumpHorizontalImpulse();
-                movementVelocity = _horizontalVelocity;
+                _jumpBufferTimer = 0f;
+
+                _horizontalVelocity +=
+                    _wallRun.GetWallJumpHorizontalImpulse();
+
+                movementVelocity =
+                    _horizontalVelocity;
+
                 _wallRun.StopWallRunFromJump();
+
                 JumpSequence++;
                 JumpAnimationActive = true;
+
                 return _wallRun.WallJumpVerticalForce;
             }
 
-            if (IsGrounded)
+            bool canGroundJump =
+                IsGrounded ||
+                _coyoteTimer > 0f;
+
+            if (canGroundJump &&
+                !IsClimbing)
             {
-                if (IsSliding && _slide != null)
+                _jumpBufferTimer = 0f;
+                _coyoteTimer = 0f;
+
+                if (IsSliding &&
+                    _slide != null)
+                {
                     _slide.StopSlideFromJump();
+                }
 
                 JumpSequence++;
                 JumpAnimationActive = true;
+
                 return JumpForce;
             }
 
             return 0f;
         }
 
-        private void GroundMovement(Vector3 moveDirection)
+        private void GroundMovement(
+            Vector3 moveDirection
+        )
         {
             if (moveDirection.sqrMagnitude > 0.01f)
             {
-                var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(
-                    _horizontalVelocity,
-                    targetVelocity,
-                    movementMultiplier * Runner.DeltaTime
-                );
+                var targetVelocity =
+                    moveDirection * moveSpeed;
+
+                _horizontalVelocity =
+                    Vector3.Lerp(
+                        _horizontalVelocity,
+                        targetVelocity,
+                        movementMultiplier *
+                        Runner.DeltaTime
+                    );
             }
             else
             {
-                _horizontalVelocity = Vector3.Lerp(
-                    _horizontalVelocity,
-                    Vector3.zero,
-                    groundDrag * Runner.DeltaTime
-                );
+                _horizontalVelocity =
+                    Vector3.Lerp(
+                        _horizontalVelocity,
+                        Vector3.zero,
+                        groundDrag *
+                        Runner.DeltaTime
+                    );
             }
         }
 
-        private void AirMovement(Vector3 moveDirection)
+        private void AirMovement(
+            Vector3 moveDirection
+        )
         {
             if (moveDirection.sqrMagnitude > 0.01f)
             {
-                var targetVelocity = moveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(
-                    _horizontalVelocity,
-                    targetVelocity,
-                    movementMultiplier * AirMultiplier * Runner.DeltaTime
-                );
+                var targetVelocity =
+                    moveDirection * moveSpeed;
+
+                _horizontalVelocity =
+                    Vector3.Lerp(
+                        _horizontalVelocity,
+                        targetVelocity,
+                        movementMultiplier *
+                        AirMultiplier *
+                        Runner.DeltaTime
+                    );
             }
 
             if (airDrag > 0f)
             {
-                _horizontalVelocity = Vector3.Lerp(
-                    _horizontalVelocity,
-                    Vector3.zero,
-                    airDrag * Runner.DeltaTime
-                );
+                _horizontalVelocity =
+                    Vector3.Lerp(
+                        _horizontalVelocity,
+                        Vector3.zero,
+                        airDrag *
+                        Runner.DeltaTime
+                    );
             }
         }
 
-        private void WallRunMovement(Vector3 moveDirection)
+        private void WallRunMovement(
+            Vector3 moveDirection
+        )
         {
-            var wallMoveDirection = _wallRun.GetWallRunDirection(moveDirection);
+            var wallMoveDirection =
+                _wallRun.GetWallRunDirection(
+                    moveDirection
+                );
 
             if (wallMoveDirection.sqrMagnitude > 0.01f)
             {
-                var targetVelocity = wallMoveDirection * moveSpeed;
-                _horizontalVelocity = Vector3.Lerp(
-                    _horizontalVelocity,
-                    targetVelocity,
-                    movementMultiplier * AirMultiplier * Runner.DeltaTime
-                );
+                var targetVelocity =
+                    wallMoveDirection * moveSpeed;
+
+                _horizontalVelocity =
+                    Vector3.Lerp(
+                        _horizontalVelocity,
+                        targetVelocity,
+                        movementMultiplier *
+                        AirMultiplier *
+                        Runner.DeltaTime
+                    );
             }
 
-            _horizontalVelocity = _wallRun.GetWallRunVelocity(
-                _horizontalVelocity
-            );
+            _horizontalVelocity =
+                _wallRun.GetWallRunVelocity(
+                    _horizontalVelocity
+                );
         }
 
         private void SlideMovement()
         {
-            _horizontalVelocity = Vector3.Lerp(
-                _horizontalVelocity,
-                Vector3.zero,
-                slideDrag * Runner.DeltaTime
-            );
+            _horizontalVelocity =
+                Vector3.Lerp(
+                    _horizontalVelocity,
+                    Vector3.zero,
+                    slideDrag *
+                    Runner.DeltaTime
+                );
         }
 
-        private void ControlSpeed(GameplayInput input)
+        private void ControlSpeed(
+            GameplayInput input
+        )
         {
-            float speedMultiplier = Mathf.Max(1f, SpeedBoostMultiplier);
-            float targetSpeed = IsGrounded switch
-            {
-                true when IsCrouching && !IsSliding => crouchSpeed * speedMultiplier,
-                true when input.Buttons.IsSet(InputButton.SprintHeld) => SprintSpeed * speedMultiplier,
-                _ => walkSpeed * speedMultiplier
-            };
+            float speedMultiplier =
+                Mathf.Max(
+                    1f,
+                    SpeedBoostMultiplier
+                );
 
-            moveSpeed = Mathf.Lerp(
-                moveSpeed,
-                targetSpeed,
-                acceleration * Runner.DeltaTime
-            );
+            float targetSpeed =
+                IsGrounded switch
+                {
+                    true when
+                        IsCrouching &&
+                        !IsSliding =>
+                        crouchSpeed *
+                        speedMultiplier,
+
+                    true when
+                        input.Buttons.IsSet(
+                            InputButton.SprintHeld
+                        ) =>
+                        SprintSpeed *
+                        speedMultiplier,
+
+                    _ =>
+                        walkSpeed *
+                        speedMultiplier
+                };
+
+            moveSpeed =
+                Mathf.Lerp(
+                    moveSpeed,
+                    targetSpeed,
+                    acceleration *
+                    Runner.DeltaTime
+                );
         }
 
-        public void AddSlideImpulse(Vector3 direction, float force)
+        public void AddSlideImpulse(
+            Vector3 direction,
+            float force
+        )
         {
-            _horizontalVelocity += direction.normalized * force;
+            _horizontalVelocity +=
+                direction.normalized *
+                force;
         }
 
         public void ClearMovementVelocity()
         {
-            _horizontalVelocity = Vector3.zero;
+            _horizontalVelocity =
+                Vector3.zero;
         }
 
-        public void SetGravity(float gravity)
+        public void ResetKCCMovement()
         {
-            _kcc?.SetGravity(gravity);
+            if (_kcc == null)
+                return;
+
+            _kcc.SetPosition(
+                _kcc.Position
+            );
+        }
+
+        public void SetGravity(
+            float gravity
+        )
+        {
+            _kcc?.SetGravity(
+                gravity
+            );
         }
 
         internal void ApplyJumpBoost(
@@ -277,41 +434,57 @@ namespace _Experimenation.Fraser.Scripts
             if (!HasStateAuthority)
                 return;
 
-            NetworkedJumpForce = Mathf.Min(
-                maxJumpForce,
-                DefaultJumpForce + DefaultJumpForce * boostMultiplier
-            );
+            NetworkedJumpForce =
+                Mathf.Min(
+                    maxJumpForce,
+                    DefaultJumpForce +
+                    DefaultJumpForce *
+                    boostMultiplier
+                );
         }
 
-        internal void ApplyDashBoost(float boostMultiplier)
+        internal void ApplyDashBoost(
+            float boostMultiplier
+        )
         {
             if (!HasStateAuthority)
                 return;
 
-            NetworkedSprintSpeed = Mathf.Min(
-                maxMoveSpeed,
-                defaultSprintSpeed + defaultSprintSpeed * boostMultiplier
-            );
+            NetworkedSprintSpeed =
+                Mathf.Min(
+                    maxMoveSpeed,
+                    defaultSprintSpeed +
+                    defaultSprintSpeed *
+                    boostMultiplier
+                );
         }
 
-        internal void ApplyAerialControlBoost(float boostMultiplier)
+        internal void ApplyAerialControlBoost(
+            float boostMultiplier
+        )
         {
             if (!HasStateAuthority)
                 return;
 
-            NetworkedAerialMultiplier = Mathf.Min(
-                defaultAirMultiplier * 2,
-                defaultAirMultiplier + defaultAirMultiplier * boostMultiplier
-            );
+            NetworkedAerialMultiplier =
+                Mathf.Min(
+                    defaultAirMultiplier * 2,
+                    defaultAirMultiplier +
+                    defaultAirMultiplier *
+                    boostMultiplier
+                );
         }
 
-        internal void ApplyAgilityBoost(float boostMultiplier)
+        internal void ApplyAgilityBoost(
+            float boostMultiplier
+        )
         {
             if (!HasStateAuthority)
                 return;
 
             NetworkedAgilityMultiplier +=
-                NetworkedAgilityMultiplier * boostMultiplier;
+                NetworkedAgilityMultiplier *
+                boostMultiplier;
         }
     }
 }
