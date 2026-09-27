@@ -291,8 +291,17 @@ namespace _Experimenation.Fraser.Scripts
         {
             if (moveDirection.sqrMagnitude > 0.01f)
             {
-                var targetVelocity =
-                    moveDirection * moveSpeed;
+                float currentSpeed =
+                    _horizontalVelocity.magnitude;
+
+                float targetSpeed =
+                    Mathf.Max(
+                        moveSpeed,
+                        currentSpeed
+                    );
+
+                Vector3 targetVelocity =
+                    moveDirection * targetSpeed;
 
                 _horizontalVelocity =
                     Vector3.Lerp(
