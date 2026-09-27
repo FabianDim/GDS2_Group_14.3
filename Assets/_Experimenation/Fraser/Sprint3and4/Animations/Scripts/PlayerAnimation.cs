@@ -9,6 +9,8 @@ namespace _Experimenation.Fraser.Scripts
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private Animator thirdPersonAnimator;
         [SerializeField] private GameObject thirdPersonVisual;
+        [SerializeField] private Animator firstPersonAnimator;
+        [SerializeField] private GameObject firstPersonVisual;
 
         [Header("Movement Speeds")]
         [SerializeField] private float walkingSpeed = 10f;
@@ -46,6 +48,9 @@ namespace _Experimenation.Fraser.Scripts
 
             if (thirdPersonVisual != null)
                 thirdPersonVisual.SetActive(!HasInputAuthority);
+
+            if (firstPersonVisual != null)
+                firstPersonVisual.SetActive(HasInputAuthority);
         }
 
         public override void FixedUpdateNetwork()
@@ -70,7 +75,7 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void Render()
         {
-            if (thirdPersonAnimator == null)
+            if (playerMovement == null)
                 return;
 
             float animationSpeed = NetworkedAnimationSpeed;
@@ -81,7 +86,7 @@ namespace _Experimenation.Fraser.Scripts
             bool jumpAnimationActive = NetworkedJumpAnimationActive;
             bool isClimbing = NetworkedIsClimbing;
 
-            if (HasInputAuthority && playerMovement != null)
+            if (HasInputAuthority)
             {
                 float horizontalSpeed = playerMovement.HorizontalSpeed;
 
@@ -98,35 +103,79 @@ namespace _Experimenation.Fraser.Scripts
                 isClimbing = playerMovement.IsClimbing;
             }
 
-            thirdPersonAnimator.SetFloat(
+            if (thirdPersonAnimator != null && !HasInputAuthority)
+            {
+                UpdateAnimator(
+                    thirdPersonAnimator,
+                    animationSpeed,
+                    crouchSpeed,
+                    isSliding,
+                    isCrouching,
+                    isAirborne,
+                    jumpAnimationActive,
+                    isClimbing
+                );
+            }
+
+            if (firstPersonAnimator != null && HasInputAuthority)
+            {
+                UpdateAnimator(
+                    firstPersonAnimator,
+                    animationSpeed,
+                    crouchSpeed,
+                    isSliding,
+                    isCrouching,
+                    isAirborne,
+                    jumpAnimationActive,
+                    isClimbing
+                );
+            }
+
+            if (playerMovement.JumpSequence != _lastJumpSequence)
+            {
+                _lastJumpSequence = playerMovement.JumpSequence;
+
+                if (thirdPersonAnimator != null && !HasInputAuthority)
+                    thirdPersonAnimator.SetTrigger(JumpHash);
+
+                if (firstPersonAnimator != null && HasInputAuthority)
+                    firstPersonAnimator.SetTrigger(JumpHash);
+            }
+        }
+
+        private void UpdateAnimator(
+            Animator animator,
+            float animationSpeed,
+            float crouchSpeed,
+            bool isSliding,
+            bool isCrouching,
+            bool isAirborne,
+            bool jumpAnimationActive,
+            bool isClimbing
+        )
+        {
+            animator.SetFloat(
                 SpeedHash,
                 animationSpeed,
                 animatorDampTime,
                 Time.deltaTime
             );
 
-            thirdPersonAnimator.SetFloat(
+            animator.SetFloat(
                 CrouchSpeedHash,
                 crouchSpeed,
                 animatorDampTime,
                 Time.deltaTime
             );
 
-            thirdPersonAnimator.SetBool(IsSlidingHash, isSliding);
-            thirdPersonAnimator.SetBool(IsCrouchingHash, isCrouching);
-            thirdPersonAnimator.SetBool(IsAirborneHash, isAirborne);
-            thirdPersonAnimator.SetBool(
+            animator.SetBool(IsSlidingHash, isSliding);
+            animator.SetBool(IsCrouchingHash, isCrouching);
+            animator.SetBool(IsAirborneHash, isAirborne);
+            animator.SetBool(
                 JumpAnimationActiveHash,
                 jumpAnimationActive
             );
-            thirdPersonAnimator.SetBool(IsClimbingHash, isClimbing);
-
-            if (playerMovement != null &&
-                playerMovement.JumpSequence != _lastJumpSequence)
-            {
-                _lastJumpSequence = playerMovement.JumpSequence;
-                thirdPersonAnimator.SetTrigger(JumpHash);
-            }
+            animator.SetBool(IsClimbingHash, isClimbing);
         }
 
         private float ConvertSpeedToAnimatorValue(float horizontalSpeed)
