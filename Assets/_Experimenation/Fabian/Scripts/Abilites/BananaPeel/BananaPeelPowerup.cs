@@ -24,7 +24,7 @@ namespace _Experimenation.Fabian.Scripts.Abilites
 
             if (bananaPeelSpawner == null)
             {
-                Debug.LogError("BananaPeelPowerup: Player is missing BananaPeelNetworkSpawner.");
+                UnityEngine.Debug.LogError("BananaPeelPowerup: Player is missing BananaPeelNetworkSpawner.");
                 return;
             }
 
