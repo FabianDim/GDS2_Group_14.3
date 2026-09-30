@@ -66,7 +66,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
             else
             {
                 gameData.CurrentRound++;
-                Runner.LoadScene(SceneRef.FromIndex(1));
+                Runner.LoadScene(SceneManager.GetActiveScene().name);
             }
         }
 
@@ -92,7 +92,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
             try
             {
                 await Runner.Shutdown();
-                SceneManager.LoadScene(2);
+                SceneManager.LoadScene("_Project/Scenes/Game Over");
             }
             catch (Exception e)
             {
