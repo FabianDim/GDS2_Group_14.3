@@ -378,27 +378,6 @@ namespace _Experimenation.Fraser.Scripts
                 _ => walkSpeed * speedMultiplier
             };
 
-            float targetSpeed =
-                IsGrounded switch
-                {
-                    true when
-                        IsCrouching &&
-                        !IsSliding =>
-                        crouchSpeed *
-                        speedMultiplier,
-
-                    true when
-                        input.Buttons.IsSet(
-                            InputButton.SprintHeld
-                        ) =>
-                        SprintSpeed *
-                        speedMultiplier,
-
-                    _ =>
-                        walkSpeed *
-                        speedMultiplier
-                };
-
             moveSpeed =
                 Mathf.Lerp(
                     moveSpeed,
