@@ -37,7 +37,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
                     playerCamera.tag = "MainCamera";
                     playerCamera.enabled = true;
 
-                    var compass = FindAnyObjectByType<TargetIndicators.TargetIndicatorManager>();
+                    var compass = FindAnyObjectByType<TargetIndicators.TargetIndicatorManager>(FindObjectsInactive.Include);
 
                     if (compass != null)
                     {
@@ -51,7 +51,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
                 audioListener.enabled = isLocalPlayer;
 
             if (isLocalPlayer)
-                _compassSetup = FindAnyObjectByType<CompassTapeTargetIndicatorsSetupExample>();
+                _compassSetup = FindAnyObjectByType<CompassTapeTargetIndicatorsSetupExample>(FindObjectsInactive.Include);
 
             // The second player to spawn links both sides, regardless of spawn order.
             foreach (var player in FindObjectsByType<Player>())
@@ -59,7 +59,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
                 if (player == this || player.Object == null || !player.Object.IsValid)
                     continue;
 
-                Debug.Log($"Found the second player: [{OtherPlayer.name}]");
+                Debug.Log($"Found the second player: [{player.name}]");
 
                 OtherPlayer = player;
                 player.OtherPlayer = this;
@@ -90,8 +90,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
             if (OtherPlayer == null)
             {
                 Debug.Log($"The other player is NULL");
-                return;
             }
+            // A null target also clears the marker when the other player despawns.
             if (_compassSetup != null)
                 _compassSetup.SetTarget(OtherPlayer != null ? OtherPlayer.transform : null);
         }
