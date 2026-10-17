@@ -35,6 +35,7 @@ namespace _Experimenation.Fraser.Scripts
 
         private float _maximumClimbHeight;
         private float _previousClimbHeight;
+        private float _verticalVelocityCompensation;
 
         private RaycastHit _wallHit;
         private RaycastHit _lowerWallHit;
@@ -155,6 +156,9 @@ namespace _Experimenation.Fraser.Scripts
             if (IsClimbing)
                 return;
 
+            _verticalVelocityCompensation =
+                -_playerMovement.VerticalSpeed;
+
             IsClimbing = true;
             _playerMovement.IsClimbing = true;
 
@@ -178,6 +182,8 @@ namespace _Experimenation.Fraser.Scripts
             IsClimbing = false;
             _playerMovement.IsClimbing = false;
 
+            _verticalVelocityCompensation = 0f;
+
             _playerMovement.SetGravity(
                 _playerMovement.NormalGravity
             );
@@ -189,6 +195,8 @@ namespace _Experimenation.Fraser.Scripts
 
             IsClimbing = false;
             _playerMovement.IsClimbing = false;
+
+            _verticalVelocityCompensation = 0f;
 
             _playerMovement.ClearMovementVelocity();
 
@@ -241,7 +249,8 @@ namespace _Experimenation.Fraser.Scripts
                 climbSideSpeed;
 
             Vector3 climbVelocity =
-                Vector3.up * climbSpeed;
+                Vector3.up *
+                (climbSpeed + _verticalVelocityCompensation);
 
             Vector3 wallVelocity =
                 -currentWallHit.normal *

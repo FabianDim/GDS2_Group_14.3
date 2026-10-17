@@ -21,6 +21,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
         [SerializeField] private TMP_InputField roomId;
         [SerializeField] private TextMeshProUGUI multiplayerLog;
         [SerializeField] private TextMeshProUGUI username;
+        [SerializeField] private TMP_InputField numberOfRounds;
+        [SerializeField] private TMP_InputField roundDuration;
 
         private NetworkRunner _networkRunner;
         private bool _gameStarted;
@@ -103,7 +105,14 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         public override void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            runner.Spawn(gameDataPrefab).SetUsername(username.text);
+            var gameData = runner.Spawn(gameDataPrefab);
+            gameData.SetUsername(username.text);
+
+            var nRound = int.Parse(numberOfRounds.text);
+            gameData.numberOfRounds = nRound % 2 == 0 ? nRound : nRound + 1;
+            
+            var duration = int.Parse(roundDuration.text);
+            if(duration > gameData.roundDuration) gameData.roundDuration = duration;
 
             // Only the scene authority (the host, in Host Mode) decides when
             // the match is ready to transition.

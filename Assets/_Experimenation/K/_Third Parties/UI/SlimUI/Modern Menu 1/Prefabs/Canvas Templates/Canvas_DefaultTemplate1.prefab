@@ -22863,9 +22863,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.K.Multiplayer.Scripts.MenuConnector
   runnerPrefab: {fileID: 5541435066032819259, guid: cbc6396a57c1d6246a098fa41c630735, type: 3}
+  gameDataPrefab: {fileID: 0}
+  targetFrameRate: 60
   connectionText: {fileID: 0}
   roomId: {fileID: 0}
   multiplayerLog: {fileID: 0}
+  username: {fileID: 0}
 --- !u!114 &5267087213616333551
 MonoBehaviour:
   m_ObjectHideFlags: 0
