@@ -5,11 +5,14 @@ using _Experimenation.K.Game_Manager.Scripts;
 using Fusion;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace _Experimenation.K.Multiplayer.Scripts
 {
     public class MenuConnector : MonoRunnerCallbacks
     {
+        private const string GameplayScenePath = "Assets/_Project/Scenes/Multiplayer Test Scene.unity";
+
         [SerializeField] private NetworkRunner runnerPrefab;
         [SerializeField] private GameData gameDataPrefab;
 
@@ -25,8 +28,10 @@ namespace _Experimenation.K.Multiplayer.Scripts
         [SerializeField] private TMP_InputField roundDuration;
 
         private NetworkRunner _networkRunner;
+        private GameData _gameData;
         private bool _gameStarted;
         private bool _callbacksRegistered;
+        private int _gameplaySceneIndex;
 
         private void Awake()
         {
@@ -49,18 +54,33 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private async void Connect(GameMode mode)
         {
+            // A second click must not create a competing runner for this menu.
+            if (_networkRunner != null && !_networkRunner.IsShutdown) return;
+
             try
             {
                 await StartGame(mode);
             }
             catch (Exception e)
             {
+                SetConnectionStatus("Connection failed. See the Console for details.");
                 Debug.LogError(e);
             }
         }
 
         private async Task StartGame(GameMode mode)
         {
+            _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(GameplayScenePath);
+            if (_gameplaySceneIndex < 0)
+            {
+                SetConnectionStatus("Cannot start: gameplay scene is missing from the build.");
+                Debug.LogError($"Enable {GameplayScenePath} in the build scene list.");
+                return;
+            }
+
+            _gameStarted = false;
+            _gameData = null;
+            SetConnectionStatus(mode == GameMode.Host ? "Creating room..." : "Joining room...");
             _networkRunner = Instantiate(runnerPrefab);
             _networkRunner.name = "Network Runner";
             _networkRunner.AddCallbacks(this);
@@ -80,13 +100,31 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             if (!result.Ok)
             {
+                SetConnectionStatus($"Connection failed: {result.ShutdownReason}");
                 Debug.LogError($"Failed to start: {result.ShutdownReason}");
+            }
+            else
+            {
+                Debug.Log($"Connected as {mode} to room '{_networkRunner.SessionInfo.Name}' " +
+                          $"in region '{_networkRunner.SessionInfo.Region}'.");
+                if (!_gameStarted)
+                    SetConnectionStatus(mode == GameMode.Host
+                        ? "Waiting for the other player"
+                        : "Connected. Waiting for the host to start the match...");
             }
         }
 
         public override void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
+            SetConnectionStatus($"Disconnected: {shutdownReason}");
+            Debug.Log($"Menu connection shut down: {shutdownReason}");
             RemoveRunnerCallbacks(runner);
+        }
+
+        private void SetConnectionStatus(string message)
+        {
+            if (connectionText != null)
+                connectionText.SetText(message);
         }
 
         private void OnDestroy()
@@ -105,26 +143,39 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         public override void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            var gameData = runner.Spawn(gameDataPrefab);
-            gameData.SetUsername(username.text);
+            Debug.Log($"{player} joined. Host: {runner.IsServer}, players: {runner.ActivePlayers.Count()}/2.");
+            // Host Mode clients receive GameData through replication; they cannot
+            // spawn it. This callback also runs again when another player joins.
+            if (!runner.IsServer || _gameStarted) return;
 
-            var nRound = int.Parse(numberOfRounds.text);
-            gameData.numberOfRounds = nRound % 2 == 0 ? nRound : nRound + 1;
-            
-            var duration = int.Parse(roundDuration.text);
-            if(duration > gameData.roundDuration) gameData.roundDuration = duration;
+            if (_gameData == null)
+            {
+                _gameData = runner.Spawn(gameDataPrefab);
+                _gameData.SetUsername(username.text ?? $"Player_{runner.ActivePlayers.Count()}");
+
+                // Empty/invalid inputs keep the prefab defaults instead of aborting
+                // the join callback. The match requires an even number of rounds.
+                if (numberOfRounds != null && int.TryParse(numberOfRounds.text, out var nRound) &&
+                    nRound > 0 && nRound < int.MaxValue)
+                    _gameData.numberOfRounds = nRound % 2 == 0 ? nRound : nRound + 1;
+
+                if (roundDuration != null && int.TryParse(roundDuration.text, out var duration) &&
+                    duration > _gameData.roundDuration)
+                    _gameData.roundDuration = duration;
+            }
 
             // Only the scene authority (the host, in Host Mode) decides when
             // the match is ready to transition.
-            if (_gameStarted || !runner.IsServer) return;
             if (runner.ActivePlayers.Count() < 2)
             {
-                connectionText.SetText("Waiting for the other player");
+                SetConnectionStatus("Waiting for the other player");
                 return;
             }
 
             _gameStarted = true;
-            runner.LoadScene(SceneRef.FromIndex(1));
+            SetConnectionStatus("Both players connected. Loading match...");
+            Debug.Log($"Loading gameplay scene '{GameplayScenePath}' (build index {_gameplaySceneIndex}).");
+            runner.LoadScene(SceneRef.FromIndex(_gameplaySceneIndex));
         }
     }
 }
