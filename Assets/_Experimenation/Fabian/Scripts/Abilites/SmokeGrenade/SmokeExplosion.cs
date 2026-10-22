@@ -17,6 +17,9 @@ public class SmokeExplosion : NetworkBehaviour
     public override void Spawned()
     {
         countDown = smokeExplosionDelay;
+        // Only the host simulates the projectile; NetworkTransform replicates it.
+        if (TryGetComponent<Rigidbody>(out var body))
+            body.isKinematic = !HasStateAuthority;
     }
 
     public override void FixedUpdateNetwork()

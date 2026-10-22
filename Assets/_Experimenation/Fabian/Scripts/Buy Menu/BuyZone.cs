@@ -7,19 +7,35 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 {
     public class BuyZone : MonoBehaviour
     {
-        private void Awake() => EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
-        private void OnDestroy() => EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
-        
+        private bool _shopOpen;
+
+        private void OnEnable() => EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+
+        private void OnDisable()
+        {
+            EventBus.Unsubscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
+            // PhaseManager disables the buy-phase objects before raising its event.
+            if (_shopOpen)
+                ExitShop();
+        }
+
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.GetComponentInParent<Player>()) return;
+            var player = other.GetComponentInParent<Player>();
+            if (player == null || player.Object == null || !player.Object.IsValid ||
+                !player.HasInputAuthority)
+                return;
+
+            _shopOpen = true;
             EventBus.Raise(new BuyZoneEnteredEvent(true));
         }
-        
-        public void ExitShop() => 
+
+        public void ExitShop()
+        {
+            _shopOpen = false;
             EventBus.Raise(new BuyZoneEnteredEvent(false));
-        
-        private void OnRunPhaseStarts(RunPhaseStartsEvent ev) => 
-            EventBus.Raise(new BuyZoneEnteredEvent(false));
+        }
+
+        private void OnRunPhaseStarts(RunPhaseStartsEvent ev) => ExitShop();
     }
 }

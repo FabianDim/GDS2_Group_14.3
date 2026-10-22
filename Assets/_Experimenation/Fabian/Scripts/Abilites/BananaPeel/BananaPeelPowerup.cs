@@ -1,46 +1,25 @@
-using _Experimenation.Fraser.Scripts;
+using System;
 using _Experimenation.K.Multiplayer.Scripts;
 using _Project.Abilities.Scripts;
 using UnityEngine;
 
 namespace _Experimenation.Fabian.Scripts.Abilites
 {
-    [System.Serializable]
+    [Serializable]
     public class BananaPeelPowerup : AbilityEffect
     {
-        RaycastHit hit;
-
-        private PlayerMovement _playerMovement;
+        [SerializeField] private GameObject bananaPeelPrefab;
 
         public override void ApplyEffect(Player target)
         {
-            _playerMovement = target != null ? target.GetComponent<PlayerMovement>() : null;
+            if (bananaPeelPrefab == null)
+                throw new InvalidOperationException("Banana peel prefab is not assigned.");
 
-            var closestGround = RayCastForGround();
-
-            var bananaPeelSpawner = target != null
-                ? target.GetComponent<BananaPeelNetworkSpawner>()
-                : null;
-
-            if (bananaPeelSpawner == null)
-            {
-                UnityEngine.Debug.LogError("BananaPeelPowerup: Player is missing BananaPeelNetworkSpawner.");
-                return;
-            }
-
-            bananaPeelSpawner.SpawnTheBanana(closestGround);
-
-            return;
-        }
-
-        public Vector3 RayCastForGround()
-        {
-            if (_playerMovement == null)
-                return Vector3.zero;
-
-            Ray ray = new Ray(_playerMovement.transform.position, Vector3.down);
-            return Physics.Raycast(ray, out hit) ? hit.point : Vector3.zero;
+            var position = target.transform.position - target.transform.forward * 1.5f;
+            if (Physics.Raycast(position + Vector3.up, Vector3.down, out var hit, 10f))
+                position = hit.point;
+            target.Runner.Spawn(bananaPeelPrefab, position + Vector3.up * 0.1f,
+                Quaternion.identity, target.Object.InputAuthority);
         }
     }
-
 }
