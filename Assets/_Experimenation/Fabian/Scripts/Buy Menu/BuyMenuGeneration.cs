@@ -52,7 +52,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             // its Spawned callbacks before releasing the cursor and gameplay input.
             yield return new WaitUntil(() => FindLocalPlayer() != null);
             if (isActiveAndEnabled && _visible && _phase != null && !_phase.IsRunPhase)
-                EventBus.Raise(new BuyZoneEnteredEvent(true));
+                EventBus.Raise(new BuyZoneEnteredEvent(false));
         }
 
         private static Player FindLocalPlayer()
