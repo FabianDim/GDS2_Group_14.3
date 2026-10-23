@@ -121812,6 +121812,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BuyMenuScreenBlock
       objectReference: {fileID: 0}
+    - target: {fileID: 6478412720591275776, guid: 1df1e6461a66b2b42bd228f4dfb77a7d, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7034831948968904775, guid: 1df1e6461a66b2b42bd228f4dfb77a7d, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -121900,16 +121904,49 @@ PrefabInstance:
       propertyPath: p2BuyMenuLocation
       value: 
       objectReference: {fileID: 1705226484}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4622414222503501305, guid: 1df1e6461a66b2b42bd228f4dfb77a7d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1801085458993069608, guid: 1df1e6461a66b2b42bd228f4dfb77a7d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2020913712}
   m_SourcePrefab: {fileID: 100100000, guid: 1df1e6461a66b2b42bd228f4dfb77a7d, type: 3}
 --- !u!224 &2020913710 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7034831948968904775, guid: 1df1e6461a66b2b42bd228f4dfb77a7d, type: 3}
   m_PrefabInstance: {fileID: 2020913709}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2020913711 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1801085458993069608, guid: 1df1e6461a66b2b42bd228f4dfb77a7d, type: 3}
+  m_PrefabInstance: {fileID: 2020913709}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2020913712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020913711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 150, y: 150}
+  m_Spacing: {x: 50, y: 50}
+  m_Constraint: 0
+  m_ConstraintCount: 2
 --- !u!1001 &2021756486
 PrefabInstance:
   m_ObjectHideFlags: 0

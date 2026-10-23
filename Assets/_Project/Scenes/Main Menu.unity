@@ -11678,14 +11678,14 @@ MonoBehaviour:
   themeController: {fileID: 11400000, guid: e00c7d2bc58a2424b8dc09ecdafdb067, type: 2}
   mainCanvas: {fileID: 353375068840521855}
   PanelControls: {fileID: 353351800789438993}
-  PanelVideo: {fileID: 0}
+  PanelVideo: {fileID: 352560970389203847}
   PanelGame: {fileID: 352418612358508793}
   PanelKeyBindings: {fileID: 352060822911530495}
   PanelMovement: {fileID: 352856238332892675}
   PanelCombat: {fileID: 352560970389203847}
   PanelGeneral: {fileID: 352519589753778103}
   lineGame: {fileID: 352407967741610237}
-  lineVideo: {fileID: 0}
+  lineVideo: {fileID: 352684057577387817}
   lineControls: {fileID: 352470063294179997}
   lineKeyBindings: {fileID: 352830209471725251}
   lineMovement: {fileID: 353453019342535171}
