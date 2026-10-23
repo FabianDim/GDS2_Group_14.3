@@ -11,7 +11,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
 {
     public class MenuConnector : MonoRunnerCallbacks
     {
-        private const string GameplayScenePath = "Assets/_Project/Scenes/Multiplayer Test Scene.unity";
+        [SerializeField] private string gameplayScenePath;
 
         [SerializeField] private NetworkRunner runnerPrefab;
         [SerializeField] private GameData gameDataPrefab;
@@ -70,11 +70,11 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private async Task StartGame(GameMode mode)
         {
-            _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(GameplayScenePath);
+            _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(gameplayScenePath);
             if (_gameplaySceneIndex < 0)
             {
                 SetConnectionStatus("Cannot start: gameplay scene is missing from the build.");
-                Debug.LogError($"Enable {GameplayScenePath} in the build scene list.");
+                Debug.LogError($"Enable {gameplayScenePath} in the build scene list.");
                 return;
             }
 
@@ -174,7 +174,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             _gameStarted = true;
             SetConnectionStatus("Both players connected. Loading match...");
-            Debug.Log($"Loading gameplay scene '{GameplayScenePath}' (build index {_gameplaySceneIndex}).");
+            Debug.Log($"Loading gameplay scene '{gameplayScenePath}' (build index {_gameplaySceneIndex}).");
             runner.LoadScene(SceneRef.FromIndex(_gameplaySceneIndex));
         }
     }
