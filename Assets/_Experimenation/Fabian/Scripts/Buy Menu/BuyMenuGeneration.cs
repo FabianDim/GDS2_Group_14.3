@@ -23,7 +23,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
         private TMP_Text _timer;
         private TMP_Text _role;
         private PhaseManager _phase;
-        private bool _visible = true;
+        private bool _visible = false;
 
         private void Awake()
         {
