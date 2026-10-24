@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3e69b8f7e444ec9960dcc5c3e54336, type: 3}
   m_Name: BananaPeel
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.Ability
-  abilityName: Banana Peel
+  abilityName: Banana peel
   abilitySprite: {fileID: 0}
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
-  abilityType: 1
+  abilityType: 2
   abilityScope: 1
-  abilityDescription: Drop a object behind you to slow down the chaser.
+  abilityDescription: Drop a trap behind you to slow the opposing player.
   effects:
   - rid: 7367326343231963225
   abilityPrice: 0
@@ -26,4 +26,5 @@ MonoBehaviour:
     RefIds:
     - rid: 7367326343231963225
       type: {class: BananaPeelPowerup, ns: _Experimenation.Fabian.Scripts.Abilites, asm: Assembly-CSharp}
-      data: 
+      data:
+        bananaPeelPrefab: {fileID: 8714437318731189684, guid: 74e070f7c6b9fa548a829d922e657d0b, type: 3}

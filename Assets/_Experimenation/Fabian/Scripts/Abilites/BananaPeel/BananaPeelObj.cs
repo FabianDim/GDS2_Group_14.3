@@ -9,13 +9,14 @@ public class BananaPeelObj : NetworkBehaviour
     [SerializeField, Range(0.1f, 1f)] private float speedMultiplier = 0.5f;
     [SerializeField] private float hindranceDuration = 3f;
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
         if (!HasStateAuthority)
             return;
 
-        var player = collision.collider.GetComponentInParent<Player>();
-        if (player == null)
+        var player = other.GetComponentInParent<Player>();
+        if (player == null || player.Object == null ||
+            player.Object.InputAuthority == Object.InputAuthority)
             return;
 
         var playerMovement = player.GetComponent<PlayerMovement>();
@@ -23,5 +24,6 @@ public class BananaPeelObj : NetworkBehaviour
             return;
 
         playerMovement.ApplySpeedHindrance(speedMultiplier, hindranceDuration);
+        Runner.Despawn(Object);
     }
 }

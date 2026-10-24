@@ -30,7 +30,13 @@ namespace _Experimenation.Fraser.Scripts
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            if (!HasInputAuthority) return;
+            // Authority may already be cleared during a round's scene unload.
+            // Always remove the old camera handler from the static event bus.
+            EventBus.Unsubscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
+        }
+
+        private void OnDestroy()
+        {
             EventBus.Unsubscribe<BuyZoneEnteredEvent>(OnBuyZoneEntered);
         }
 

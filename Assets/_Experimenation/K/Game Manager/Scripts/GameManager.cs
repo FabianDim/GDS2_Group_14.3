@@ -79,6 +79,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
             if (!TryGetHostAndClient(runner, out var host, out var client))
                 return;
 
+            GameData.Instance?.ResetRoundPurchases();
             var hostObject = SpawnPlayer(runner, host, HostSpawnPointIndex);
             var clientObject = SpawnPlayer(runner, client, ClientSpawnPointIndex);
 
