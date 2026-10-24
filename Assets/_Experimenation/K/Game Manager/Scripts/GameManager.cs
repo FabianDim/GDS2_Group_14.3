@@ -15,7 +15,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private const int ExpectedPlayerCount = 2;
         private const int HostSpawnPointIndex = 0;
         private const int ClientSpawnPointIndex = 1;
-        private const int MenuSceneIndex = 0;
+        private const int MenuSceneIndex = 1;
 
         [Header("Player Spawning")]
         [SerializeField] private NetworkPrefabRef playerPrefab;
