@@ -418,7 +418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Experimenation.Fraser.Scripts.PlayerAnimation
   playerMovement: {fileID: 3241989403578629798}
-  thirdPersonAnimator: {fileID: 0}
+  thirdPersonAnimator: {fileID: 4502385004652882098}
   thirdPersonVisual: {fileID: 7492360408693642603}
   firstPersonAnimator: {fileID: 3425914222670068142}
   firstPersonVisual: {fileID: 8663942174972384942}
@@ -2260,6 +2260,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1745179449011267940}
   m_SourcePrefab: {fileID: 100100000, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
+--- !u!95 &4502385004652882098 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
+  m_PrefabInstance: {fileID: 8003242778364597539}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7192340098513168498 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e482823e7a89374e9f937b61c2082bb, type: 3}
