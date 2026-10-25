@@ -38,6 +38,8 @@ namespace _Experimenation.K.Tools.Scripts
         private bool _subscribed;
         private bool _isSelecting;
 
+        private readonly Dictionary<(PlayerRef player, int slot), TickTimer> _cooldowns = new();
+
         public override void Spawned()
         {
             if (Instance != null && Instance != this)
@@ -162,8 +164,15 @@ namespace _Experimenation.K.Tools.Scripts
         {
             if (!IsValidActivationRequest(playerRef, slotIndex, out var ability, out var player))
                 return false;
+            var key = (playerRef, slotIndex);
 
-            AbilityEffectApplier.ApplyAll(ability, player);
+            if (_cooldowns.TryGetValue(key, out var timer) && !timer.ExpiredOrNotRunning(Runner))
+            {
+                return false;
+            }
+            if (!AbilityEffectApplier.ApplyAll(ability, player))
+                return false;
+            _cooldowns[key] = TickTimer.CreateFromSeconds(Runner, ability.ToolCoolDowns);
             return true;
         }
 
