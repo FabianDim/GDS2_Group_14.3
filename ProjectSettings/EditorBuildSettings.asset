@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Game Over.unity
     guid: 25ed9fae07464cd49808b751aa1bccbc
+  - enabled: 1
+    path: Assets/_Experimenation/Shen/MapTestingScene.unity
+    guid: b009a2fae7e82634cb35b13d5253cc8c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 0a2cdaa880cb2b54d90a17dab80bce98, type: 3}
