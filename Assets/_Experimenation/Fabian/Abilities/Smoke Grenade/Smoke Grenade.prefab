@@ -286,6 +286,7 @@ MonoBehaviour:
   smokeExplosionEffectPrefab: {fileID: 2494225147758639966, guid: 3b99e628b3bc10a46bb8f6f6caf39755, type: 3}
   particleOffset: {x: 0, y: 1, z: 0}
   smokeExplosionDelay: 3
+  compassBlockingRadius: 8
 --- !u!114 &459964699641389873
 MonoBehaviour:
   m_ObjectHideFlags: 0

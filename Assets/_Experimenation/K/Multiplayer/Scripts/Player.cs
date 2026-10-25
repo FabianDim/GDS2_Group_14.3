@@ -17,6 +17,9 @@ namespace _Experimenation.K.Multiplayer.Scripts
         public Player OtherPlayer { get; private set; }
 
         private CompassTapeTargetIndicatorsSetupExample _compassSetup;
+        private Transform _viewpoint;
+        private Transform _visibleCompassTarget;
+        private bool _compassTargetAssigned;
 
         public override void Spawned()
         {
@@ -25,6 +28,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
             OnRoleChanged();
 
             var playerCamera = GetComponentInChildren<Camera>(true);
+            _viewpoint = playerCamera != null ? playerCamera.transform : null;
+            _compassTargetAssigned = false;
             var audioListener = GetComponentInChildren<AudioListener>(true);
 
             var isLocalPlayer = HasInputAuthority;
@@ -56,7 +61,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
             // The second player to spawn links both sides, regardless of spawn order.
             foreach (var player in FindObjectsByType<Player>())
             {
-                if (player == this || player.Object == null || !player.Object.IsValid)
+                if (player == this || player.Object == null || !player.Object.IsValid || player.Runner != Runner)
                     continue;
 
                 Debug.Log($"Found the second player: [{player.name}]");
@@ -68,6 +73,12 @@ namespace _Experimenation.K.Multiplayer.Scripts
             }
 
             UpdateCompassTarget();
+        }
+
+        public override void Render()
+        {
+            if (HasInputAuthority)
+                UpdateCompassTarget();
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -83,17 +94,34 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             OtherPlayer = null;
             _compassSetup = null;
+            _visibleCompassTarget = null;
+            _compassTargetAssigned = false;
+            _viewpoint = null;
         }
 
         private void UpdateCompassTarget()
         {
-            if (OtherPlayer == null)
+            if (_compassSetup == null)
+                return;
+
+            Transform target = null;
+            if (OtherPlayer != null && OtherPlayer.Object != null && OtherPlayer.Object.IsValid)
             {
-                Debug.Log($"The other player is NULL");
+                var viewerPosition = _viewpoint != null ? _viewpoint.position : transform.position + Vector3.up * 1.5f;
+                var targetPosition = OtherPlayer._viewpoint != null
+                    ? OtherPlayer._viewpoint.position
+                    : OtherPlayer.transform.position + Vector3.up * 1.5f;
+                if (!SmokeExplosion.BlocksCompass(Runner, viewerPosition, targetPosition))
+                    target = OtherPlayer.transform;
             }
-            // A null target also clears the marker when the other player despawns.
-            if (_compassSetup != null)
-                _compassSetup.SetTarget(OtherPlayer != null ? OtherPlayer.transform : null);
+
+            // SetTarget recreates the marker, so only call it on visibility changes.
+            if (_compassTargetAssigned && _visibleCompassTarget == target)
+                return;
+
+            _compassSetup.SetTarget(target);
+            _visibleCompassTarget = target;
+            _compassTargetAssigned = true;
         }
 
         private void OnRoleChanged()

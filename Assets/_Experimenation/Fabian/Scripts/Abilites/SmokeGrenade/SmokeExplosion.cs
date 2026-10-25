@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -9,8 +10,11 @@ public class SmokeExplosion : NetworkBehaviour
 
     [Header("Smoke Settings")]
     [SerializeField] private float smokeExplosionDelay = 3f;
+    [SerializeField, Min(0f), Tooltip("World-space radius in which active smoke blocks opponent compass markers.")]
+    private float compassBlockingRadius = 8f;
 
     private const float SmokeDuration = 10f;
+    private static readonly HashSet<SmokeExplosion> SpawnedGrenades = new();
 
     [Networked] private TickTimer FuseTimer { get; set; }
     [Networked] private TickTimer SmokeTimer { get; set; }
@@ -22,10 +26,51 @@ public class SmokeExplosion : NetworkBehaviour
 
     public override void Spawned()
     {
+        SpawnedGrenades.Add(this);
         explosionVisualsPlayed = false;
         // Only the host simulates the projectile; NetworkTransform replicates it.
         if (TryGetComponent<Rigidbody>(out var body))
             body.isKinematic = !HasStateAuthority;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetSmokeRegistry() => SpawnedGrenades.Clear();
+
+    public static bool BlocksCompass(NetworkRunner runner, Vector3 viewer, Vector3 target)
+    {
+        if (runner == null || !runner.IsRunning)
+            return false;
+
+        foreach (var grenade in SpawnedGrenades)
+        {
+            // Each peer checks its own replicated smoke state, including when
+            // multiple runners share an editor process. Unexploded grenades do not block.
+            if (grenade == null || !grenade.isActiveAndEnabled || grenade.Runner != runner ||
+                grenade.Object == null || !grenade.Object.IsValid || !grenade.HasExploded ||
+                grenade.SmokeTimer.ExpiredOrNotRunning(runner))
+                continue;
+
+            if (IntersectsSmoke(viewer, target, grenade.ExplosionPosition, grenade.compassBlockingRadius))
+                return true;
+        }
+
+        return false;
+    }
+
+    internal static bool IntersectsSmoke(Vector3 viewer, Vector3 target, Vector3 center, float radius)
+    {
+        if (radius <= 0f)
+            return false;
+
+        // Closest point on the finite sight line: smoke behind either player
+        // does not block, but a viewpoint inside the cloud does.
+        var direction = target - viewer;
+        float lengthSquared = direction.sqrMagnitude;
+        float fraction = lengthSquared > 0f
+            ? Mathf.Clamp01(Vector3.Dot(center - viewer, direction) / lengthSquared)
+            : 0f;
+        var closest = viewer + direction * fraction;
+        return (center - closest).sqrMagnitude <= radius * radius;
     }
 
     public override void FixedUpdateNetwork()
@@ -108,6 +153,14 @@ public class SmokeExplosion : NetworkBehaviour
 
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
+        SpawnedGrenades.Remove(this);
+        if (smoke != null)
+            Destroy(smoke);
+    }
+
+    private void OnDestroy()
+    {
+        SpawnedGrenades.Remove(this);
         if (smoke != null)
             Destroy(smoke);
     }
