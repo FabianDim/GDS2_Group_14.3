@@ -247,6 +247,15 @@ namespace _Experimenation.K.Game_Manager.Scripts
             if (!HasStateAuthority)
                 return;
 
+            // Solo play uses Runner so runner-only tools can be tested. Both the
+            // menu's LocalRole and the spawned Player.Role must use this assignment.
+            if (Runner.GameMode == GameMode.Single)
+            {
+                P1Data.Role = PlayerRole.Runner;
+                P2Data.Role = PlayerRole.Chaser;
+                return;
+            }
+
             // P1 is the host in this project and P2 is the joining client. Keep the
             // assignment deterministic so it agrees with GameManager.SpawnPlayers.
             P1Data.Role = PlayerRole.Chaser;

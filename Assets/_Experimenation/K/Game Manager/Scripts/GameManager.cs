@@ -95,16 +95,34 @@ namespace _Experimenation.K.Game_Manager.Scripts
             EventBus.Raise(new AllPlayersSpawnedEvent());
         }
 
-        // Single mode: spawn only the local player, with no role pairing or GameData roles.
+        // Single mode still needs a role for the shop's readiness and purchase checks.
         private void SpawnSinglePlayer(NetworkRunner runner)
         {
             var localPlayer = runner.LocalPlayer;
             if (!localPlayer.IsValid || !ValidateSpawnConfiguration(runner))
                 return;
 
-            GameData.Instance?.ResetRoundPurchases();
-            if (SpawnPlayer(runner, localPlayer, HostSpawnPointIndex) == null)
+            var gameData = GameData.Instance;
+            if (gameData == null || gameData.Object == null || !gameData.Object.IsValid ||
+                gameData.Runner != runner || !gameData.HasStateAuthority)
+            {
+                Debug.LogError("GameManager: authoritative GameData is not ready for single-player spawning.");
                 return;
+            }
+
+            gameData.ResetRoundPurchases();
+            var playerObject = SpawnPlayer(runner, localPlayer, HostSpawnPointIndex);
+            if (playerObject == null)
+                return;
+
+            if (!playerObject.TryGetComponent<Player>(out var player))
+            {
+                Debug.LogError("GameManager: the single-player prefab has no Player component.");
+                return;
+            }
+
+            gameData.GenerateRole();
+            player.Role = gameData.P1Data.Role;
 
             EventBus.Raise(new AllPlayersSpawnedEvent());
         }

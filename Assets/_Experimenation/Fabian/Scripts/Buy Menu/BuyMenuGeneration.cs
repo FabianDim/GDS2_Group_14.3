@@ -38,7 +38,8 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
 
         private IEnumerator Start()
         {
-            yield return new WaitUntil(() => GameData.Instance != null && GameData.Instance.Object.IsValid &&
+            yield return new WaitUntil(() => GameData.Instance != null && GameData.Instance.Object != null &&
+                GameData.Instance.Object.IsValid &&
                 GameData.Instance.LocalRole != 0);
             var data = GameData.Instance;
             var location = 
