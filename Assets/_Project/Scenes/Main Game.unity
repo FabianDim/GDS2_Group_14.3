@@ -97936,6 +97936,7 @@ GameObject:
   - component: {fileID: 1655759834}
   - component: {fileID: 1655759836}
   - component: {fileID: 1655759837}
+  - component: {fileID: 1655759838}
   m_Layer: 0
   m_Name: Audio Source
   m_TagString: Untagged
@@ -98168,6 +98169,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1655759838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655759833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d495b344844cb1a333a9fbcd7d1a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Audio.Scripts.SfxManager
+  buttonSfx: {fileID: 8300000, guid: e2ef82f2b81d6ae45808107543f5aee5, type: 3}
+  volume: 2
 --- !u!1001 &1655838665
 PrefabInstance:
   m_ObjectHideFlags: 0
