@@ -1,6 +1,7 @@
 using _Experimenation.Fabian.Scripts.PhaseController;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
+using _Experimenation.K.Multiplayer.Scripts;
 using Fusion;
 using TMPro;
 using UnityEngine;
@@ -75,8 +76,25 @@ namespace _Experimenation.K.Game_Manager.Scripts
             Timer = default;
             _timerInitialized = false;
             EventBus.Raise(new TimeRunsOutEvent());
-            _timeText.text = "EXTRACTION POD ARRIVED! REACH THE POD TO WIN!";
+            _timeText.text = GetTimeRunsOutMessage();
             _animator.SetTrigger(Fade);
+        }
+
+        private string GetTimeRunsOutMessage()
+        {
+            var isRunner = false;
+
+            if (Runner != null && Runner.IsRunning &&
+                GameManager.SpawnedPlayers.TryGetValue(Runner.LocalPlayer, out var localPlayerObject) &&
+                localPlayerObject != null &&
+                localPlayerObject.TryGetComponent<Player>(out var localPlayer))
+            {
+                isRunner = localPlayer.Role == PlayerRole.Runner;
+            }
+
+            return isRunner
+                ? "EXTRACTION POD ARRIVED! REACH THE POD TO WIN!"
+                : "EXTRACTION POD ARRIVED! CATCH THE RUNNER BEFORE THEY REACH THE POD!";
         }
 
         private void OnRunPhaseStarts(RunPhaseStartsEvent ev)
