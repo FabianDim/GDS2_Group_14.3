@@ -12,6 +12,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
     public class MenuConnector : MonoRunnerCallbacks
     {
         [SerializeField] private string gameplayScenePath;
+        [SerializeField] private string singlePlayerTestScenePath = "Assets/_Project/Scenes/Test Game.unity";
 
         [SerializeField] private NetworkRunner runnerPrefab;
         [SerializeField] private GameData gameDataPrefab;
@@ -32,6 +33,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         private bool _gameStarted;
         private bool _callbacksRegistered;
         private int _gameplaySceneIndex;
+        private bool _singlePlayerTest;
 
         private void Awake()
         {
@@ -52,6 +54,14 @@ namespace _Experimenation.K.Multiplayer.Scripts
         public void HostGame() => Connect(GameMode.Host);
         public void JoinGame() => Connect(GameMode.Client);
 
+        // Hosts a private room and joins it with a second runner in this same
+        // process, so the gameplay scene gets two players without multiplayer.
+        public void SinglePlayerTest()
+        {
+            _singlePlayerTest = true;
+            Connect(GameMode.Host);
+        }
+
         private async void Connect(GameMode mode)
         {
             // A second click must not create a competing runner for this menu.
@@ -70,11 +80,12 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private async Task StartGame(GameMode mode)
         {
-            _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(gameplayScenePath);
+            var scenePath = _singlePlayerTest ? singlePlayerTestScenePath : gameplayScenePath;
+            _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
             if (_gameplaySceneIndex < 0)
             {
                 SetConnectionStatus("Cannot start: gameplay scene is missing from the build.");
-                Debug.LogError($"Enable {gameplayScenePath} in the build scene list.");
+                Debug.LogError($"Enable {scenePath} in the build scene list.");
                 return;
             }
 
@@ -107,6 +118,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
             {
                 Debug.Log($"Connected as {mode} to room '{_networkRunner.SessionInfo.Name}' " +
                           $"in region '{_networkRunner.SessionInfo.Region}'.");
+                if (_singlePlayerTest)
+                    await StartSecondTestClient(_networkRunner.SessionInfo.Name);
                 if (!_gameStarted)
                     SetConnectionStatus(mode == GameMode.Host
                         ? "Waiting for the other player"
@@ -114,8 +127,30 @@ namespace _Experimenation.K.Multiplayer.Scripts
             }
         }
 
+        private async Task StartSecondTestClient(string sessionName)
+        {
+            var clientRunner = Instantiate(runnerPrefab);
+            clientRunner.name = "Test Client Runner";
+            clientRunner.ProvideInput = true;
+
+            var result = await clientRunner.StartGame(new StartGameArgs
+            {
+                GameMode = GameMode.Client,
+                SessionName = sessionName,
+                SceneManager = clientRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                ObjectProvider = clientRunner.GetComponent<INetworkObjectProvider>()
+            });
+
+            if (!result.Ok)
+            {
+                SetConnectionStatus($"Test client failed: {result.ShutdownReason}");
+                Debug.LogError($"Failed to start test client: {result.ShutdownReason}");
+            }
+        }
+
         public override void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
+            _singlePlayerTest = false;
             SetConnectionStatus($"Disconnected: {shutdownReason}");
             Debug.Log($"Menu connection shut down: {shutdownReason}");
             RemoveRunnerCallbacks(runner);

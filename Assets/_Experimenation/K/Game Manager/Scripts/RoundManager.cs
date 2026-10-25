@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 namespace _Experimenation.K.Game_Manager.Scripts
 {
 	public class RoundManager : MonoBehaviour
@@ -62,8 +63,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
 		private static void SetColor(GameObject unit, Color color)
 		{
-			foreach (var renderer in unit.GetComponentsInChildren<Renderer>(true))
-				renderer.material.color = color;
+			foreach (var graphic in unit.GetComponentsInChildren<Graphic>(true))
+				graphic.color = color;
 		}
 	}
 }
