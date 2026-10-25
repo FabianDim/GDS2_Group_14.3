@@ -60,6 +60,10 @@ namespace _Experimenation.K.Cube_Tokens.Scripts
 
         private void SpawnTokens()
         {
+            // Players are not spawned yet; the spawn origin is unknown until they are.
+            if (_runnerPlayer == null)
+                return;
+
             for (var i = 0; i < tokensPerSpawn; i++)
             {
                 // Stop spawning once the live token population cap is reached.
