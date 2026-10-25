@@ -1,4 +1,5 @@
 using System;
+using _Experimenation.Fabian.Scripts.PhaseController;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
 using _Experimenation.K.Multiplayer.Scripts;
@@ -54,6 +55,41 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         [Networked] public ref PlayerData P1Data => ref MakeRef<PlayerData>();
         [Networked] public ref PlayerData P2Data => ref MakeRef<PlayerData>();
+        [Networked, Capacity(2)] public NetworkDictionary<PlayerRef, uint> PurchasedAbilities => default;
+        [Networked] private int PurchaseRound { get; set; }
+
+        public AbilityDatabase AbilityDatabase => abilityDatabase;
+
+        public bool HasPurchased(PlayerRef player, int index) =>
+            index >= 0 && index < 32 && PurchasedAbilities.TryGet(player, out var mask) &&
+            (mask & (1u << index)) != 0;
+
+        public int GetToolAbilityIndex(PlayerRef player, int slot)
+        {
+            if (abilityDatabase == null || slot < 0)
+                return -1;
+
+            for (var index = 0; index < abilityDatabase.allAbilities.Count; index++)
+            {
+                var ability = abilityDatabase.allAbilities[index];
+                if (ability != null && ability.abilityType == AbilityType.Tool &&
+                    HasPurchased(player, index) && slot-- == 0)
+                    return index;
+            }
+            return -1;
+        }
+
+        public int LocalPoints => HasStateAuthority ? P1Data.Points : P2Data.Points;
+        public PlayerRole LocalRole => HasStateAuthority ? P1Data.Role : P2Data.Role;
+
+        public void ResetRoundPurchases()
+        {
+            if (!HasStateAuthority || PurchaseRound == CurrentRound)
+                return;
+
+            PurchasedAbilities.Clear();
+            PurchaseRound = CurrentRound;
+        }
 
         private string _username = string.Empty;
 
@@ -276,13 +312,42 @@ namespace _Experimenation.K.Game_Manager.Scripts
             if (!HasStateAuthority || !buyer.IsValid)
                 return;
 
-            var accepted = abilityDatabase != null &&
-                abilityIndex >= 0 &&
-                abilityIndex < abilityDatabase.allAbilities.Count;
-
-            var ability = accepted ? abilityDatabase.allAbilities[abilityIndex] : null;
-            accepted = ability != null && TrySpendPoints(buyer, ability.abilityPrice);
+            var accepted = TryAssignPurchase(buyer, abilityIndex);
             RPC_PurchaseResult(buyer, abilityIndex, accepted);
+        }
+
+        private bool TryAssignPurchase(PlayerRef buyer, int abilityIndex)
+        {
+            if (abilityDatabase == null || abilityIndex < 0 || abilityIndex >= 32 ||
+                abilityIndex >= abilityDatabase.allAbilities.Count || HasPurchased(buyer, abilityIndex) ||
+                !GameManager.SpawnedPlayers.TryGetValue(buyer, out var playerObject) ||
+                playerObject == null || !playerObject.TryGetComponent<Player>(out var player) ||
+                !player.HasStateAuthority || player.Runner != Runner ||
+                playerObject.InputAuthority != buyer)
+                return false;
+
+            var phase = FindAnyObjectByType<PhaseManager>();
+            var ability = abilityDatabase.allAbilities[abilityIndex];
+            var points = buyer == Runner.LocalPlayer ? P1Data.Points : P2Data.Points;
+            if (phase == null || phase.Runner != Runner || phase.IsRunPhase ||
+                ability == null || ability.abilityPrice < 0 || points < ability.abilityPrice ||
+                ability.effects == null || ability.effects.Count == 0 ||
+                ability.effects.Exists(effect => effect == null) ||
+                (ability.abilityScope == AbilityScope.Runner && player.Role != PlayerRole.Runner) ||
+                (ability.abilityScope == AbilityScope.Chaser && player.Role != PlayerRole.Chaser) ||
+                (ability.abilityType == AbilityType.Tool && GetToolAbilityIndex(buyer, 3) >= 0))
+                return false;
+
+            // Assign before charging. Tools remain in the replicated loadout until
+            // activated; upgrades modify only this buyer's authoritative player.
+            if (ability.abilityType != AbilityType.Tool &&
+                !AbilityEffectApplier.ApplyAll(ability, player))
+                return false;
+
+            PurchasedAbilities.TryGet(buyer, out var mask);
+            PurchasedAbilities.Set(buyer, mask | (1u << abilityIndex));
+            TrySpendPoints(buyer, ability.abilityPrice);
+            return true;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
@@ -293,7 +358,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         private bool TrySpendPoints(PlayerRef player, int amount)
         {
-            if (!HasStateAuthority || !player.IsValid || amount <= 0)
+            if (!HasStateAuthority || !player.IsValid || amount < 0)
                 return false;
 
             if (player == Runner.LocalPlayer)

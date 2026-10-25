@@ -9,16 +9,16 @@ namespace _Project.Abilities.Scripts
     /// </summary>
     public static class AbilityEffectApplier
     {
-        public static void ApplyAll(Ability ability, Player player)
+        public static bool ApplyAll(Ability ability, Player player)
         {
             if (ability == null || player == null || player.Object == null ||
-                !player.HasStateAuthority || ability.effects == null)
-                return;
+                !player.HasStateAuthority || ability.effects == null || ability.effects.Count == 0)
+                return false;
 
             foreach (var effect in ability.effects)
             {
                 if (effect == null)
-                    continue;
+                    return false;
 
                 try
                 {
@@ -29,8 +29,10 @@ namespace _Project.Abilities.Scripts
                     Debug.LogError(
                         $"Failed to apply an effect from '{ability.abilityName}' " +
                         $"to '{player.name}': {exception}");
+                    return false;
                 }
             }
+            return true;
         }
     }
 }

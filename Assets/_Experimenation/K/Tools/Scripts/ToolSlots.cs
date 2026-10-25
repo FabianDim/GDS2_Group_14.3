@@ -38,6 +38,8 @@ namespace _Experimenation.K.Tools.Scripts
         private bool _subscribed;
         private bool _isSelecting;
 
+        
+
         public override void Spawned()
         {
             if (Instance != null && Instance != this)
@@ -163,7 +165,8 @@ namespace _Experimenation.K.Tools.Scripts
             if (!IsValidActivationRequest(playerRef, slotIndex, out var ability, out var player))
                 return false;
 
-            AbilityEffectApplier.ApplyAll(ability, player);
+            if (!AbilityEffectApplier.ApplyAll(ability, player))
+                return false;
             return true;
         }
 

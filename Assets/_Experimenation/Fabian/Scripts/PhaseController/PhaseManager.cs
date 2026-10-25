@@ -16,8 +16,9 @@ namespace _Experimenation.Fabian.Scripts.PhaseController
         [OnChangedRender(nameof(OnRunPhaseChanged))]
         [Networked] public NetworkBool IsRunPhase { get; private set; }
 
-        private TickTimer _timer;
+        [Networked] private TickTimer BuyTimer { get; set; }
         private bool _timerInitialized;
+        public float BuyTimeRemaining => BuyTimer.RemainingTime(Runner) ?? 0f;
 
         public override void Spawned()
         {
@@ -38,16 +39,16 @@ namespace _Experimenation.Fabian.Scripts.PhaseController
             while (GameData.Instance == null)
                 yield return null;
 
-            _timer = TickTimer.CreateFromSeconds(Runner, GameData.Instance.roundDuration * 0.25f);
+            BuyTimer = TickTimer.CreateFromSeconds(Runner, GameData.Instance.roundDuration * 0.25f);
             _timerInitialized = true;
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority || !_timerInitialized || !_timer.Expired(Runner))
+            if (!HasStateAuthority || !_timerInitialized || !BuyTimer.Expired(Runner))
                 return;
 
-            _timer = TickTimer.None;
+            BuyTimer = TickTimer.None;
             _timerInitialized = false;
             IsRunPhase = true;
         }

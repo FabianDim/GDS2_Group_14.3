@@ -52,6 +52,13 @@ namespace _Experimenation.K.Multiplayer.Scripts
         public void HostGame() => Connect(GameMode.Host);
         public void JoinGame() => Connect(GameMode.Client);
 
+        // Kept under this name so the Main Menu's Btn_SinglePlayer listener still resolves.
+        public void SinglePlayerTest() => Connect(GameMode.Single);
+
+        // Single mode runs one local player; Host/Join need both players.
+        private static int RequiredPlayerCount(NetworkRunner runner) =>
+            runner.GameMode == GameMode.Single ? 1 : 2;
+
         private async void Connect(GameMode mode)
         {
             // A second click must not create a competing runner for this menu.
@@ -70,11 +77,12 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private async Task StartGame(GameMode mode)
         {
-            _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(gameplayScenePath);
+            var scenePath = gameplayScenePath;
+            _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
             if (_gameplaySceneIndex < 0)
             {
                 SetConnectionStatus("Cannot start: gameplay scene is missing from the build.");
-                Debug.LogError($"Enable {gameplayScenePath} in the build scene list.");
+                Debug.LogError($"Enable {scenePath} in the build scene list.");
                 return;
             }
 
@@ -166,7 +174,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             // Only the scene authority (the host, in Host Mode) decides when
             // the match is ready to transition.
-            if (runner.ActivePlayers.Count() < 2)
+            if (runner.ActivePlayers.Count() < RequiredPlayerCount(runner))
             {
                 SetConnectionStatus("Waiting for the other player");
                 return;

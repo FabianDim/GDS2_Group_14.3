@@ -7,7 +7,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
         private static string _shutdownReason;
         
         public static void LogShutdown(NetworkRunner runner, ShutdownReason reason) => 
-            _shutdownReason = $"{runner.LocalPlayer} rage quit with {_shutdownReason}";
+            _shutdownReason = $"{runner.LocalPlayer} rage quit";
 
         public static void ClearLog()
         {

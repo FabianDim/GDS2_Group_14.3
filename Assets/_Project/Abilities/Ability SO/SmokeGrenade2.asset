@@ -12,18 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3e69b8f7e444ec9960dcc5c3e54336, type: 3}
   m_Name: SmokeGrenade2
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Abilities.Scripts.Ability
-  abilityName: Smoke
+  abilityName: Smoke grenade
   abilitySprite: {fileID: 21300000, guid: 3126d32d69eb392488e96fc585a0790b, type: 3}
   abilityColor: {r: 1, g: 0.6470588, b: 0, a: 1}
-  abilityType: 0
+  abilityType: 2
   abilityScope: 1
-  abilityDescription: Throw a smoke grenade to conceal yourself
+  abilityDescription: Throw smoke in your aim direction to break line of sight.
   effects:
   - rid: 9010019802128842975
   abilityPrice: 100
+  ToolCoolDowns: 3
   references:
     version: 2
     RefIds:
     - rid: 9010019802128842975
       type: {class: GrenadeAbility, ns: _Experimenation.Fabian.Scripts.Abilites.SmokeGrenade, asm: Assembly-CSharp}
-      data: 
+      data:
+        grenadePrefab: {fileID: 4658576062198514395, guid: 113e44a73f7bdc14e89de825175ea4a1, type: 3}

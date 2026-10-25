@@ -17,6 +17,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private TickTimer _timer;
         private bool _sceneLoadTriggered;
         private GameData _gameData;
+        private bool _subscribedToEvents;
 
         // Resolved lazily: this component can initialize before GameData.Spawned()
         // assigns the singleton, so a field initializer would cache a null reference.
@@ -34,12 +35,17 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
             if (!HasStateAuthority) return;
             EventBus.Subscribe<RoundOverEvent>(OnRoundOver);
+            _subscribedToEvents = true;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            if (!HasStateAuthority) return;
+            // Unsubscribe based on our own flag, not HasStateAuthority, which may already
+            // be false during despawn. A stale subscription would call RPC_ShowScreen on a
+            // despawned object after the scene reload.
+            if (!_subscribedToEvents) return;
             EventBus.Unsubscribe<RoundOverEvent>(OnRoundOver);
+            _subscribedToEvents = false;
         }
 
         public override void FixedUpdateNetwork()

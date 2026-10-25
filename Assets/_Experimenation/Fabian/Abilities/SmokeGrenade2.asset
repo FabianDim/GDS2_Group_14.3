@@ -19,11 +19,13 @@ MonoBehaviour:
   abilityScope: 0
   abilityDescription: 
   effects:
-  - rid: 7367326324884242442
+  - rid: 70254918099271771
   abilityPrice: 0
+  ToolCoolDowns: 3
   references:
     version: 2
     RefIds:
-    - rid: 7367326324884242442
-      type: {class: GrenadeAbility, ns: _Experimenation.Fabian.Scripts.Abilites, asm: Assembly-CSharp}
-      data: 
+    - rid: 70254918099271771
+      type: {class: GrenadeAbility, ns: _Experimenation.Fabian.Scripts.Abilites.SmokeGrenade, asm: Assembly-CSharp}
+      data:
+        grenadePrefab: {fileID: 0}

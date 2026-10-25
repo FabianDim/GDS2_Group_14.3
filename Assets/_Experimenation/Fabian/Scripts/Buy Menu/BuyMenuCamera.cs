@@ -18,7 +18,7 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             // Do not disable this object in Awake. The previous implementation
             // disabled itself before the player had a chance to enter the game,
             // so the initial Buy Phase UI was never visible.
-            SetVisible(true);
+            SetVisible(false);
         }
 
         private void OnDestroy()

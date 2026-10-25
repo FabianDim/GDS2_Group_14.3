@@ -192,6 +192,8 @@ GameObject:
   - component: {fileID: 3676588523921767593}
   - component: {fileID: 2079421889371735370}
   - component: {fileID: 8312218682763219756}
+  - component: {fileID: 459964699641389873}
+  - component: {fileID: 8262775555316944827}
   m_Layer: 0
   m_Name: Smoke Grenade
   m_TagString: Untagged
@@ -279,14 +281,73 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1dea520089bab1c41866b501cfcf26ac, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: '::'
   smokeExplosionEffectPrefab: {fileID: 2494225147758639966, guid: 3b99e628b3bc10a46bb8f6f6caf39755, type: 3}
   particleOffset: {x: 0, y: 1, z: 0}
   smokeExplosionDelay: 3
-  smokeExplosionForce: 700
-  explosionRadius: 5
-  testExplosion: 0
+  compassBlockingRadius: 8
+--- !u!114 &459964699641389873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4658576062198514395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 3716810380
+  SendPriority: 0
+  EnableInterpolation: 1
+  Flags: 262402
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 8262775555316944827}
+  - {fileID: 8312218682763219756}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &8262775555316944827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4658576062198514395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  ConfigFlags: 0
+  PhysicsSettings:
+    ForecastEnabled: 1
+    DebugPhysics: 0
+    GravityForecast: 2
+    MaxExtrapolationTime: 0.15
+    MinLinearDetectedError: 0.02
+    MinAngularDetectedError: 3
+    MaxLinearError: 0
+    MaxAngularError: 0
+    LowCorrectionProgressThreshold: 0.015
+    HighErrorSimilarityThreshold: 1
+    MaxErrorTotalTime: 0.5
+    MaxRemoteSleepIgnoreTime: 0.5
+    ErrorCorrectionType: 0
+    LinearVelCorrectionMul: 1
+    AngularVelCorrectionMul: 1
+    PositionCorrectionLerp: 0.15
+    RotationCorrectionLerp: 0.15
+    Spring: 75
+    Damper: 2
+    MinImpactfulCollisionAlignment: 0.3
+    ImpactStartCorrectionTime: 0.1
+    ImpactCorrectionTimeComplete: 0.3
 --- !u!1 &6437303193026772368
 GameObject:
   m_ObjectHideFlags: 0

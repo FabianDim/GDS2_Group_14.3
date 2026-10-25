@@ -1,3 +1,4 @@
+using System.Collections;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
 using UnityEngine;
@@ -8,11 +9,16 @@ namespace _Project.Audio.Scripts
     public class BGM : MonoBehaviour
     {
         [SerializeField] private AudioClip runPhaseBgm;
-        private AudioSource _as;
+        [SerializeField] private AudioSource as1;
+        [SerializeField] private AudioSource as2;
+
+        [SerializeField] private float loopPoint;
+        private WaitForSeconds _loopPoint;
+        private AudioSource _currentAs;
         
         private void Awake()
         {
-            _as = GetComponent<AudioSource>();
+            _loopPoint = new WaitForSeconds(loopPoint);
             EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
         }
         
@@ -21,8 +27,21 @@ namespace _Project.Audio.Scripts
 
         private void OnRunPhaseStarts(RunPhaseStartsEvent ev)
         {
-            _as.clip = runPhaseBgm;
-            _as.Play();
+            StartCoroutine(RunPhaseBgm());
+        }
+
+        private IEnumerator RunPhaseBgm()
+        {
+            _currentAs = as1;
+            _currentAs.clip = runPhaseBgm;
+            _currentAs.Play();
+
+            while (true)
+            {
+                yield return _loopPoint;
+                _currentAs = _currentAs == as1 ? as2 : as1;
+                _currentAs.Play();
+            }
         }
     }
 }
