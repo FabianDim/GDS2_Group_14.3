@@ -14,6 +14,7 @@ namespace _Experimenation.K.Game_Manager.Scripts
     /// </summary>
     public class TimeManager : NetworkBehaviour
     {
+        private static readonly int Fade = Animator.StringToHash("Fade");
         [Networked] private TickTimer Timer { get; set; }
 
         private TextMeshProUGUI _timeText;
@@ -23,12 +24,16 @@ namespace _Experimenation.K.Game_Manager.Scripts
         private bool _subscribed;
         private int _lastDisplayedSecond = -1;
 
+        private Animator _animator;
+
         public override void Spawned()
         {
             _timeText = GetComponentInChildren<TextMeshProUGUI>();
 
             if (!HasStateAuthority)
                 return;
+
+            _animator = GetComponent<Animator>();
 
             EventBus.Subscribe<RunPhaseStartsEvent>(OnRunPhaseStarts);
             _subscribed = true;
@@ -70,6 +75,8 @@ namespace _Experimenation.K.Game_Manager.Scripts
             Timer = default;
             _timerInitialized = false;
             EventBus.Raise(new TimeRunsOutEvent());
+            _timeText.text = "EXTRACTION POD ARRIVED! REACH THE POD TO WIN!";
+            _animator.SetTrigger(Fade);
         }
 
         private void OnRunPhaseStarts(RunPhaseStartsEvent ev)
