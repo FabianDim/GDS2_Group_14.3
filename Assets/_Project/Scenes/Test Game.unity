@@ -26644,6 +26644,77 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &464145731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 464145732}
+  - component: {fileID: 464145734}
+  - component: {fileID: 464145733}
+  m_Layer: 0
+  m_Name: Fusion Bootstrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &464145732
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464145731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 44.87311, y: -20.67297, z: 40.39501}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &464145733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464145731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ba5764f4714bd64ab9efab127938e77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Unity::Fusion.FusionBootstrapDebugGUI
+  EnableHotkeys: 0
+  BaseSkin: {fileID: 11400000, guid: e59b35dfeb4b6f54e9b2791b2a40a510, type: 2}
+--- !u!114 &464145734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464145731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88230848386761045af440d808ee3efa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Unity::Fusion.FusionBootstrap
+  RunnerPrefab: {fileID: 5541435066032819259, guid: cbc6396a57c1d6246a098fa41c630735, type: 3}
+  StartMode: 0
+  AutoStartAs: 2
+  AutoHideGUI: 1
+  AutoClients: 1
+  ClientStartDelay: 0.1
+  ServerPort: 0
+  DefaultRoomName: 
+  InitialScenePath: Assets/_Project/Scenes/Main Menu.unity
+  _currentStage: 0
+  AutoConnectVirtualInstances: 1
+  VirtualInstanceConnectDelay: 1
 --- !u!1001 &464380751
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -112407,7 +112478,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 388224734892242266, guid: 7e1a34257c222924a84d1c1e0c6e40e5, type: 3}
       propertyPath: SortKey
-      value: 2975093624
+      value: 897771056
       objectReference: {fileID: 0}
     - target: {fileID: 860317042287042062, guid: 7e1a34257c222924a84d1c1e0c6e40e5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -129596,7 +129667,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2121451806345538896, guid: c90f162099c4d8d46a726fe986c9e35a, type: 3}
       propertyPath: SortKey
-      value: 2634142999
+      value: 556820431
       objectReference: {fileID: 0}
     - target: {fileID: 2647679092878550063, guid: c90f162099c4d8d46a726fe986c9e35a, type: 3}
       propertyPath: m_AnchorMax.y
@@ -129914,3 +129985,4 @@ SceneRoots:
   - {fileID: 1655759835}
   - {fileID: 349945527}
   - {fileID: 667620155}
+  - {fileID: 464145732}

@@ -12,7 +12,6 @@ namespace _Experimenation.K.Multiplayer.Scripts
     public class MenuConnector : MonoRunnerCallbacks
     {
         [SerializeField] private string gameplayScenePath;
-        [SerializeField] private string singlePlayerTestScenePath = "Assets/_Project/Scenes/Test Game.unity";
 
         [SerializeField] private NetworkRunner runnerPrefab;
         [SerializeField] private GameData gameDataPrefab;
@@ -33,7 +32,6 @@ namespace _Experimenation.K.Multiplayer.Scripts
         private bool _gameStarted;
         private bool _callbacksRegistered;
         private int _gameplaySceneIndex;
-        private bool _singlePlayerTest;
 
         private void Awake()
         {
@@ -54,13 +52,12 @@ namespace _Experimenation.K.Multiplayer.Scripts
         public void HostGame() => Connect(GameMode.Host);
         public void JoinGame() => Connect(GameMode.Client);
 
-        // Hosts a private room and joins it with a second runner in this same
-        // process, so the gameplay scene gets two players without multiplayer.
-        public void SinglePlayerTest()
-        {
-            _singlePlayerTest = true;
-            Connect(GameMode.Host);
-        }
+        // Kept under this name so the Main Menu's Btn_SinglePlayer listener still resolves.
+        public void SinglePlayerTest() => Connect(GameMode.Single);
+
+        // Single mode runs one local player; Host/Join need both players.
+        private static int RequiredPlayerCount(NetworkRunner runner) =>
+            runner.GameMode == GameMode.Single ? 1 : 2;
 
         private async void Connect(GameMode mode)
         {
@@ -80,7 +77,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
         private async Task StartGame(GameMode mode)
         {
-            var scenePath = _singlePlayerTest ? singlePlayerTestScenePath : gameplayScenePath;
+            var scenePath = gameplayScenePath;
             _gameplaySceneIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
             if (_gameplaySceneIndex < 0)
             {
@@ -118,8 +115,6 @@ namespace _Experimenation.K.Multiplayer.Scripts
             {
                 Debug.Log($"Connected as {mode} to room '{_networkRunner.SessionInfo.Name}' " +
                           $"in region '{_networkRunner.SessionInfo.Region}'.");
-                if (_singlePlayerTest)
-                    await StartSecondTestClient(_networkRunner.SessionInfo.Name);
                 if (!_gameStarted)
                     SetConnectionStatus(mode == GameMode.Host
                         ? "Waiting for the other player"
@@ -127,30 +122,8 @@ namespace _Experimenation.K.Multiplayer.Scripts
             }
         }
 
-        private async Task StartSecondTestClient(string sessionName)
-        {
-            var clientRunner = Instantiate(runnerPrefab);
-            clientRunner.name = "Test Client Runner";
-            clientRunner.ProvideInput = true;
-
-            var result = await clientRunner.StartGame(new StartGameArgs
-            {
-                GameMode = GameMode.Client,
-                SessionName = sessionName,
-                SceneManager = clientRunner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                ObjectProvider = clientRunner.GetComponent<INetworkObjectProvider>()
-            });
-
-            if (!result.Ok)
-            {
-                SetConnectionStatus($"Test client failed: {result.ShutdownReason}");
-                Debug.LogError($"Failed to start test client: {result.ShutdownReason}");
-            }
-        }
-
         public override void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-            _singlePlayerTest = false;
             SetConnectionStatus($"Disconnected: {shutdownReason}");
             Debug.Log($"Menu connection shut down: {shutdownReason}");
             RemoveRunnerCallbacks(runner);
@@ -201,7 +174,7 @@ namespace _Experimenation.K.Multiplayer.Scripts
 
             // Only the scene authority (the host, in Host Mode) decides when
             // the match is ready to transition.
-            if (runner.ActivePlayers.Count() < 2)
+            if (runner.ActivePlayers.Count() < RequiredPlayerCount(runner))
             {
                 SetConnectionStatus("Waiting for the other player");
                 return;

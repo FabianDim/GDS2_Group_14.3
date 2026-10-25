@@ -76,6 +76,12 @@ namespace _Experimenation.K.Game_Manager.Scripts
 
         private void SpawnPlayers(NetworkRunner runner)
         {
+            if (runner.GameMode == GameMode.Single)
+            {
+                SpawnSinglePlayer(runner);
+                return;
+            }
+
             if (!TryGetHostAndClient(runner, out var host, out var client))
                 return;
 
@@ -84,6 +90,20 @@ namespace _Experimenation.K.Game_Manager.Scripts
             var clientObject = SpawnPlayer(runner, client, ClientSpawnPointIndex);
 
             if (!TryAssignRoles(hostObject, clientObject))
+                return;
+
+            EventBus.Raise(new AllPlayersSpawnedEvent());
+        }
+
+        // Single mode: spawn only the local player, with no role pairing or GameData roles.
+        private void SpawnSinglePlayer(NetworkRunner runner)
+        {
+            var localPlayer = runner.LocalPlayer;
+            if (!localPlayer.IsValid || !ValidateSpawnConfiguration(runner))
+                return;
+
+            GameData.Instance?.ResetRoundPurchases();
+            if (SpawnPlayer(runner, localPlayer, HostSpawnPointIndex) == null)
                 return;
 
             EventBus.Raise(new AllPlayersSpawnedEvent());
