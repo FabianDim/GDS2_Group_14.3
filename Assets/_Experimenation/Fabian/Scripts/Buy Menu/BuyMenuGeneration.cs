@@ -41,7 +41,8 @@ namespace _Experimenation.Fabian.Scripts.Buy_Menu
             yield return new WaitUntil(() => GameData.Instance != null && GameData.Instance.Object.IsValid &&
                 GameData.Instance.LocalRole != 0);
             var data = GameData.Instance;
-            var location = data.HasStateAuthority ? p1BuyMenuLocation : p2BuyMenuLocation;
+            var location = 
+                data.HasStateAuthority ? p1BuyMenuLocation : p2BuyMenuLocation;
             if (location != null) transform.SetPositionAndRotation(location.position, location.rotation);
             _phase = FindAnyObjectByType<PhaseManager>();
             // UI and server must use exactly the same catalogue indices.
