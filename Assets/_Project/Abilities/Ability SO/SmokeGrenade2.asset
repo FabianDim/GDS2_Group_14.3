@@ -21,6 +21,7 @@ MonoBehaviour:
   effects:
   - rid: 9010019802128842975
   abilityPrice: 100
+  ToolCoolDowns: 3
   references:
     version: 2
     RefIds:
