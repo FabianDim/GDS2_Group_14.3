@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using _Experimenation.Fabian.Scripts.PhaseController;
 using _Experimenation.K.Event_Bus;
 using _Experimenation.K.Event_Bus.Events;
@@ -17,7 +18,7 @@ namespace _Project.Abilities.Scripts
             if (HasStateAuthority)
                 EventBus.Subscribe<AbilitySelectedEvent>(OnAbilitySelected);
         }
-
+        private readonly Dictionary<(PlayerRef player, int slot), TickTimer> _cooldowns = new();
         public override void Despawned(NetworkRunner runner, bool hasState) => Unsubscribe();
         private void OnDestroy() => Unsubscribe();
         private void Unsubscribe() => EventBus.Unsubscribe<AbilitySelectedEvent>(OnAbilitySelected);
@@ -33,7 +34,19 @@ namespace _Project.Abilities.Scripts
 
             var index = data.GetToolAbilityIndex(ev.Player.Object.InputAuthority, ev.SelectedAbility - 1);
             if (index >= 0)
-                AbilityEffectApplier.ApplyAll(data.AbilityDatabase.allAbilities[index], ev.Player);
+            {
+                var playerRef = ev.Player.Object.InputAuthority;
+                var key = (playerRef, index);
+                if (_cooldowns.TryGetValue(key, out var timer) && !timer.ExpiredOrNotRunning(Runner))
+                {
+                    return;
+                }
+                if (AbilityEffectApplier.ApplyAll(data.AbilityDatabase.allAbilities[index], ev.Player))
+                {
+                    _cooldowns[key] = TickTimer.CreateFromSeconds(Runner, data.AbilityDatabase.allAbilities[index].ToolCoolDowns);
+
+                }
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ namespace _Project.Abilities.Scripts
         public string abilityDescription;
         [SerializeReference, SR] public List<AbilityEffect> effects;
         public int abilityPrice;
+        [SerializeField] public int ToolCoolDowns;
 
 
         public void OnEnable()
